@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Material Management Pro</title>
+  <style>
+    :root { --main: #FF9800; --dark: #2D3436; --light: #f8f9fa; }
+    body { font-family: system-ui; background: #eaeff2; margin: 0; padding-bottom: 100px; }
+    header { background: var(--dark); color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; border-bottom: 4px solid var(--main); }
+    
+    .pooja-section { background: white; margin: 15px; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .pooja-header { background: #FFF3E0; padding: 15px; font-weight: bold; font-size: 18px; color: var(--dark); border-bottom: 1px solid #ffe0b2; display: flex; justify-content: space-between; }
+    
+    .item-row { padding: 12px 15px; border-bottom: 1px solid #eee; display: grid; grid-template-columns: 1.5fr 1fr 1.2fr 40px; gap: 8px; align-items: center; }
+    .item-row:last-child { border-bottom: none; }
+    
+    input, select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box; }
+    input:focus { border-color: var(--main); outline: none; }
+    
+    .add-box { padding: 15px; background: #fdfdfd; border-top: 1px dashed var(--main); }
+    .add-box textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; height: 60px; font-family: inherit; margin-bottom: 10px; }
+    .btn-add-db { background: var(--main); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
+
+    .footer-nav { position: fixed; bottom: 0; width: 100%; background: white; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); box-sizing: border-box; }
+    .btn-save { background: #607d8b; color: white; padding: 15px; border: none; border-radius: 12px; font-weight: bold; }
+    .btn-next { background: var(--dark); color: white; padding: 15px; border: none; border-radius: 12px; font-weight: bold; }
+    
+    .item-name { font-size: 14px; font-weight: 700; color: #000; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h2 style="margin:0; font-size: 20px;">📦 सामग्री प्रबंधन</h2>
+</header>
+
+<div id="mainContainer">
+  <div style="text-align:center; padding:40px;">डेटा लोड हो रहा है...</div>
+</div>
+
+<div class="footer-nav">
+  <button class="btn-save" onclick="saveAsTemplate()">💾 सेव टेम्पलेट</button>
+  <button class="btn-next" onclick="goToPreview()">Next: Preview →</button>
+</div>
+
+<script>
+  const API_URL = "https://script.google.com/macros/s/AKfycbyhXVfu7WVAs2pQQLyH3lkkO3ZG-rmbqTmyygjqH8XeWyQPNgqx49whCIsa8WttKRZ4/exec";
+  const selectedPoojas = JSON.parse(localStorage.getItem("selected_poojas") || "[]");
+  let masterData = [];
+
+  async function init() {
+    try {
+      const res = await fetch(API_URL);
+      masterData = await res.json();
+      renderAll();
+    } catch (e) { 
+      document.getElementById("mainContainer").innerHTML = "<p style='text-align:center; padding:20px;'>डेटा लोड करने में समस्या हुई।</p>";
+      console.error(e); 
+    }
+  }
+
+  function renderAll() {
+    const container = document.getElementById("mainContainer");
+    
+    // टेम्पलेट से आया हुआ डेटा चेक करें
+    const savedItems = JSON.parse(localStorage.getItem("final_samagri") || "[]");
+    
+    container.innerHTML = "";
+
+    if (selectedPoojas.length === 0) {
+        container.innerHTML = "<p style='text-align:center; padding:20px;'>कोई पूजा नहीं चुनी गई।</p>";
+        return;
+    }
+
+    selectedPoojas.forEach(poojaName => {
+      const section = document.createElement("div");
+      section.className = "pooja-section";
+      
+      let itemsHtml = "";
+      const poojaItems = masterData.filter(d => d.pooja === poojaName);
+
+      poojaItems.forEach((item) => {
+        // चेक करें कि क्या यह आइटम पहले से टेम्पलेट में था?
+        const matched = savedItems.find(s => s.name === item.samagri && s.pooja === poojaName) || {};
+        
+        itemsHtml += `
+          <div class="item-row" data-pooja="${poojaName}">
+            <span class="item-name">${item.samagri}</span>
+            <input type="text" class="qty" value="${matched.qty || ''}" placeholder="Qty">
+            <select class="unit">
+              <option value="">इकाई</option>
+              <option ${matched.unit === 'ग्राम' ? 'selected' : ''}>ग्राम</option>
+              <option ${matched.unit === 'किग्रा' ? 'selected' : ''}>किग्रा</option>
+              <option ${matched.unit === 'नग' ? 'selected' : ''}>नग</option>
+              <option ${matched.unit === 'पैकेट' ? 'selected' : ''}>पैकेट</option>
+            </select>
+            <input type="checkbox" class="include" ${matched.name ? 'checked' : 'checked'} style="width:20px; height:20px;">
+          </div>`;
+      });
+
+      section.innerHTML = `
+        <div class="pooja-header"><span>🕉️ ${poojaName}</span></div>
+        <div class="items-list">${itemsHtml || '<p style="padding:15px; color:#999;">कोई सामग्री नहीं</p>'}</div>
+        <div class="add-box">
+          <textarea id="newItems-${poojaName}" placeholder="नयी सामग्री लिखें (हर लाइन में एक)"></textarea>
+          <button class="btn-add-db" onclick="bulkAdd('${poojaName}')">+ Database में जोड़ें</button>
+        </div>
+      `;
+      container.appendChild(section);
+    });
+  }
+
+  async function bulkAdd(pooja) {
+    const text = document.getElementById(`newItems-${pooja}`).value.trim();
+    if(!text) return;
+
+    const itemsToAdd = text.split("\n").filter(i => i.trim() !== "");
+    const btn = document.querySelector(`button[onclick="bulkAdd('${pooja}')"]`);
+    btn.innerText = "जोड़ रहे हैं...";
+    btn.disabled = true;
+    
+    for(let item of itemsToAdd) {
+      await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "add", pooja: pooja, samagri: item.trim() })
+      });
+    }
+    alert("सामग्री Database में जोड़ दी गयी!");
+    location.reload(); 
+  }
+
+  function saveAsTemplate() {
+    const name = prompt("यजमान या टेम्पलेट का नाम लिखें:");
+    if(!name) return;
+
+    const currentSamagri = gatherData();
+    const templates = JSON.parse(localStorage.getItem("templates") || "[]");
+    
+    templates.push({
+      id: Date.now(),
+      name: name,
+      date: new Date().toLocaleDateString('hi-IN'),
+      poojas: selectedPoojas,
+      meta: JSON.parse(localStorage.getItem("pooja_meta") || "{}"),
+      samagri: currentSamagri
+    });
+
+    localStorage.setItem("templates", JSON.stringify(templates));
+    alert("टेम्पलेट '" + name + "' सुरक्षित कर लिया गया है!");
+  }
+
+  function gatherData() {
+    const finalItems = [];
+    document.querySelectorAll(".item-row").forEach(row => {
+      if(row.querySelector(".include").checked) {
+        finalItems.push({
+          name: row.querySelector(".item-name").innerText,
+          qty: row.querySelector(".qty").value,
+          unit: row.querySelector(".unit").value,
+          pooja: row.dataset.pooja
+        });
+      }
+    });
+    return finalItems;
+  }
+
+  function goToPreview() {
+    localStorage.setItem("final_samagri", JSON.stringify(gatherData()));
+    window.location.href = "preview.html";
+  }
+
+  init();
+</script>
+</body>
+</html>
