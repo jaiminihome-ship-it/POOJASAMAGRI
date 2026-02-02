@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Pooja Details</title>
+  <style>
+    :root { --main: #FF9800; --dark: #2D3436; }
+    body { font-family: system-ui; background: #F4F7F6; margin: 0; padding-bottom: 30px; }
+    header { background: #FF9800; color: white; padding: 30px 20px; text-align: center; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; }
+    .container { padding: 20px; max-width: 500px; margin: auto; }
+    .section { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    h2 { font-size: 18px; margin-top: 0; color: var(--dark); border-bottom: 2px solid #eee; padding-bottom: 10px; }
+    label { display: block; font-size: 14px; font-weight: 600; margin: 15px 0 5px; color: #666; }
+    input, select { width: 100%; padding: 14px; border: 1.5px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; transition: 0.3s; }
+    input:focus { border-color: var(--main); outline: none; }
+    .pandit-info { background: #FFF3E0; padding: 15px; border-radius: 12px; margin-top: 15px; font-size: 14px; display: none; }
+    .btn { width: 100%; background: var(--dark); color: white; padding: 18px; border: none; border-radius: 15px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<header><h1>📋 यजमान और पंडित</h1></header>
+
+<div class="container">
+  <div class="section">
+    <h2>🧑‍🦳 पंडित जी का चुनाव</h2>
+    <select id="pandit" onchange="showPandit()">
+      <option value="">-- चुनें --</option>
+      <option value="yugal">Yugal Acharya</option>
+      <option value="purushotam">Purushotam Acharya</option>
+    </select>
+    <div id="pBox" class="pandit-info"></div>
+  </div>
+
+  <div class="section">
+    <h2>👤 यजमान का विवरण</h2>
+    <label>यजमान का नाम</label>
+    <input id="yajman" placeholder="नाम लिखें">
+    <label>फ़ोन नंबर</label>
+    <input id="phone" type="tel" placeholder="98XXXXXXXX">
+    <label>तारीख</label>
+    <input id="date" type="date">
+  </div>
+
+  <button class="btn" onclick="nextStep()">Next: पूजा चुनें →</button>
+</div>
+
+<script>
+  const pandits = {
+    yugal: { name: "Yugal Acharya", phone: "9928139485", address: "Shri Ram Mandir, Vaishali Nagar, Jaipur" },
+    purushotam: { name: "Purushotam Acharya", phone: "9680992496", address: "Shri Ram Mandir, Vaishali Nagar, Jaipur" }
+  };
+
+  function showPandit() {
+    const p = pandits[document.getElementById("pandit").value];
+    const box = document.getElementById("pBox");
+    if(p) {
+      box.style.display = "block";
+      box.innerHTML = `<strong>${p.name}</strong><br>📞 ${p.phone}<br>📍 ${p.address}`;
+    } else box.style.display = "none";
+  }
+
+  function nextStep() {
+    const data = {
+      pandit: pandits[document.getElementById("pandit").value] || {},
+      yajman: document.getElementById("yajman").value,
+      phone: document.getElementById("phone").value,
+      date: document.getElementById("date").value
+    };
+    if(!data.pandit.name || !data.yajman) return alert("Details भरें!");
+    localStorage.setItem("pooja_meta", JSON.stringify(data));
+    window.location.href = "pooja.html";
+  }
+</script>
+</body>
+</html>
