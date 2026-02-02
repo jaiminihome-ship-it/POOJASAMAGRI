@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pooja Samagri Pro</title>
+  <style>
+    :root { --main: #FF9800; --dark: #2D3436; --bg: #F4F7F6; }
+    body { margin: 0; font-family: system-ui; background: var(--bg); color: var(--dark); }
+    header { background: var(--dark); color: white; padding: 40px 20px; text-align: center; border-radius: 0 0 30px 30px; }
+    header h1 { margin: 0; font-size: 24px; letter-spacing: 1px; }
+    .container { padding: 20px; max-width: 500px; margin: -30px auto 0; }
+    .card { 
+      background: white; border-radius: 20px; padding: 20px; margin-bottom: 16px; 
+      display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+      transition: transform 0.2s; cursor: pointer; border-left: 5px solid var(--main);
+    }
+    .card:active { transform: scale(0.95); }
+    .icon { font-size: 30px; background: #FFF3E0; padding: 10px; border-radius: 12px; }
+    .info h2 { margin: 0; font-size: 18px; color: var(--dark); }
+    .info p { margin: 5px 0 0; font-size: 13px; color: #636e72; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🕉️ Pooja Samagri Pro</h1>
+  <p style="opacity: 0.8; font-size: 14px;">शुद्धता और परंपरा का संगम</p>
+</header>
+
+<div class="container">
+  <div class="card" onclick="location.href='new.html'">
+    <div class="icon">➕</div>
+    <div class="info">
+      <h2>नई पूजा सूची</h2>
+      <p>यजमान और पंडित का विवरण भरें</p>
+    </div>
+  </div>
+
+  <div class="card" onclick="location.href='templates.html'">
+    <div class="icon">📁</div>
+    <div class="info">
+      <h2>सेव किये गए टेम्पलेट्स</h2>
+      <p>पुरानी सूचियाँ देखें और एडिट करें</p>
+    </div>
+  </div>
+
+  <div class="card" onclick="location.href='database.html'">
+    <div class="icon">🗄️</div>
+    <div class="info">
+      <h2>डेटाबेस कंट्रोल</h2>
+      <p>सामग्री और पूजा लिस्ट मैनेज करें</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
