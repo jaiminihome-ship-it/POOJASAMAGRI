@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pooja Selection</title>
+  <style>
+    :root { --main: #FF9800; --dark: #2D3436; }
+    body { font-family: system-ui; background: #F4F7F6; margin: 0; padding: 15px; }
+    .card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.05); }
+    input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--main); }
+    .btn-next { position: fixed; bottom: 20px; left: 15px; right: 15px; background: var(--main); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: bold; font-size: 18px; }
+    header { text-align: center; margin-bottom: 20px; padding-top: 10px; }
+  </style>
+</head>
+<body>
+
+<header><h2>🙏 पूजा का चयन करें</h2></header>
+<div id="list">लोड हो रहा है...</div>
+<div style="height: 80px;"></div>
+
+<button class="btn-next" onclick="save()">Next: सामग्री देखें →</button>
+
+<script>
+  const API_URL = "https://script.google.com/macros/s/AKfycbyhXVfu7WVAs2pQQLyH3lkkO3ZG-rmbqTmyygjqH8XeWyQPNgqx49whCIsa8WttKRZ4/exec";
+
+  fetch(API_URL).then(r => r.json()).then(data => {
+    const unique = [...new Set(data.map(x => x.pooja?.trim()))].filter(Boolean);
+    const box = document.getElementById("list");
+    box.innerHTML = "";
+    unique.forEach((p, i) => {
+      box.innerHTML += `<div class="card"><input type="checkbox" id="p${i}" value="${p}"><label for="p${i}">${p}</label></div>`;
+    });
+  });
+
+  function save() {
+    const selected = [...document.querySelectorAll("input:checked")].map(c => c.value);
+    if(selected.length === 0) return alert("पूजा चुनें!");
+    localStorage.setItem("selected_poojas", JSON.stringify(selected));
+    window.location.href = "samagri.html";
+  }
+</script>
+</body>
+</html>
