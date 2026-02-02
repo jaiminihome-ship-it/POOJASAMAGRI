@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Database Control</title>
+  <style>
+    :root { --main: #FF9800; --dark: #2D3436; }
+    body { font-family: system-ui; background: #f0f2f5; margin: 0; padding-bottom: 20px; }
+    header { background: var(--dark); color: white; padding: 30px 20px; text-align: center; border-bottom: 5px solid var(--main); }
+    .container { padding: 15px; max-width: 500px; margin: auto; }
+    .card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    h2 { font-size: 18px; margin: 0 0 15px; color: var(--dark); display: flex; align-items: center; gap: 10px; }
+    label { font-size: 13px; color: #666; margin-bottom: 5px; display: block; font-weight: 600; }
+    input, select { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; font-size: 15px; }
+    button { width: 100%; padding: 16px; background: var(--main); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(255,152,0,0.3); }
+    .list-area { max-height: 300px; overflow-y: auto; border-radius: 10px; background: #fafafa; padding: 5px; border: 1px solid #eee; }
+    .item-row { padding: 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .item-row:last-child { border-bottom: none; }
+    .badge { background: #E3F2FD; color: #1976D2; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1 style="margin:0; font-size:22px;">🗄️ डेटाबेस मैनेजमेंट</h1>
+</header>
+
+<div class="container">
+  <div class="card">
+    <h2>➕ नया सामान जोड़ें</h2>
+    <label>पूजा का प्रकार</label>
+    <select id="poojaSelect"><option>लोड हो रहा है...</option></select>
+    <label>सामग्री का नाम</label>
+    <input id="samagriInput" placeholder="जैसे: कलावा, नारियल">
+    <button onclick="addSamagri()">डेटाबेस में सुरक्षित करें</button>
+  </div>
+
+  <div class="card">
+    <h2>📋 मौजूदा डेटा</h2>
+    <select id="filterPooja" onchange="renderList()"><option value="">सभी पूजा</option></select>
+    <div class="list-area" id="dataList">
+      <div style="text-align:center; padding:20px; color:#999;">डेटा लोड हो रहा है...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_URL = "https://script.google.com/macros/s/AKfycbyhXVfu7WVAs2pQQLyH3lkkO3ZG-rmbqTmyygjqH8XeWyQPNgqx49whCIsa8WttKRZ4/exec";
+  let rawData = [];
+
+  fetch(API_URL).then(r => r.json()).then(data => {
+    rawData = data;
+    const poojas = [...new Set(data.map(x => x.pooja?.trim()))].filter(Boolean).sort();
+    
+    const options = '<option value="">-- चुनें --</option>' + poojas.map(p => `<option>${p}</option>`).join("");
+    document.getElementById("poojaSelect").innerHTML = options;
+    document.getElementById("filterPooja").innerHTML = '<option value="">सभी पूजा देखें</option>' + poojas.map(p => `<option>${p}</option>`).join("");
+    renderList();
+  });
+
+  function renderList() {
+    const filter = document.getElementById("filterPooja").value;
+    const list = document.getElementById("dataList");
+    list.innerHTML = "";
+    rawData.filter(r => !filter || r.pooja === filter).forEach(r => {
+      list.innerHTML += `<div class="item-row"><span>${r.samagri}</span><span class="badge">${r.pooja}</span></div>`;
+    });
+  }
+
+  function addSamagri() {
+    const pooja = document.getElementById("poojaSelect").value;
+    const samagri = document.getElementById("samagriInput").value.trim();
+    if(!pooja || !samagri) return alert("दोनों जानकारी भरें!");
+
+    fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "add", pooja, samagri })
+    }).then(r => r.json()).then(resp => {
+      if(resp.status === "ok") { alert("सफलतापूर्वक जोड़ दिया गया!"); location.reload(); }
+    });
+  }
+</script>
+</body>
+</html>
