@@ -3,48 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cloud Templates - Vedic Pro</title>
+  <title>Vedic Cloud Library - Final Fix</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    :root { --main: #FF6F00; --dark: #2D3436; --bg: #f0f2f5; }
-    body { font-family: 'Noto Sans Devanagari', sans-serif; background: var(--bg); margin: 0; }
+    :root { --main: #FF6F00; --dark: #2D3436; --bg: #f4f7f9; }
+    body { font-family: 'Noto Sans Devanagari', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
     
-    header { 
-      background: var(--dark); color: white; padding: 25px; text-align: center; 
-      border-bottom: 5px solid var(--main); border-radius: 0 0 20px 20px;
+    header { background: var(--dark); color: white; padding: 25px; text-align: center; border-bottom: 5px solid var(--main); border-radius: 0 0 20px 20px; }
+    
+    /* डैशबोर्ड सांख्यिकी */
+    .stats-bar { 
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; 
+      margin: 15px; background: white; padding: 15px; border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-align: center;
     }
+    .stat-item div:first-child { font-size: 11px; color: #666; font-weight: 700; text-transform: uppercase; }
+    .stat-item div:last-child { font-size: 18px; color: var(--main); font-weight: 800; }
+
+    .controls { padding: 0 15px; display: flex; flex-direction: column; gap: 12px; max-width: 600px; margin: auto; }
+    .search-input { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid #ddd; font-size: 16px; box-sizing: border-box; outline: none; }
+    .search-input:focus { border-color: var(--main); }
+    
+    .bulk-actions { display: flex; justify-content: space-between; align-items: center; padding: 0 5px; }
+    .btn-export { background: #2E7D32; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 13px; }
 
     .container { padding: 15px; max-width: 600px; margin: auto; }
 
-    /* क्लाउड कार्ड स्टाइल */
     .temp-card { 
-      background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; 
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 10px solid var(--main);
-      animation: fadeIn 0.5s ease;
+      background: white; border-radius: 15px; padding: 18px; margin-bottom: 15px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-left: 10px solid var(--main);
+      transition: 0.3s;
     }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .temp-name { font-size: 20px; font-weight: 800; color: var(--dark); margin-bottom: 5px; }
+    .temp-meta { font-size: 13px; color: #888; font-weight: 700; margin-bottom: 10px; }
+    .temp-poojas { color: var(--main); font-size: 14px; font-weight: 700; margin-bottom: 15px; }
 
-    .temp-name { font-size: 22px; font-weight: 800; color: var(--dark); }
-    .temp-meta { font-size: 14px; color: #666; margin: 8px 0; font-weight: 600; }
-    .temp-poojas { color: var(--main); font-size: 15px; font-weight: 700; margin-bottom: 15px; }
-
-    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    button { padding: 12px; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 15px; }
+    /* बटन ग्रिड */
+    .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    button { padding: 12px; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 14px; transition: 0.2s; }
     .btn-load { background: var(--dark); color: white; }
-    .btn-view { background: #e3f2fd; color: #1976d2; }
-
-    .loading { text-align: center; padding: 50px; color: var(--main); font-weight: 700; }
+    .btn-clone { background: #E3F2FD; color: #1976D2; border: 1.5px solid #BBDEFB; }
+    .btn-del { background: #FFEBEE; color: #D32F2F; border: 1.5px solid #FFCDD2; }
+    
+    button:active { transform: scale(0.95); }
+    .loading { text-align: center; padding: 50px; color: var(--main); font-weight: 700; font-size: 18px; }
   </style>
 </head>
 <body>
 
 <header>
-  <h2 style="margin:0;">☁️ क्लाउड टेम्पलेट्स</h2>
-  <p style="margin:5px 0 0; opacity:0.8;">सीधे आपकी Google Sheet से सुरक्षित</p>
+  <h2 style="margin:0;">☁️ वैदिक क्लाउड लाइब्रेरी</h2>
+  <p style="margin:5px 0 0; opacity:0.8; font-size:14px;">Smart Dashboard Pro</p>
 </header>
 
-<div class="container" id="list">
-  <div class="loading">बादलों से डेटा आ रहा है... ☁️</div>
+<div class="stats-bar" id="statsBar">
+  <div class="stat-item"><div>कुल यजमान</div><div id="totalYajmans">0</div></div>
+  <div class="stat-item"><div>इस महीने</div><div id="monthlyCount">0</div></div>
+  <div class="stat-item"><div>टॉप पूजा</div><div id="topPooja">---</div></div>
+</div>
+
+<div class="container">
+  <div class="controls">
+    <input type="text" class="search-input" id="searchInput" placeholder="यजमान या पूजा का नाम लिखें..." onkeyup="filterTemplates()">
+    <div class="bulk-actions">
+      <span style="font-size: 14px; font-weight: 700; color: #666;" id="countText">दिखाए जा रहे हैं: 0</span>
+      <button class="btn-export" onclick="exportToExcel()">Excel Export 📊</button>
+    </div>
+  </div>
+
+  <div id="list">
+    <div class="loading">बादलों से डेटा आ रहा है... ☁️</div>
+  </div>
 </div>
 
 <script>
@@ -52,49 +81,128 @@
   const API_URL = "https://script.google.com/macros/s/AKfycbyhXVfu7WVAs2pQQLyH3lkkO3ZG-rmbqTmyygjqH8XeWyQPNgqx49whCIsa8WttKRZ4/exec";
   let cloudTemplates = [];
 
+  // तारीख फॉर्मेट फिक्स (DD/MM/YYYY)
+  function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    return `${day}/${month}/${d.getFullYear()}`;
+  }
+
   async function fetchCloudTemplates() {
     try {
-      // "getTemplates" एक्शन के साथ क्लाउड से डेटा मंगाना
       const res = await fetch(`${API_URL}?action=getTemplates`);
       cloudTemplates = await res.json();
-      renderTemplates();
+      updateStats();
+      renderTemplates(cloudTemplates);
     } catch (e) {
-      document.getElementById("list").innerHTML = "<div class='loading' style='color:red;'>कनेक्शन एरर! कृपया 'Anyone' एक्सेस चेक करें।</div>";
+      document.getElementById("list").innerHTML = "<div class='loading' style='color:red;'>कनेक्शन एरर! Deploy Check करें।</div>";
     }
   }
 
-  function renderTemplates() {
+  function updateStats() {
+    const now = new Date();
+    const thisMonth = cloudTemplates.filter(t => new Date(t.date).getMonth() === now.getMonth());
+    const poojaCounts = {};
+    cloudTemplates.forEach(t => t.poojas.forEach(p => poojaCounts[p] = (poojaCounts[p] || 0) + 1));
+    const topP = Object.keys(poojaCounts).reduce((a, b) => poojaCounts[a] > poojaCounts[b] ? a : b, "---");
+
+    document.getElementById("totalYajmans").innerText = cloudTemplates.length;
+    document.getElementById("monthlyCount").innerText = thisMonth.length;
+    document.getElementById("topPooja").innerText = topP.split(",")[0];
+  }
+
+  function renderTemplates(data) {
     const container = document.getElementById("list");
-    if(cloudTemplates.length === 0) {
-      container.innerHTML = "<div class='loading'>कोई टेम्पलेट नहीं मिला।</div>";
-      return;
-    }
+    document.getElementById("countText").innerText = `दिखाए जा रहे हैं: ${data.length}`;
+    if(data.length === 0) { container.innerHTML = "<div class='loading'>कोई डेटा नहीं मिला।</div>"; return; }
 
     container.innerHTML = "";
-    cloudTemplates.reverse().forEach((t, i) => { // लेटेस्ट टेम्पलेट ऊपर दिखाएँ
+    // लेटेस्ट डेटा सबसे ऊपर
+    [...data].reverse().forEach((t, i) => {
       container.innerHTML += `
-        <div class="temp-card">
-          <div class="temp-name">यजमान: ${t.name}</div>
-          <div class="temp-meta">📅 तारीख: ${t.date}</div>
+        <div class="temp-card" id="card-${t.id}">
+          <div class="temp-name">${t.name}</div>
+          <div class="temp-meta">📅 तारीख: ${formatDate(t.date)}</div>
           <div class="temp-poojas">🕉️ ${t.poojas.join(", ")}</div>
           <div class="actions">
-            <button class="btn-load" onclick="loadTemplate(${i})">Edit & Print ✍️</button>
-            <button class="btn-view" onclick="alert('ID: ' + cloudTemplates[${i}].id)">Details ℹ️</button>
+            <button class="btn-load" onclick="loadTemplate('${t.id}')">Open ✍️</button>
+            <button class="btn-clone" onclick="cloneTemplate('${t.id}')">Clone 📑</button>
+            <button class="btn-del" onclick="deleteTemplate('${t.id}')">Del 🗑️</button>
           </div>
-        </div>
-      `;
+        </div>`;
     });
   }
 
-  function loadTemplate(idx) {
-    const t = cloudTemplates[idx];
-    
-    // लोकल स्टोरेज में डेटा सेट करें ताकि अन्य पेजेज इसे इस्तेमाल कर सकें
+  function filterTemplates() {
+    const term = document.getElementById("searchInput").value.toLowerCase();
+    const filtered = cloudTemplates.filter(t => 
+      t.name.toLowerCase().includes(term) || 
+      t.poojas.some(p => p.toLowerCase().includes(term))
+    );
+    renderTemplates(filtered);
+  }
+
+  // क्लोन लॉजिक (नयी ID और डेटा सिंक फिक्स)
+  async function cloneTemplate(id) {
+    const t = cloudTemplates.find(x => x.id.toString() === id.toString());
+    const newName = prompt("नये यजमान का नाम लिखें (Clone):", t.name + " (Copy)");
+    if(!newName) return;
+
+    const payload = {
+      action: "saveTemplate",
+      id: Date.now().toString(),
+      name: newName,
+      date: new Date().toLocaleDateString('hi-IN'),
+      poojas: t.poojas.join(", "),
+      samagri: t.samagri,
+      meta: { yajman: newName, date: new Date().toLocaleDateString('hi-IN') }
+    };
+
+    try {
+      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+      const text = await res.text();
+      if(text.includes("Saved")) {
+        alert("क्लोन सफल! 📑");
+        fetchCloudTemplates();
+      }
+    } catch (e) { alert("क्लोन करने में एरर! नेटवर्क चेक करें।"); }
+  }
+
+  function loadTemplate(id) {
+    const t = cloudTemplates.find(x => x.id.toString() === id.toString());
     localStorage.setItem("pooja_meta", JSON.stringify({ yajman: t.name, date: t.date }));
     localStorage.setItem("selected_poojas", JSON.stringify(t.poojas));
-    localStorage.setItem("final_samagri", JSON.stringify(t.samagri)); // मात्रा और इकाई भी सुरक्षित
-    
+    localStorage.setItem("final_samagri", JSON.stringify(t.samagri));
     window.location.href = "samagri.html";
+  }
+
+  async function deleteTemplate(id) {
+    if(!confirm("क्या आप इस यजमान को बादलों से हटाना चाहते हैं?")) return;
+    try {
+      const res = await fetch(API_URL, { 
+        method: "POST", 
+        body: JSON.stringify({ action: "deleteTemplate", id: id }) 
+      });
+      const text = await res.text();
+      if(text.includes("Deleted")) {
+        alert("डिलीट हो गया! 🗑️");
+        fetchCloudTemplates();
+      }
+    } catch (e) { alert("डिलीट नहीं हुआ।"); }
+  }
+
+  function exportToExcel() {
+    let csv = "\ufeffयजमान,तारीख,पूजा\n";
+    cloudTemplates.forEach(t => {
+      csv += `"${t.name}","${formatDate(t.date)}","${t.poojas.join('|')}"\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", `Yajman_Data_${new Date().toLocaleDateString()}.csv`);
+    link.click();
   }
 
   fetchCloudTemplates();
