@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Premium Vedic Letterpad - Final Spacing</title>
+  <title>Premium Vedic Letterpad - Complete Header Fix</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;700&family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -27,25 +27,26 @@
     .main-title-grand { color: var(--bhagwa); font-size: 45px; font-weight: 800; margin: 0; font-family: 'Noto Serif Devanagari', serif; }
     .sub-title-grand { color: var(--deep-black); font-size: 32px; margin: 3px 0; font-weight: 700; font-family: 'Noto Serif Devanagari', serif; }
 
-    /* SIMPLE LINE (Location 1) */
     .simple-divider { border-bottom: 2.5px solid var(--bhagwa); margin: 8px 0 15px 0; }
+    .swastika-divider-line { text-align: center; color: var(--bhagwa); font-size: 20px; margin: 12px 0 8px 0; letter-spacing: 14px; font-weight: bold; border-top: 2px solid var(--bhagwa); padding-top: 4px; }
 
-    /* VEDIC SWASTIKA LINE (Location 2) */
-    .swastika-divider-line {
-      text-align: center; color: var(--bhagwa); font-size: 20px; 
-      margin: 12px 0 8px 0; letter-spacing: 14px; font-weight: bold;
-      border-top: 2px solid var(--bhagwa); padding-top: 4px;
+    /* === EDITABLE INPUTS === */
+    .editable-field { 
+      border: none; border-bottom: 2px dotted var(--bhagwa); 
+      font-size: 19px; font-weight: 800; color: var(--deep-black); 
+      background: transparent; width: 90%; outline: none;
+      font-family: 'Noto Sans Devanagari', sans-serif;
     }
 
-    /* ENHANCED INFO GRID */
+    /* ENHANCED INFO GRID - अब 3 पंक्तियों में */
     .info-grid-enhanced { 
-      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; 
-      font-weight: 800; color: var(--deep-black); font-size: 21px; 
+      display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px 15px; 
+      font-weight: 800; color: var(--deep-black); font-size: 19px; 
       padding: 15px; background: #fff8f0; border-radius: 8px; border: 1.8px solid #ffe0b2;
     }
     .info-grid-enhanced b { color: var(--bhagwa); font-family: 'Noto Serif Devanagari', serif; }
+    .full-width-info { grid-column: span 2; }
     
-    /* फूटर अब और भी सुरक्षित दूरी पर */
     .footer { margin-top: 10px; border-top: 4px solid var(--bhagwa); padding-top: 10px; text-align: center; font-size: 14px; font-weight: 700; color: var(--deep-black); }
     
     .actions { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 1000; }
@@ -79,8 +80,12 @@
     itemPairs.push([items[i], items[i+1]]);
   }
 
+  // पंडित जी की पूरी जानकारी
   const pName = meta.pandit?.name || "---";
-  let footerStr = `पंडित: ${pName} | फोन: ${meta.pandit?.phone || ""} | पता: ${meta.pandit?.address || ""}`;
+  const pPhone = meta.pandit?.phone || "---";
+  const pAddr = meta.pandit?.address || "---";
+
+  let footerStr = `पंडित: ${pName} | फोन: ${pPhone} | पता: ${pAddr}`;
   if(pName.includes("Yugal")) footerStr += ` | वेबसाइट: astroyugalacharya.in`;
   const footerHtml = `<div class="footer">${footerStr}</div>`;
 
@@ -92,28 +97,36 @@
     return `<table><thead><tr><th>सामान</th><th>मात्रा</th><th>सामान</th><th>मात्रा</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
 
-  const grandVedicHeader = `
-    <div class="vedic-header-container">
-      <div class="swastik-corner">卐</div>
-      <div class="title-center">
-        <h1 class="main-title-grand">॥ श्री गणेशाय नमः ॥</h1>
-        <h2 class="sub-title-grand">पूजा सामग्री सूची</h2>
+  // --- EDITABLE HEADER HTML (अब पंडित जी की पूरी डिटेल्स के साथ) ---
+  function getGrandHeader(isStatic = false, currentVals = {}) {
+    const yName = isStatic ? currentVals.yajman : `<input type="text" id="yInput" class="editable-field" value="${meta.yajman || ''}">`;
+    const yDate = isStatic ? currentVals.date : `<input type="text" id="dInput" class="editable-field" value="${meta.date || ''}">`;
+    const poojaField = isStatic ? currentVals.pooja : `<input type="text" id="poojaInput" class="editable-field" value="${pList.join(", ")}">`;
+
+    return `
+      <div class="vedic-header-container">
+        <div class="swastik-corner">卐</div>
+        <div class="title-center">
+          <h1 class="main-title-grand">॥ श्री गणेशाय नमः ॥</h1>
+          <h2 class="sub-title-grand">पूजा सामग्री सूची</h2>
+        </div>
+        <div class="swastik-corner">卐</div>
       </div>
-      <div class="swastik-corner">卐</div>
-    </div>
-    <div class="simple-divider"></div>
-    <div class="info-grid-enhanced">
-        <div><b>यजमान:</b> ${meta.yajman}</div><div><b>तारीख:</b> ${meta.date}</div>
-        <div><b>पंडित:</b> ${pName}</div><div><b>पूजा:</b> ${pList.join(", ")}</div>
-    </div>
-    <div class="swastika-divider-line">卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐</div>
-  `;
+      <div class="simple-divider"></div>
+      <div class="info-grid-enhanced">
+          <div><b>यजमान:</b> ${yName}</div><div><b>तारीख:</b> ${yDate}</div>
+          <div><b>पंडित:</b> ${pName}</div><div><b>फोन:</b> ${pPhone}</div>
+          <div class="full-width-info"><b>पूजा:</b>&nbsp;${poojaField}</div>
+          <div class="full-width-info"><b>पता:</b>&nbsp;${pAddr}</div>
+      </div>
+      <div class="swastika-divider-line">卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐</div>
+    `;
+  }
 
-  document.getElementById("preview-content").innerHTML = grandVedicHeader + renderTable(itemPairs) + footerHtml;
+  document.getElementById("preview-content").innerHTML = getGrandHeader() + renderTable(itemPairs) + footerHtml;
 
-  function generatePageHTML(pageNum, chunk) {
-      // पेज 2+ पर मार्जिन 10mm रखा गया है
-      let headerContent = (pageNum === 1) ? grandVedicHeader : `<div style="height:10mm;"></div>`;
+  function generatePageHTML(pageNum, chunk, currentVals) {
+      let headerContent = (pageNum === 1) ? getGrandHeader(true, currentVals) : `<div style="height:10mm;"></div>`;
       return `<div style="padding:40px; background:white; position:relative; min-height:297mm; border:15px solid #FF6F00; box-sizing:border-box;">
                 ${headerContent}
                 ${renderTable(chunk)}
@@ -122,6 +135,12 @@
   }
 
   async function generatePaginatedPDF() {
+    const currentVals = {
+      yajman: document.getElementById("yInput").value,
+      date: document.getElementById("dInput").value,
+      pooja: document.getElementById("poojaInput").value
+    };
+    
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'a4');
     const printTemp = document.getElementById("print-temp");
@@ -130,33 +149,37 @@
 
     while (processed < totalPairs) {
       if (pageNum > 1) pdf.addPage();
-      // पहले पन्ने पर लिमिट अब 18 है ताकि फूटर और सामग्री में पूरा गैप रहे
-      let limit = (pageNum === 1) ? 18 : 28;
+      // पहले पन्ने पर लिमिट अब 15 है (बड़े हेडर की वजह से)
+      let limit = (pageNum === 1) ? 15 : 28;
       let chunk = itemPairs.slice(processed, processed + limit);
-      printTemp.innerHTML = generatePageHTML(pageNum, chunk);
+      printTemp.innerHTML = generatePageHTML(pageNum, chunk, currentVals);
       const canvas = await html2canvas(printTemp, { scale: 3.5, useCORS: true });
       pdf.addImage(canvas.toDataURL("image/jpeg", 1.0), 'JPEG', 0, 0, 210, 297);
       processed += limit;
       pageNum++;
     }
-    pdf.save("${meta.yajman || 'Pooja'}_Fixed_Grand_List.pdf");
+    pdf.save(`${currentVals.yajman || 'Pooja'}_Samagri.pdf`);
     printTemp.innerHTML = "";
   }
 
   async function saveAsMultiImages() {
+    const currentVals = {
+      yajman: document.getElementById("yInput").value,
+      date: document.getElementById("dInput").value,
+      pooja: document.getElementById("poojaInput").value
+    };
     const printTemp = document.getElementById("print-temp");
     let totalPairs = itemPairs.length;
     let processed = 0, pageNum = 1;
-    const baseName = meta.yajman || 'Pooja';
 
     while (processed < totalPairs) {
-      // पहले पन्ने पर 18, बाकी पर 28
-      let limit = (pageNum === 1) ? 18 : 28;
+      // पहले पन्ने पर 15, बाकी पर 28
+      let limit = (pageNum === 1) ? 15 : 28;
       let chunk = itemPairs.slice(processed, processed + limit);
-      printTemp.innerHTML = generatePageHTML(pageNum, chunk);
+      printTemp.innerHTML = generatePageHTML(pageNum, chunk, currentVals);
       const canvas = await html2canvas(printTemp, { scale: 3.5, useCORS: true });
       const link = document.createElement("a");
-      link.download = `${baseName}_Page_${pageNum}.png`;
+      link.download = `${currentVals.yajman || 'Pooja'}_Page_${pageNum}.png`;
       link.href = canvas.toDataURL("image/png");
       document.body.appendChild(link);
       link.click();
