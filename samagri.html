@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Material Management - Cloud Pro</title>
+  <title>Material Management - Cloud Pro V2</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root { 
@@ -19,7 +19,12 @@
     }
     
     .pooja-section { background: white; margin: 15px; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-    .pooja-header { background: #FFF3E0; padding: 15px; font-weight: bold; font-size: 18px; color: var(--dark); border-bottom: 1px solid #ffe0b2; }
+    /* Heading Checkbox Alignment */
+    .pooja-header { 
+      background: #FFF3E0; padding: 15px; font-weight: bold; font-size: 18px; 
+      color: var(--dark); border-bottom: 1px solid #ffe0b2;
+      display: flex; justify-content: space-between; align-items: center;
+    }
     
     .item-row { padding: 12px 15px; border-bottom: 1px solid #eee; display: grid; grid-template-columns: 1.5fr 1fr 1.2fr 40px; gap: 8px; align-items: center; }
     
@@ -40,11 +45,12 @@
     .btn-next { background: var(--dark); color: white; padding: 15px; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; }
     
     .item-name { font-size: 14px; font-weight: 700; color: #000; }
+    .check-box-large { width: 22px; height: 22px; cursor: pointer; accent-color: var(--main); }
   </style>
 </head>
 <body>
 
-<header><h2 style="margin:0; font-size: 20px;">📦 सामग्री प्रबंधन (Cloud Pro)</h2></header>
+<header><h2 style="margin:0; font-size: 20px;">📦 सामग्री प्रबंधन (Cloud Pro V2)</h2></header>
 
 <div id="mainContainer">
   <div style="text-align:center; padding:40px;">डेटा लोड हो रहा है...</div>
@@ -56,7 +62,6 @@
 </div>
 
 <script>
-  // Google Apps Script URL
   const API_URL = "https://script.google.com/macros/s/AKfycbyhXVfu7WVAs2pQQLyH3lkkO3ZG-rmbqTmyygjqH8XeWyQPNgqx49whCIsa8WttKRZ4/exec";
   const selectedPoojas = JSON.parse(localStorage.getItem("selected_poojas") || "[]");
   let masterData = [];
@@ -69,6 +74,13 @@
     } catch (e) { 
       document.getElementById("mainContainer").innerHTML = "<p style='text-align:center; padding:20px;'>डेटा लोड करने में समस्या हुई।</p>";
     }
+  }
+
+  // Heading se saare items toggle karne ka function
+  function togglePoojaItems(headerCheckbox, poojaName) {
+    const section = headerCheckbox.closest('.pooja-section');
+    const checkboxes = section.querySelectorAll('.include');
+    checkboxes.forEach(cb => cb.checked = headerCheckbox.checked);
   }
 
   function renderAll() {
@@ -84,6 +96,8 @@
 
       poojaItems.forEach((item) => {
         const matched = savedItems.find(s => s.name === item.samagri && s.pooja === poojaName) || {};
+        // Naya logic: Default sab tick honge unless template mein band ho
+        const isChecked = savedItems.length > 0 ? (matched.name ? 'checked' : '') : 'checked';
         
         itemsHtml += `
           <div class="item-row" data-pooja="${poojaName}">
@@ -101,12 +115,15 @@
               <option ${matched.unit==='बंडल'?'selected':''}>बंडल</option>
               <option ${matched.unit==='लीटर'?'selected':''}>लीटर</option>
             </select>
-            <input type="checkbox" class="include" ${matched.name || !savedItems.length ? 'checked' : ''} style="width:20px; height:20px;">
+            <input type="checkbox" class="include check-box-large" ${isChecked}>
           </div>`;
       });
 
       section.innerHTML = `
-        <div class="pooja-header">🕉️ ${poojaName}</div>
+        <div class="pooja-header">
+          <span>🕉️ ${poojaName}</span>
+          <input type="checkbox" class="check-box-large" checked onclick="togglePoojaItems(this, '${poojaName}')">
+        </div>
         <div class="items-list">${itemsHtml || '<p style="padding:15px; color:#999;">कोई सामग्री नहीं</p>'}</div>
         <div class="add-box">
           <textarea id="newItems-${poojaName}" placeholder="नयी सामग्री लिखें (हर लाइन में एक)"></textarea>
@@ -132,7 +149,6 @@
     return finalItems;
   }
 
-  // === क्लाउड बैकअप फंक्शन (Point 5) ===
   async function saveAsTemplate() {
     const meta = JSON.parse(localStorage.getItem("pooja_meta") || "{}");
     const name = prompt("यजमान का नाम बदलें या वही रखें:", meta.yajman || "");
@@ -145,11 +161,10 @@
       name: name,
       date: new Date().toLocaleDateString('hi-IN'),
       poojas: selectedPoojas.join(", "),
-      meta: { ...meta, yajman: name }, // यजमान का नया नाम मेटा में अपडेट करना
+      meta: { ...meta, yajman: name }, 
       samagri: currentSamagri
     };
 
-    // साथ ही लोकल मेमोरी में भी सेव करें (Offline के लिए)
     const templates = JSON.parse(localStorage.getItem("templates") || "[]");
     templates.push(payload);
     localStorage.setItem("templates", JSON.stringify(templates));
