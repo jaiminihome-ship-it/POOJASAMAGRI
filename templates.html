@@ -3,111 +3,101 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pooja Samagri - Saved Templates</title>
+  <title>Cloud Templates - Vedic Pro</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    :root { 
-      --bhagwa: #FF6F00; /* Crispy Orange */
-      --dark: #2D3436; 
-      --bg: #F4F7F6;
-    }
-    body { font-family: 'Noto Sans Devanagari', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
+    :root { --main: #FF6F00; --dark: #2D3436; --bg: #f0f2f5; }
+    body { font-family: 'Noto Sans Devanagari', sans-serif; background: var(--bg); margin: 0; }
     
     header { 
       background: var(--dark); color: white; padding: 25px; text-align: center; 
-      border-bottom: 5px solid var(--bhagwa); border-radius: 0 0 25px 25px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      border-bottom: 5px solid var(--main); border-radius: 0 0 20px 20px;
     }
 
     .container { padding: 15px; max-width: 600px; margin: auto; }
 
-    /* टेम्पलेट कार्ड स्टाइल */
+    /* क्लाउड कार्ड स्टाइल */
     .temp-card { 
       background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; 
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-left: 8px solid var(--bhagwa);
-      transition: 0.3s;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 10px solid var(--main);
+      animation: fadeIn 0.5s ease;
     }
-    .temp-card:active { transform: scale(0.98); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    .temp-name { font-size: 20px; font-weight: 800; color: var(--dark); margin-bottom: 5px; }
-    .temp-meta { font-size: 14px; color: #666; margin-bottom: 15px; font-weight: 600; }
-    .temp-poojas { color: var(--bhagwa); font-size: 14px; font-weight: 700; }
+    .temp-name { font-size: 22px; font-weight: 800; color: var(--dark); }
+    .temp-meta { font-size: 14px; color: #666; margin: 8px 0; font-weight: 600; }
+    .temp-poojas { color: var(--main); font-size: 15px; font-weight: 700; margin-bottom: 15px; }
 
-    .actions { display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px; margin-top: 10px; }
-    
-    button { 
-      padding: 12px; border: none; border-radius: 10px; font-weight: 800; 
-      cursor: pointer; font-size: 15px; transition: 0.3s;
-    }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    button { padding: 12px; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 15px; }
     .btn-load { background: var(--dark); color: white; }
-    .btn-del { background: #FFEBEE; color: #D32F2F; }
+    .btn-view { background: #e3f2fd; color: #1976d2; }
 
-    .empty-state { text-align: center; padding: 50px 20px; color: #999; font-weight: 700; }
+    .loading { text-align: center; padding: 50px; color: var(--main); font-weight: 700; }
   </style>
 </head>
 <body>
 
 <header>
-  <h2 style="margin:0;">📁 सुरक्षित टेम्पलेट्स</h2>
-  <p style="margin:5px 0 0; opacity:0.8; font-size:14px;">यजमानों की सूची और पुरानी सामग्री</p>
+  <h2 style="margin:0;">☁️ क्लाउड टेम्पलेट्स</h2>
+  <p style="margin:5px 0 0; opacity:0.8;">सीधे आपकी Google Sheet से सुरक्षित</p>
 </header>
 
 <div class="container" id="list">
-  </div>
+  <div class="loading">बादलों से डेटा आ रहा है... ☁️</div>
+</div>
 
 <script>
-  // localStorage से टेम्पलेट्स निकालना
-  const templates = JSON.parse(localStorage.getItem("templates") || "[]");
-  const container = document.getElementById("list");
+  // आपकी Apps Script URL
+  const API_URL = "https://script.google.com/macros/s/AKfycbyhXVfu7WVAs2pQQLyH3lkkO3ZG-rmbqTmyygjqH8XeWyQPNgqx49whCIsa8WttKRZ4/exec";
+  let cloudTemplates = [];
+
+  async function fetchCloudTemplates() {
+    try {
+      // "getTemplates" एक्शन के साथ क्लाउड से डेटा मंगाना
+      const res = await fetch(`${API_URL}?action=getTemplates`);
+      cloudTemplates = await res.json();
+      renderTemplates();
+    } catch (e) {
+      document.getElementById("list").innerHTML = "<div class='loading' style='color:red;'>कनेक्शन एरर! कृपया 'Anyone' एक्सेस चेक करें।</div>";
+    }
+  }
 
   function renderTemplates() {
-    if(templates.length === 0) {
-      container.innerHTML = `<div class="empty-state">
-        <div style="font-size:50px;">📦</div>
-        <p>अभी तक कोई टेम्पलेट सेव नहीं किया गया है।<br>सामग्री पेज से "सेव टेम्पलेट" बटन दबाएँ।</p>
-      </div>`;
+    const container = document.getElementById("list");
+    if(cloudTemplates.length === 0) {
+      container.innerHTML = "<div class='loading'>कोई टेम्पलेट नहीं मिला।</div>";
       return;
     }
 
     container.innerHTML = "";
-    templates.forEach((t, i) => {
+    cloudTemplates.reverse().forEach((t, i) => { // लेटेस्ट टेम्पलेट ऊपर दिखाएँ
       container.innerHTML += `
         <div class="temp-card">
-          <div class="temp-name">${t.name}</div>
+          <div class="temp-name">यजमान: ${t.name}</div>
           <div class="temp-meta">📅 तारीख: ${t.date}</div>
           <div class="temp-poojas">🕉️ ${t.poojas.join(", ")}</div>
           <div class="actions">
             <button class="btn-load" onclick="loadTemplate(${i})">Edit & Print ✍️</button>
-            <button class="btn-del" onclick="deleteTemp(${i})">Delete 🗑️</button>
+            <button class="btn-view" onclick="alert('ID: ' + cloudTemplates[${i}].id)">Details ℹ️</button>
           </div>
         </div>
       `;
     });
   }
 
-  // टेम्पलेट लोड करने का लॉजिक
   function loadTemplate(idx) {
-    const t = templates[idx];
+    const t = cloudTemplates[idx];
     
-    // सभी ज़रूरी Keys को सेट करना ताकि samagri.html और preview.html पहचान सकें
-    localStorage.setItem("pooja_meta", JSON.stringify(t.meta));
+    // लोकल स्टोरेज में डेटा सेट करें ताकि अन्य पेजेज इसे इस्तेमाल कर सकें
+    localStorage.setItem("pooja_meta", JSON.stringify({ yajman: t.name, date: t.date }));
     localStorage.setItem("selected_poojas", JSON.stringify(t.poojas));
-    localStorage.setItem("final_samagri", JSON.stringify(t.samagri)); // पुरानी मात्रा (Quantity) लोड करना
+    localStorage.setItem("final_samagri", JSON.stringify(t.samagri)); // मात्रा और इकाई भी सुरक्षित
     
-    // सीधे सामग्री पेज पर भेजें ताकि एडिट किया जा सके
     window.location.href = "samagri.html";
   }
 
-  // टेम्पलेट डिलीट करने का लॉजिक
-  function deleteTemp(idx) {
-    if(confirm("क्या आप इस यजमान का टेम्पलेट हटाना चाहते हैं?")) {
-      templates.splice(idx, 1);
-      localStorage.setItem("templates", JSON.stringify(templates));
-      renderTemplates();
-    }
-  }
-
-  renderTemplates();
+  fetchCloudTemplates();
 </script>
 </body>
 </html>
