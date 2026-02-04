@@ -3,44 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Database Control</title>
+  <title>Database Control Pro - Nirpreet</title>
   <style>
-    :root { --main: #FF9800; --dark: #2D3436; }
+    :root { --main: #FF9800; --dark: #2D3436; --red: #d32f2f; }
     body { font-family: system-ui; background: #f0f2f5; margin: 0; padding-bottom: 20px; }
-    header { background: var(--dark); color: white; padding: 30px 20px; text-align: center; border-bottom: 5px solid var(--main); }
+    header { background: var(--dark); color: white; padding: 25px 20px; text-align: center; border-bottom: 5px solid var(--main); }
     .container { padding: 15px; max-width: 500px; margin: auto; }
     .card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    
     h2 { font-size: 18px; margin: 0 0 15px; color: var(--dark); display: flex; align-items: center; gap: 10px; }
     label { font-size: 13px; color: #666; margin-bottom: 5px; display: block; font-weight: 600; }
     input, select { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; font-size: 15px; }
-    button { width: 100%; padding: 16px; background: var(--main); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(255,152,0,0.3); }
-    .list-area { max-height: 300px; overflow-y: auto; border-radius: 10px; background: #fafafa; padding: 5px; border: 1px solid #eee; }
-    .item-row { padding: 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-    .item-row:last-child { border-bottom: none; }
-    .badge { background: #E3F2FD; color: #1976D2; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; }
+    
+    #newPoojaBox { background: #fff3e0; padding: 15px; border-radius: 12px; border: 1px dashed var(--main); margin-bottom: 15px; display: none; }
+    
+    .btn-save { width: 100%; padding: 16px; background: var(--main); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; }
+    
+    /* === REVERSED LAYOUT CSS === */
+    .list-area { max-height: 450px; overflow-y: auto; border-radius: 12px; background: #fafafa; border: 1px solid #eee; }
+    .item-row { 
+      padding: 15px; 
+      border-bottom: 1.5px solid #f0f0f0; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      gap: 15px; /* सामग्री और बटन के बीच गैप */
+    }
+    .info-box { 
+      flex-grow: 1; /* सामग्री अब $80\%$ जगह लेगी */
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .samagri-name { font-weight: 700; color: var(--dark); font-size: 17px; }
+    .badge { background: #E3F2FD; color: #1976D2; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; align-self: flex-start; }
+
+    /* छोटा और कॉम्पैक्ट डिलीट बटन */
+    .delete-btn { 
+      background: #fee2e2; 
+      color: var(--red); 
+      border: none; 
+      width: 42px; 
+      height: 42px; 
+      border-radius: 10px; 
+      cursor: pointer; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-size: 18px;
+      flex-shrink: 0; /* बटन को छोटा ही रखेगा */
+      transition: 0.3s;
+    }
+    .delete-btn:hover { background: var(--red); color: white; }
   </style>
 </head>
 <body>
 
 <header>
-  <h1 style="margin:0; font-size:22px;">🗄️ डेटाबेस मैनेजमेंट</h1>
+  <h1 style="margin:0; font-size:20px;">🗄️ डेटाबेस मैनेजमेंट</h1>
 </header>
 
 <div class="container">
   <div class="card">
-    <h2>➕ नया सामान जोड़ें</h2>
+    <h2>➕ नया सामान जोड़ें</h2>
     <label>पूजा का प्रकार</label>
-    <select id="poojaSelect"><option>लोड हो रहा है...</option></select>
+    <select id="poojaSelect" onchange="toggleNewPooja()"><option value="">लोड हो रहा है...</option></select>
+
+    <div id="newPoojaBox">
+      <label>नयी पूजा का नाम</label>
+      <input id="newPoojaInput" placeholder="जैसे: सुन्दरकाण्ड">
+    </div>
+
     <label>सामग्री का नाम</label>
     <input id="samagriInput" placeholder="जैसे: कलावा, नारियल">
-    <button onclick="addSamagri()">डेटाबेस में सुरक्षित करें</button>
+    <button class="btn-save" onclick="addSamagri()">डेटाबेस में सुरक्षित करें</button>
   </div>
 
   <div class="card">
     <h2>📋 मौजूदा डेटा</h2>
-    <select id="filterPooja" onchange="renderList()"><option value="">सभी पूजा</option></select>
+    <select id="filterPooja" onchange="renderList()"><option value="">सभी पूजा देखें</option></select>
     <div class="list-area" id="dataList">
-      <div style="text-align:center; padding:20px; color:#999;">डेटा लोड हो रहा है...</div>
+      <div style="text-align:center; padding:20px; color:#999;">लोड हो रहा है...</div>
     </div>
   </div>
 </div>
@@ -49,37 +92,64 @@
   const API_URL = "https://script.google.com/macros/s/AKfycbyhXVfu7WVAs2pQQLyH3lkkO3ZG-rmbqTmyygjqH8XeWyQPNgqx49whCIsa8WttKRZ4/exec";
   let rawData = [];
 
-  fetch(API_URL).then(r => r.json()).then(data => {
-    rawData = data;
-    const poojas = [...new Set(data.map(x => x.pooja?.trim()))].filter(Boolean).sort();
-    
-    const options = '<option value="">-- चुनें --</option>' + poojas.map(p => `<option>${p}</option>`).join("");
-    document.getElementById("poojaSelect").innerHTML = options;
-    document.getElementById("filterPooja").innerHTML = '<option value="">सभी पूजा देखें</option>' + poojas.map(p => `<option>${p}</option>`).join("");
-    renderList();
-  });
+  function loadData() {
+    fetch(API_URL).then(r => r.json()).then(data => {
+      rawData = data;
+      const poojas = [...new Set(data.map(x => x.pooja?.trim()))].filter(Boolean).sort();
+      let options = '<option value="">-- चुनें --</option>' + 
+                    poojas.map(p => `<option value="${p}">${p}</option>`).join("") +
+                    '<option value="ADD_NEW" style="color:var(--main); font-weight:bold;">+ नयी पूजा जोड़ें</option>';
+      document.getElementById("poojaSelect").innerHTML = options;
+      document.getElementById("filterPooja").innerHTML = '<option value="">सभी पूजा देखें</option>' + poojas.map(p => `<option>${p}</option>`).join("");
+      renderList();
+    });
+  }
+
+  function toggleNewPooja() {
+    document.getElementById("newPoojaBox").style.display = (document.getElementById("poojaSelect").value === "ADD_NEW") ? "block" : "none";
+  }
 
   function renderList() {
     const filter = document.getElementById("filterPooja").value;
     const list = document.getElementById("dataList");
     list.innerHTML = "";
     rawData.filter(r => !filter || r.pooja === filter).forEach(r => {
-      list.innerHTML += `<div class="item-row"><span>${r.samagri}</span><span class="badge">${r.pooja}</span></div>`;
+      list.innerHTML += `
+        <div class="item-row">
+          <div class="info-box">
+            <span class="samagri-name">${r.samagri}</span>
+            <span class="badge">${r.pooja}</span>
+          </div>
+          <button class="delete-btn" onclick="deleteSamagri('${r.pooja}', '${r.samagri}')" title="डिलीट">🗑️</button>
+        </div>`;
     });
   }
 
   function addSamagri() {
-    const pooja = document.getElementById("poojaSelect").value;
+    let pooja = document.getElementById("poojaSelect").value;
+    if(pooja === "ADD_NEW") pooja = document.getElementById("newPoojaInput").value.trim();
     const samagri = document.getElementById("samagriInput").value.trim();
-    if(!pooja || !samagri) return alert("दोनों जानकारी भरें!");
+    if(!pooja || !samagri) return alert("Pooja aur Samagri bharein!");
 
     fetch(API_URL, {
       method: "POST",
       body: JSON.stringify({ action: "add", pooja, samagri })
     }).then(r => r.json()).then(resp => {
-      if(resp.status === "ok") { alert("सफलतापूर्वक जोड़ दिया गया!"); location.reload(); }
+      if(resp.status === "ok") { alert("सुरक्षित हो गया!"); location.reload(); }
     });
   }
+
+  function deleteSamagri(pooja, samagri) {
+    if(!confirm(`क्या आप '${samagri}' को हटाना चाहते हैं?`)) return;
+    fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "deleteItem", pooja, samagri })
+    }).then(r => r.json()).then(resp => {
+      if(resp.status === "ok") { alert("हटा दिया गया!"); loadData(); }
+    });
+  }
+
+  loadData();
 </script>
 </body>
 </html>
