@@ -12,7 +12,7 @@
     .card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
     h2 { font-size: 18px; margin: 0 0 15px; color: var(--dark); display: flex; align-items: center; gap: 10px; }
     label { font-size: 13px; color: #666; margin-bottom: 5px; display: block; font-weight: 600; }
-    input, select { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; font-size: 15px; }
+    input, select, textarea { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; font-size: 15px; font-family: inherit; }
     #newPoojaBox { background: #fff3e0; padding: 15px; border-radius: 12px; border: 1px dashed var(--main); margin-bottom: 15px; display: none; }
     .btn-save { width: 100%; padding: 16px; background: var(--main); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; }
     .list-area { max-height: 450px; overflow-y: auto; border-radius: 12px; background: #fafafa; border: 1px solid #eee; transition: 0.3s; }
@@ -23,7 +23,6 @@
     .delete-btn { background: #fee2e2; color: var(--red); border: none; width: 42px; height: 42px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; transition: 0.3s; }
     .delete-btn:hover { background: var(--red); color: white; }
     
-    /* डेटा फ्लैश होने का इफेक्ट */
     .flash-refresh { animation: flashEffect 0.5s ease-out; }
     @keyframes flashEffect { 0% { opacity: 0.5; background: #FFF3E0; } 100% { opacity: 1; background: #fafafa; } }
   </style>
@@ -43,8 +42,8 @@
       <label>नयी पूजा का नाम</label>
       <input id="newPoojaInput" placeholder="जैसे: सुन्दरकाण्ड">
     </div>
-    <label>सामग्री का नाम</label>
-    <input id="samagriInput" placeholder="जैसे: कलावा, नारियल">
+    <label>सामग्री का नाम (हर लाइन में एक लिखें)</label>
+    <textarea id="samagriInput" placeholder="जैसे: कलावा&#10;नारियल&#10;कुमकुम" style="height: 100px; resize: vertical;"></textarea>
     <button class="btn-save" id="saveBtn" onclick="addSamagri()">डेटाबेस में सुरक्षित करें</button>
   </div>
 
@@ -102,8 +101,8 @@
     });
   }
 
-  // === यहाँ वह 'दिमाग' वाला लॉजिक है ===
-  function addSamagri() {
+  // === अपडेटेड 'Bulk Add' लॉजिक ===
+  async function addSamagri() {
     const pSelect = document.getElementById("poojaSelect");
     const npInput = document.getElementById("newPoojaInput");
     const sInput = document.getElementById("samagriInput");
@@ -111,33 +110,36 @@
 
     let pooja = pSelect.value;
     if(pooja === "ADD_NEW") pooja = npInput.value.trim();
-    const samagri = sInput.value.trim();
-    if(!pooja || !samagri) return alert("Pooja aur Samagri bharein!");
+    
+    const rawText = sInput.value.trim();
+    if(!pooja || !rawText) return alert("पूजा और सामग्री भरें!");
 
-    // विजुअल फीडबैक: बटन बदलें
+    const items = rawText.split("\n").map(i => i.trim()).filter(i => i !== "");
+
     sBtn.innerText = "सेव हो रहा है...";
     sBtn.disabled = true;
 
-    fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "add", pooja, samagri })
-    }).then(r => r.json()).then(resp => {
-      if(resp.status === "ok") {
-        // 1. इनपुट ब्लैंक करें
-        sInput.value = "";
-        npInput.value = "";
-        // 2. डेटा साइलेंटली रीलोड करें (बिना पेज रिलोड के)
-        loadData(true); 
-        // 3. बटन वापस नॉर्मल करें
-        sBtn.innerText = "डेटाबेस में सुरक्षित करें";
-        sBtn.disabled = false;
-        sInput.focus(); // अगली एंट्री के लिए तैयार!
+    try {
+      // हर सामान के लिए अलग रिक्वेस्ट (Loop)
+      for (let item of items) {
+        await fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify({ action: "add", pooja: pooja, samagri: item })
+        });
       }
-    }).catch(err => {
-        alert("त्रुटि आई!");
+
+      // सफलता के बाद सफाई
+      sInput.value = "";
+      npInput.value = "";
+      loadData(true); 
+      sBtn.innerText = "डेटाबेस में सुरक्षित करें";
+      sBtn.disabled = false;
+      sInput.focus();
+    } catch(err) {
+        alert("कुछ सामान सेव नहीं हो पाए!");
         sBtn.innerText = "डेटाबेस में सुरक्षित करें";
         sBtn.disabled = false;
-    });
+    }
   }
 
   function deleteSamagri(pooja, samagri) {
