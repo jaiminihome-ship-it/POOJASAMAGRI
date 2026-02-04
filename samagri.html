@@ -93,7 +93,7 @@
         <input type="text" class="qty" value="${matched.qty || ''}" placeholder="Qty">
         <select class="unit">
           <option value="">इकाई</option>
-          ${['ग्राम','किग्रा','नग','पैकेट','रुपये','छोटी शीशी','बड़ी शीशी','बंडल','लीटर'].map(u => 
+          ${['ग्राम','किग्रा','नग','पैकेट','रुपये','छोटी शीशी','बड़ी शीशी','बंडल','लीटर','मीटर'].map(u => 
             `<option ${matched.unit===u?'selected':''}>${u}</option>`
           ).join('')}
         </select>
