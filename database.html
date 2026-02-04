@@ -10,51 +10,22 @@
     header { background: var(--dark); color: white; padding: 25px 20px; text-align: center; border-bottom: 5px solid var(--main); }
     .container { padding: 15px; max-width: 500px; margin: auto; }
     .card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-    
     h2 { font-size: 18px; margin: 0 0 15px; color: var(--dark); display: flex; align-items: center; gap: 10px; }
     label { font-size: 13px; color: #666; margin-bottom: 5px; display: block; font-weight: 600; }
     input, select { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; font-size: 15px; }
-    
     #newPoojaBox { background: #fff3e0; padding: 15px; border-radius: 12px; border: 1px dashed var(--main); margin-bottom: 15px; display: none; }
-    
     .btn-save { width: 100%; padding: 16px; background: var(--main); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; }
-    
-    /* === REVERSED LAYOUT CSS === */
-    .list-area { max-height: 450px; overflow-y: auto; border-radius: 12px; background: #fafafa; border: 1px solid #eee; }
-    .item-row { 
-      padding: 15px; 
-      border-bottom: 1.5px solid #f0f0f0; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      gap: 15px; /* सामग्री और बटन के बीच गैप */
-    }
-    .info-box { 
-      flex-grow: 1; /* सामग्री अब $80\%$ जगह लेगी */
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
+    .list-area { max-height: 450px; overflow-y: auto; border-radius: 12px; background: #fafafa; border: 1px solid #eee; transition: 0.3s; }
+    .item-row { padding: 15px; border-bottom: 1.5px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+    .info-box { flex-grow: 1; display: flex; flex-direction: column; gap: 4px; }
     .samagri-name { font-weight: 700; color: var(--dark); font-size: 17px; }
     .badge { background: #E3F2FD; color: #1976D2; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; align-self: flex-start; }
-
-    /* छोटा और कॉम्पैक्ट डिलीट बटन */
-    .delete-btn { 
-      background: #fee2e2; 
-      color: var(--red); 
-      border: none; 
-      width: 42px; 
-      height: 42px; 
-      border-radius: 10px; 
-      cursor: pointer; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      font-size: 18px;
-      flex-shrink: 0; /* बटन को छोटा ही रखेगा */
-      transition: 0.3s;
-    }
+    .delete-btn { background: #fee2e2; color: var(--red); border: none; width: 42px; height: 42px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; transition: 0.3s; }
     .delete-btn:hover { background: var(--red); color: white; }
+    
+    /* डेटा फ्लैश होने का इफेक्ट */
+    .flash-refresh { animation: flashEffect 0.5s ease-out; }
+    @keyframes flashEffect { 0% { opacity: 0.5; background: #FFF3E0; } 100% { opacity: 1; background: #fafafa; } }
   </style>
 </head>
 <body>
@@ -68,15 +39,13 @@
     <h2>➕ नया सामान जोड़ें</h2>
     <label>पूजा का प्रकार</label>
     <select id="poojaSelect" onchange="toggleNewPooja()"><option value="">लोड हो रहा है...</option></select>
-
     <div id="newPoojaBox">
       <label>नयी पूजा का नाम</label>
       <input id="newPoojaInput" placeholder="जैसे: सुन्दरकाण्ड">
     </div>
-
     <label>सामग्री का नाम</label>
     <input id="samagriInput" placeholder="जैसे: कलावा, नारियल">
-    <button class="btn-save" onclick="addSamagri()">डेटाबेस में सुरक्षित करें</button>
+    <button class="btn-save" id="saveBtn" onclick="addSamagri()">डेटाबेस में सुरक्षित करें</button>
   </div>
 
   <div class="card">
@@ -92,7 +61,10 @@
   const API_URL = "https://script.google.com/macros/s/AKfycbyhXVfu7WVAs2pQQLyH3lkkO3ZG-rmbqTmyygjqH8XeWyQPNgqx49whCIsa8WttKRZ4/exec";
   let rawData = [];
 
-  function loadData() {
+  function loadData(isSilent = false) {
+    const list = document.getElementById("dataList");
+    if(!isSilent) list.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">लोड हो रहा है...</div>';
+    
     fetch(API_URL).then(r => r.json()).then(data => {
       rawData = data;
       const poojas = [...new Set(data.map(x => x.pooja?.trim()))].filter(Boolean).sort();
@@ -101,7 +73,12 @@
                     '<option value="ADD_NEW" style="color:var(--main); font-weight:bold;">+ नयी पूजा जोड़ें</option>';
       document.getElementById("poojaSelect").innerHTML = options;
       document.getElementById("filterPooja").innerHTML = '<option value="">सभी पूजा देखें</option>' + poojas.map(p => `<option>${p}</option>`).join("");
+      
       renderList();
+      if(isSilent) {
+          list.classList.add('flash-refresh');
+          setTimeout(() => list.classList.remove('flash-refresh'), 500);
+      }
     });
   }
 
@@ -125,17 +102,41 @@
     });
   }
 
+  // === यहाँ वह 'दिमाग' वाला लॉजिक है ===
   function addSamagri() {
-    let pooja = document.getElementById("poojaSelect").value;
-    if(pooja === "ADD_NEW") pooja = document.getElementById("newPoojaInput").value.trim();
-    const samagri = document.getElementById("samagriInput").value.trim();
+    const pSelect = document.getElementById("poojaSelect");
+    const npInput = document.getElementById("newPoojaInput");
+    const sInput = document.getElementById("samagriInput");
+    const sBtn = document.getElementById("saveBtn");
+
+    let pooja = pSelect.value;
+    if(pooja === "ADD_NEW") pooja = npInput.value.trim();
+    const samagri = sInput.value.trim();
     if(!pooja || !samagri) return alert("Pooja aur Samagri bharein!");
+
+    // विजुअल फीडबैक: बटन बदलें
+    sBtn.innerText = "सेव हो रहा है...";
+    sBtn.disabled = true;
 
     fetch(API_URL, {
       method: "POST",
       body: JSON.stringify({ action: "add", pooja, samagri })
     }).then(r => r.json()).then(resp => {
-      if(resp.status === "ok") { alert("सुरक्षित हो गया!"); location.reload(); }
+      if(resp.status === "ok") {
+        // 1. इनपुट ब्लैंक करें
+        sInput.value = "";
+        npInput.value = "";
+        // 2. डेटा साइलेंटली रीलोड करें (बिना पेज रिलोड के)
+        loadData(true); 
+        // 3. बटन वापस नॉर्मल करें
+        sBtn.innerText = "डेटाबेस में सुरक्षित करें";
+        sBtn.disabled = false;
+        sInput.focus(); // अगली एंट्री के लिए तैयार!
+      }
+    }).catch(err => {
+        alert("त्रुटि आई!");
+        sBtn.innerText = "डेटाबेस में सुरक्षित करें";
+        sBtn.disabled = false;
     });
   }
 
@@ -145,7 +146,7 @@
       method: "POST",
       body: JSON.stringify({ action: "deleteItem", pooja, samagri })
     }).then(r => r.json()).then(resp => {
-      if(resp.status === "ok") { alert("हटा दिया गया!"); loadData(); }
+      if(resp.status === "ok") { loadData(true); }
     });
   }
 
