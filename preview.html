@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Premium Vedic Letterpad - Complete Header Fix</title>
+  <title>Premium Vedic Letterpad - Complete Fix</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;700&family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root { 
-      --bhagwa: #FF6F00; /* Deep Crispy Orange */
+      --bhagwa: #FF6F00; 
       --deep-black: #000000; 
     }
     body { background: #333; font-family: 'Noto Sans Devanagari', sans-serif; margin: 0; }
@@ -20,7 +20,6 @@
     th, td { border: 1.5px solid var(--deep-black); padding: 6px 12px; text-align: left; font-size: 14.2px; color: var(--deep-black); font-weight: 700; }
     th { background: #FFF3E0; color: var(--bhagwa); font-family: 'Noto Serif Devanagari', serif; }
 
-    /* === भव्य वैदिक हेडर === */
     .vedic-header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
     .swastik-corner { font-size: 80px; color: var(--bhagwa); line-height: 1; font-weight: bold; }
     .title-center { text-align: center; flex-grow: 1; }
@@ -30,7 +29,6 @@
     .simple-divider { border-bottom: 2.5px solid var(--bhagwa); margin: 8px 0 15px 0; }
     .swastika-divider-line { text-align: center; color: var(--bhagwa); font-size: 20px; margin: 12px 0 8px 0; letter-spacing: 14px; font-weight: bold; border-top: 2px solid var(--bhagwa); padding-top: 4px; }
 
-    /* === EDITABLE INPUTS === */
     .editable-field { 
       border: none; border-bottom: 2px dotted var(--bhagwa); 
       font-size: 19px; font-weight: 800; color: var(--deep-black); 
@@ -38,7 +36,6 @@
       font-family: 'Noto Sans Devanagari', sans-serif;
     }
 
-    /* ENHANCED INFO GRID - अब 3 पंक्तियों में */
     .info-grid-enhanced { 
       display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px 15px; 
       font-weight: 800; color: var(--deep-black); font-size: 19px; 
@@ -49,10 +46,11 @@
     
     .footer { margin-top: 10px; border-top: 4px solid var(--bhagwa); padding-top: 10px; text-align: center; font-size: 14px; font-weight: 700; color: var(--deep-black); }
     
-    .actions { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 1000; }
-    button { padding: 15px 35px; border-radius: 50px; border: none; font-weight: 700; color: white; cursor: pointer; font-size: 16px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: 0.3s; }
+    .actions { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; z-index: 1000; width: 95%; }
+    button { padding: 12px 20px; border-radius: 50px; border: none; font-weight: 700; color: white; cursor: pointer; font-size: 14px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: 0.3s; }
     .btn-pdf { background: linear-gradient(135deg, var(--bhagwa), #e65100); }
     .btn-img { background: linear-gradient(135deg, #2E7D32, #1b5e20); }
+    .btn-share { background: linear-gradient(135deg, #007bff, #0056b3); } /* Share Button Color */
     
     #print-temp { position: absolute; left: -9999px; top: 0; width: 210mm; }
   </style>
@@ -66,8 +64,9 @@
 <div id="print-temp"></div>
 
 <div class="actions">
-  <button class="btn-pdf" onclick="generatePaginatedPDF()">📄 Download PDF</button>
-  <button class="btn-img" onclick="saveAsMultiImages()">🖼️ Download Images</button>
+  <button class="btn-pdf" onclick="generatePaginatedPDF()">📄 PDF Download</button>
+  <button class="btn-img" onclick="saveAsMultiImages()">🖼️ Image Download</button>
+  <button class="btn-share" onclick="shareAsPDF()">📤 WhatsApp Share</button>
 </div>
 
 <script>
@@ -80,7 +79,6 @@
     itemPairs.push([items[i], items[i+1]]);
   }
 
-  // पंडित जी की पूरी जानकारी
   const pName = meta.pandit?.name || "---";
   const pPhone = meta.pandit?.phone || "---";
   const pAddr = meta.pandit?.address || "---";
@@ -97,7 +95,6 @@
     return `<table><thead><tr><th>सामान</th><th>मात्रा</th><th>सामान</th><th>मात्रा</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
 
-  // --- EDITABLE HEADER HTML (अब पंडित जी की पूरी डिटेल्स के साथ) ---
   function getGrandHeader(isStatic = false, currentVals = {}) {
     const yName = isStatic ? currentVals.yajman : `<input type="text" id="yInput" class="editable-field" value="${meta.yajman || ''}">`;
     const yDate = isStatic ? currentVals.date : `<input type="text" id="dInput" class="editable-field" value="${meta.date || ''}">`;
@@ -134,13 +131,8 @@
               </div>`;
   }
 
-  async function generatePaginatedPDF() {
-    const currentVals = {
-      yajman: document.getElementById("yInput").value,
-      date: document.getElementById("dInput").value,
-      pooja: document.getElementById("poojaInput").value
-    };
-    
+  // PDF बनाने का मास्टर फंक्शन (डाउनलोड और शेयर दोनों के लिए काम आएगा)
+  async function createPDF(currentVals) {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'a4');
     const printTemp = document.getElementById("print-temp");
@@ -149,19 +141,56 @@
 
     while (processed < totalPairs) {
       if (pageNum > 1) pdf.addPage();
-      // पहले पन्ने पर लिमिट अब 15 है (बड़े हेडर की वजह से)
       let limit = (pageNum === 1) ? 15 : 28;
       let chunk = itemPairs.slice(processed, processed + limit);
       printTemp.innerHTML = generatePageHTML(pageNum, chunk, currentVals);
-      const canvas = await html2canvas(printTemp, { scale: 3.5, useCORS: true });
-      pdf.addImage(canvas.toDataURL("image/jpeg", 1.0), 'JPEG', 0, 0, 210, 297);
+      const canvas = await html2canvas(printTemp, { scale: 3, useCORS: true });
+      pdf.addImage(canvas.toDataURL("image/jpeg", 0.9), 'JPEG', 0, 0, 210, 297);
       processed += limit;
       pageNum++;
     }
-    pdf.save(`${currentVals.yajman || 'Pooja'}_Samagri.pdf`);
     printTemp.innerHTML = "";
+    return pdf;
   }
 
+  async function generatePaginatedPDF() {
+    const currentVals = {
+      yajman: document.getElementById("yInput").value,
+      date: document.getElementById("dInput").value,
+      pooja: document.getElementById("poojaInput").value
+    };
+    const pdf = await createPDF(currentVals);
+    pdf.save(`${currentVals.yajman || 'Pooja'}_Samagri.pdf`);
+  }
+
+  // --- WhatsApp Share Fix ---
+  async function shareAsPDF() {
+    const currentVals = {
+      yajman: document.getElementById("yInput").value,
+      date: document.getElementById("dInput").value,
+      pooja: document.getElementById("poojaInput").value
+    };
+    
+    const pdf = await createPDF(currentVals);
+    const pdfBlob = pdf.output('blob');
+    const file = new File([pdfBlob], `${currentVals.yajman}_List.pdf`, { type: "application/pdf" });
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: 'पूजा सामग्री सूची',
+          text: `${currentVals.yajman} की सामग्री सूची`
+        });
+      } catch (err) {
+        alert("Share करने में विफल: " + err);
+      }
+    } else {
+      alert("आपके ब्राउज़र में Direct Share की सुविधा नहीं है। कृपया PDF Download करके भेजें।");
+    }
+  }
+
+  // --- Image Download Fix (Successive Click Logic) ---
   async function saveAsMultiImages() {
     const currentVals = {
       yajman: document.getElementById("yInput").value,
@@ -173,20 +202,25 @@
     let processed = 0, pageNum = 1;
 
     while (processed < totalPairs) {
-      // पहले पन्ने पर 15, बाकी पर 28
       let limit = (pageNum === 1) ? 15 : 28;
       let chunk = itemPairs.slice(processed, processed + limit);
       printTemp.innerHTML = generatePageHTML(pageNum, chunk, currentVals);
-      const canvas = await html2canvas(printTemp, { scale: 3.5, useCORS: true });
+      
+      const canvas = await html2canvas(printTemp, { scale: 3, useCORS: true });
+      const imgData = canvas.toDataURL("image/png");
+      
+      // Download link
       const link = document.createElement("a");
-      link.download = `${currentVals.yajman || 'Pooja'}_Page_${pageNum}.png`;
-      link.href = canvas.toDataURL("image/png");
+      link.href = imgData;
+      link.download = `${currentVals.yajman}_Page_${pageNum}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      await new Promise(resolve => setTimeout(resolve, 300));
+
       processed += limit;
       pageNum++;
+      // ब्राउज़र को सांस लेने का समय दें ताकि सिक्योरिटी ब्लॉक न हो
+      await new Promise(r => setTimeout(r, 800)); 
     }
     printTemp.innerHTML = "";
   }
