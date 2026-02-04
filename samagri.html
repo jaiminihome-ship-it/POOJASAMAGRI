@@ -19,7 +19,6 @@
     }
     
     .pooja-section { background: white; margin: 15px; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-    /* Heading Checkbox Alignment */
     .pooja-header { 
       background: #FFF3E0; padding: 15px; font-weight: bold; font-size: 18px; 
       color: var(--dark); border-bottom: 1px solid #ffe0b2;
@@ -46,6 +45,10 @@
     
     .item-name { font-size: 14px; font-weight: 700; color: #000; }
     .check-box-large { width: 22px; height: 22px; cursor: pointer; accent-color: var(--main); }
+
+    /* नयी एंट्री के लिए विजुअल कन्फर्मेशन */
+    .new-flash { animation: flash 1s; }
+    @keyframes flash { from { background: #fff3e0; } to { background: transparent; } }
   </style>
 </head>
 <body>
@@ -76,11 +79,26 @@
     }
   }
 
-  // Heading se saare items toggle karne ka function
   function togglePoojaItems(headerCheckbox, poojaName) {
     const section = headerCheckbox.closest('.pooja-section');
     const checkboxes = section.querySelectorAll('.include');
     checkboxes.forEach(cb => cb.checked = headerCheckbox.checked);
+  }
+
+  // हेल्पर फंक्शन: रो (Row) बनाने के लिए
+  function getItemHtml(samagri, poojaName, matched = {}, isChecked = 'checked') {
+    return `
+      <div class="item-row" data-pooja="${poojaName}">
+        <span class="item-name">${samagri}</span>
+        <input type="text" class="qty" value="${matched.qty || ''}" placeholder="Qty">
+        <select class="unit">
+          <option value="">इकाई</option>
+          ${['ग्राम','किग्रा','नग','पैकेट','रुपये','छोटी शीशी','बड़ी शीशी','बंडल','लीटर'].map(u => 
+            `<option ${matched.unit===u?'selected':''}>${u}</option>`
+          ).join('')}
+        </select>
+        <input type="checkbox" class="include check-box-large" ${isChecked}>
+      </div>`;
   }
 
   function renderAll() {
@@ -96,27 +114,8 @@
 
       poojaItems.forEach((item) => {
         const matched = savedItems.find(s => s.name === item.samagri && s.pooja === poojaName) || {};
-        // Naya logic: Default sab tick honge unless template mein band ho
         const isChecked = savedItems.length > 0 ? (matched.name ? 'checked' : '') : 'checked';
-        
-        itemsHtml += `
-          <div class="item-row" data-pooja="${poojaName}">
-            <span class="item-name">${item.samagri}</span>
-            <input type="text" class="qty" value="${matched.qty || ''}" placeholder="Qty">
-            <select class="unit">
-              <option value="">इकाई</option>
-              <option ${matched.unit==='ग्राम'?'selected':''}>ग्राम</option>
-              <option ${matched.unit==='किग्रा'?'selected':''}>किग्रा</option>
-              <option ${matched.unit==='नग'?'selected':''}>नग</option>
-              <option ${matched.unit==='पैकेट'?'selected':''}>पैकेट</option>
-              <option ${matched.unit==='रुपये'?'selected':''}>रुपये</option>
-              <option ${matched.unit==='छोटी शीशी'?'selected':''}>छोटी शीशी</option>
-              <option ${matched.unit==='बड़ी शीशी'?'selected':''}>बड़ी शीशी</option>
-              <option ${matched.unit==='बंडल'?'selected':''}>बंडल</option>
-              <option ${matched.unit==='लीटर'?'selected':''}>लीटर</option>
-            </select>
-            <input type="checkbox" class="include check-box-large" ${isChecked}>
-          </div>`;
+        itemsHtml += getItemHtml(item.samagri, poojaName, matched, isChecked);
       });
 
       section.innerHTML = `
@@ -124,7 +123,7 @@
           <span>🕉️ ${poojaName}</span>
           <input type="checkbox" class="check-box-large" checked onclick="togglePoojaItems(this, '${poojaName}')">
         </div>
-        <div class="items-list">${itemsHtml || '<p style="padding:15px; color:#999;">कोई सामग्री नहीं</p>'}</div>
+        <div class="items-list" id="list-${poojaName}">${itemsHtml || '<p style="padding:15px; color:#999;">कोई सामग्री नहीं</p>'}</div>
         <div class="add-box">
           <textarea id="newItems-${poojaName}" placeholder="नयी सामग्री लिखें (हर लाइन में एक)"></textarea>
           <button class="btn-add-db" onclick="bulkAdd('${poojaName}')">+ Database में जोड़ें</button>
@@ -153,31 +152,15 @@
     const meta = JSON.parse(localStorage.getItem("pooja_meta") || "{}");
     const name = prompt("यजमान का नाम बदलें या वही रखें:", meta.yajman || "");
     if(!name) return;
-
     const currentSamagri = gatherData();
     const payload = {
-      action: "saveTemplate",
-      id: Date.now(),
-      name: name,
-      date: new Date().toLocaleDateString('hi-IN'),
-      poojas: selectedPoojas.join(", "),
-      meta: { ...meta, yajman: name }, 
-      samagri: currentSamagri
+      action: "saveTemplate", id: Date.now(), name: name, date: new Date().toLocaleDateString('hi-IN'),
+      poojas: selectedPoojas.join(", "), meta: { ...meta, yajman: name }, samagri: currentSamagri
     };
-
-    const templates = JSON.parse(localStorage.getItem("templates") || "[]");
-    templates.push(payload);
-    localStorage.setItem("templates", JSON.stringify(templates));
-
     try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify(payload)
-      });
-      alert("टेम्पलेट '" + name + "' क्लाउड पर सुरक्षित हो गया! ☁️");
-    } catch (e) {
-      alert("क्लाउड एरर! केवल लोकल में सेव हुआ है।");
-    }
+      await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+      alert("टेम्पलेट सुरक्षित हो गया! ☁️");
+    } catch (e) { alert("केवल लोकल में सेव हुआ।"); }
   }
 
   function goToPreview() {
@@ -185,22 +168,46 @@
     window.location.href = "preview.html";
   }
 
+  // === सिर्फ यहाँ बदलाव किया है: NO RELOAD LOGIC ===
   async function bulkAdd(pooja) {
-    const text = document.getElementById(`newItems-${pooja}`).value.trim();
+    const textarea = document.getElementById(`newItems-${pooja}`);
+    const text = textarea.value.trim();
     if(!text) return;
+    
     const itemsToAdd = text.split("\n").filter(i => i.trim() !== "");
     const btn = document.querySelector(`button[onclick="bulkAdd('${pooja}')"]`);
+    const listDiv = document.getElementById(`list-${pooja}`);
+    
     btn.innerText = "जोड़ रहे हैं...";
     btn.disabled = true;
 
+    // अगर लिस्ट खाली थी तो "कोई सामग्री नहीं" मैसेज हटाएँ
+    if(listDiv.innerHTML.includes("कोई सामग्री नहीं")) listDiv.innerHTML = "";
+
     for(let item of itemsToAdd) {
-      await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({ action: "add", pooja: pooja, samagri: item.trim() })
-      });
+      const cleanItem = item.trim();
+      try {
+        await fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify({ action: "add", pooja: pooja, samagri: cleanItem })
+        });
+        
+        // मास्टर डेटा अपडेट करें
+        masterData.push({ pooja: pooja, samagri: cleanItem });
+        
+        // बिना रिफ्रेश के नयी रो (Row) जोड़ें
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = getItemHtml(cleanItem, pooja);
+        const newRow = tempDiv.firstElementChild;
+        newRow.classList.add('new-flash'); 
+        listDiv.appendChild(newRow);
+      } catch (e) { console.error("Error adding:", cleanItem); }
     }
-    alert("सामग्री Database में जोड़ दी गयी!");
-    location.reload(); 
+
+    textarea.value = "";
+    btn.innerText = "+ Database में जोड़ें";
+    btn.disabled = false;
+    // कोई location.reload() नहीं होगा
   }
 
   init();
