@@ -1574,11 +1574,11 @@
         materials: [],
         templates: [],
         masterData: [],
-        editableData: {} // Store editable values
+        editableData: {}
       },
 
       async init() {
-        console.log('🕉️ Initializing...');
+        console.log('🕉️ Initializing Vedic Studio Ultra...');
         
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('poojaDate').value = today;
@@ -1592,7 +1592,7 @@
         this.updateDatabaseStats();
         this.loadSavedState();
         
-        this.toast('✨ Ready!', 'System initialized', 'success');
+        this.toast('✨ Ready!', 'System initialized successfully', 'success');
       },
 
       loadSettings() {
@@ -1623,72 +1623,68 @@
       },
 
       async loadMasterData() {
-        this.showLoading('Loading data...');
+        this.showLoading('Loading master data...');
         try {
+          // Default GET request returns master Pooja-Samagri data
           const response = await fetch(this.API_URL);
           const data = await response.json();
           this.state.masterData = data;
-          console.log('📦 Loaded', data.length, 'items');
+          console.log('📦 Master Data Loaded:', data.length, 'items');
           this.renderPoojaGrid();
           this.renderDatabaseTable();
           this.updateDatabaseStats();
           this.updateExistingPoojaSelect();
           this.hideLoading();
         } catch (error) {
-          console.error('Failed:', error);
+          console.error('Failed to load master data:', error);
           this.hideLoading();
-          this.toast('⚠️ Error', 'Failed to load data', 'error');
+          this.toast('⚠️ Error', 'Failed to load master data', 'error');
         }
       },
 
+      // ✅ FIXED: Using correct API action like reference code
       async loadTemplates() {
         try {
-          // Fetch from Templates sheet
-          const response = await fetch(`${this.API_URL}?sheet=Templates`);
-          const text = await response.text();
+          // Use action=getTemplates like the reference code
+          const response = await fetch(`${this.API_URL}?action=getTemplates`);
+          const data = await response.json();
           
-          console.log('Template response:', text);
+          console.log('📚 Templates API Response:', data);
           
-          try {
-            const data = JSON.parse(text);
-            
-            // Parse template data based on sheet structure: Yajman_Name, Date, Pooja_List, Samagri_Data, ID
-            this.state.templates = Array.isArray(data) ? data.map(row => {
-              try {
-                // Parse samagri data if it's JSON string
-                let samagriData = [];
-                if (row.Samagri_Data) {
-                  try {
-                    samagriData = typeof row.Samagri_Data === 'string' ? 
-                      JSON.parse(row.Samagri_Data) : row.Samagri_Data;
-                  } catch (e) {
-                    console.warn('Failed to parse samagri:', e);
-                  }
-                }
-                
-                return {
-                  id: row.ID || row.id || Date.now().toString(),
-                  name: row.Yajman_Name || row.name || 'Unknown',
-                  date: row.Date || row.date || '',
-                  poojas: row.Pooja_List || row.poojas || '',
-                  samagri: samagriData
-                };
-              } catch (e) {
-                console.error('Error parsing row:', e, row);
-                return null;
+          // Parse templates - API returns: {id, name, date, poojas (array), samagri}
+          if (Array.isArray(data)) {
+            this.state.templates = data.map(row => {
+              // Handle poojas - could be array or string
+              let poojaList = '';
+              if (Array.isArray(row.poojas)) {
+                poojaList = row.poojas.join(', ');
+              } else if (typeof row.poojas === 'string') {
+                poojaList = row.poojas;
               }
-            }).filter(Boolean) : [];
+              
+              return {
+                id: row.id || Date.now().toString(),
+                name: row.name || 'Unknown',
+                date: row.date || '',
+                poojas: poojaList,
+                poojasArray: Array.isArray(row.poojas) ? row.poojas : 
+                  (typeof row.poojas === 'string' ? row.poojas.split(',').map(p => p.trim()).filter(Boolean) : []),
+                samagri: row.samagri || []
+              };
+            });
             
-            console.log('📚 Loaded', this.state.templates.length, 'templates');
-            this.renderTemplateGrid();
-            this.updateStats();
-          } catch (parseError) {
-            console.error('JSON parse error:', parseError);
+            console.log('📚 Templates Loaded:', this.state.templates.length, 'templates');
+          } else {
             this.state.templates = [];
+            console.warn('Templates data is not an array:', data);
           }
+          
+          this.renderTemplateGrid();
+          this.updateStats();
         } catch (error) {
           console.error('Failed to load templates:', error);
           this.state.templates = [];
+          this.renderTemplateGrid();
         }
       },
 
@@ -2074,30 +2070,47 @@
         this.saveState();
       },
 
+      // ✅ FIXED: Save template with correct format like reference code
       async saveToCloud() {
         const yajman = this.state.yajmanName || 'Unnamed';
+        
+        // Match reference code format exactly
         const payload = {
           action: 'saveTemplate',
-          sheet: 'Templates', // Specify Templates sheet
-          yajman_name: yajman,
+          id: Date.now().toString(),
+          name: yajman,
           date: this.state.poojaDate || new Date().toLocaleDateString('hi-IN'),
-          pooja_list: this.state.selectedPoojas.map(p => p.name).join(', '),
-          samagri_data: JSON.stringify(this.state.materials.filter(m => m.included)),
-          id: Date.now().toString()
+          poojas: this.state.selectedPoojas.map(p => p.name).join(', '),
+          samagri: this.state.materials.filter(m => m.included),
+          meta: { 
+            yajman: yajman, 
+            date: this.state.poojaDate || new Date().toLocaleDateString('hi-IN')
+          }
         };
 
-        this.showLoading('Saving...');
+        console.log('💾 Saving template:', payload);
+
+        this.showLoading('Saving to cloud...');
         try {
-          await fetch(this.API_URL, {
+          const response = await fetch(this.API_URL, {
             method: 'POST',
             body: JSON.stringify(payload)
           });
+          const text = await response.text();
+          console.log('Save response:', text);
+          
           this.hideLoading();
-          this.toast('✅ Saved', 'Template saved', 'success');
-          await this.loadTemplates();
+          
+          if (text.includes('Saved') || text.includes('success')) {
+            this.toast('✅ Saved', 'Template saved to cloud', 'success');
+            await this.loadTemplates();
+          } else {
+            this.toast('⚠️ Warning', 'Check if saved correctly', 'warning');
+          }
         } catch (error) {
           this.hideLoading();
-          this.toast('❌ Failed', 'Could not save', 'error');
+          this.toast('❌ Failed', 'Could not save to cloud', 'error');
+          console.error('Save error:', error);
         }
       },
 
@@ -2105,24 +2118,39 @@
         const grid = document.getElementById('templateGrid');
         
         if (this.state.templates.length === 0) {
-          grid.innerHTML = '<p style="color: var(--gray-400); text-align: center; padding: 2rem;">No templates</p>';
+          grid.innerHTML = '<p style="color: var(--gray-400); text-align: center; padding: 2rem; grid-column: 1/-1;">No templates saved yet. Create and save a new pooja!</p>';
           return;
         }
         
-        grid.innerHTML = this.state.templates.slice().reverse().map(template => `
-          <div class="template-card">
-            <div class="template-name">${template.name}</div>
-            <div class="template-meta">
-              <span>📅 ${template.date}</span>
-              <span>🕉️ ${template.poojas?.split(',').length || 0} poojas</span>
+        // Show latest first (reverse)
+        grid.innerHTML = [...this.state.templates].reverse().map(template => {
+          const poojaCount = template.poojasArray ? template.poojasArray.length : 
+            (template.poojas ? template.poojas.split(',').length : 0);
+          
+          return `
+            <div class="template-card">
+              <div class="template-name">${template.name}</div>
+              <div class="template-meta">
+                <span>📅 ${this.formatDate(template.date)}</span>
+                <span>🕉️ ${poojaCount} poojas</span>
+              </div>
+              <div class="template-actions">
+                <button class="btn btn-sm btn-primary" onclick="app.loadTemplate('${template.id}')">Open ✍️</button>
+                <button class="btn btn-sm btn-secondary" onclick="app.cloneTemplate('${template.id}')">Clone 📑</button>
+                <button class="btn btn-sm btn-danger" onclick="app.deleteTemplate('${template.id}')">Delete 🗑️</button>
+              </div>
             </div>
-            <div class="template-actions">
-              <button class="btn btn-sm btn-primary" onclick="app.loadTemplate('${template.id}')">Open</button>
-              <button class="btn btn-sm btn-secondary" onclick="app.cloneTemplate('${template.id}')">Clone</button>
-              <button class="btn btn-sm btn-danger" onclick="app.deleteTemplate('${template.id}')">Delete</button>
-            </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
+      },
+
+      formatDate(dateStr) {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        return `${day}/${month}/${d.getFullYear()}`;
       },
 
       filterTemplates() {
@@ -2134,89 +2162,132 @@
         
         const grid = document.getElementById('templateGrid');
         if (filtered.length === 0) {
-          grid.innerHTML = '<p style="color: var(--gray-400); text-align: center; padding: 2rem;">No matching templates</p>';
+          grid.innerHTML = '<p style="color: var(--gray-400); text-align: center; padding: 2rem; grid-column: 1/-1;">No matching templates found</p>';
           return;
         }
         
-        grid.innerHTML = filtered.map(template => `
-          <div class="template-card">
-            <div class="template-name">${template.name}</div>
-            <div class="template-meta">
-              <span>📅 ${template.date}</span>
-              <span>🕉️ ${template.poojas?.split(',').length || 0} poojas</span>
+        grid.innerHTML = [...filtered].reverse().map(template => {
+          const poojaCount = template.poojasArray ? template.poojasArray.length : 
+            (template.poojas ? template.poojas.split(',').length : 0);
+          
+          return `
+            <div class="template-card">
+              <div class="template-name">${template.name}</div>
+              <div class="template-meta">
+                <span>📅 ${this.formatDate(template.date)}</span>
+                <span>🕉️ ${poojaCount} poojas</span>
+              </div>
+              <div class="template-actions">
+                <button class="btn btn-sm btn-primary" onclick="app.loadTemplate('${template.id}')">Open ✍️</button>
+                <button class="btn btn-sm btn-secondary" onclick="app.cloneTemplate('${template.id}')">Clone 📑</button>
+                <button class="btn btn-sm btn-danger" onclick="app.deleteTemplate('${template.id}')">Delete 🗑️</button>
+              </div>
             </div>
-            <div class="template-actions">
-              <button class="btn btn-sm btn-primary" onclick="app.loadTemplate('${template.id}')">Open</button>
-              <button class="btn btn-sm btn-secondary" onclick="app.cloneTemplate('${template.id}')">Clone</button>
-              <button class="btn btn-sm btn-danger" onclick="app.deleteTemplate('${template.id}')">Delete</button>
-            </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       },
 
+      // ✅ FIXED: Load template with correct data structure
       loadTemplate(id) {
         const template = this.state.templates.find(t => t.id.toString() === id.toString());
-        if (!template) return;
+        if (!template) {
+          this.toast('❌ Error', 'Template not found', 'error');
+          return;
+        }
+        
+        console.log('📂 Loading template:', template);
         
         this.state.yajmanName = template.name;
         this.state.poojaDate = template.date;
-        this.state.selectedPoojas = (template.poojas || '').split(', ').filter(Boolean).map((name, order) => ({ name: name.trim(), order }));
+        
+        // Handle poojas - use poojasArray if available
+        const poojaList = template.poojasArray || 
+          (template.poojas ? template.poojas.split(',').map(p => p.trim()).filter(Boolean) : []);
+        
+        this.state.selectedPoojas = poojaList.map((name, order) => ({ name, order }));
         this.state.materials = template.samagri || [];
         
+        // Update form fields
         document.getElementById('yajmanName').value = template.name;
         document.getElementById('poojaDate').value = template.date;
         
         this.renderPoojaGrid();
-        this.renderMaterialSections();
-        this.navigateTo('materialsPage');
+        
+        // If we have samagri, go to materials page; otherwise go to pooja selection
+        if (this.state.materials.length > 0) {
+          this.renderMaterialSections();
+          this.navigateTo('materialsPage');
+        } else {
+          this.generateMaterialList();
+          this.renderMaterialSections();
+          this.navigateTo('materialsPage');
+        }
         
         this.toast('✅ Loaded', template.name, 'success');
       },
 
+      // ✅ FIXED: Clone with correct format like reference code
       async cloneTemplate(id) {
         const template = this.state.templates.find(t => t.id.toString() === id.toString());
         if (!template) return;
         
-        const newName = prompt('New name:', template.name + ' (Copy)');
+        const newName = prompt('नये यजमान का नाम लिखें (Clone):', template.name + ' (Copy)');
         if (!newName) return;
         
         const payload = {
           action: 'saveTemplate',
-          sheet: 'Templates',
-          yajman_name: newName,
+          id: Date.now().toString(),
+          name: newName,
           date: new Date().toLocaleDateString('hi-IN'),
-          pooja_list: template.poojas,
-          samagri_data: JSON.stringify(template.samagri),
-          id: Date.now().toString()
+          poojas: template.poojas,
+          samagri: template.samagri,
+          meta: { yajman: newName, date: new Date().toLocaleDateString('hi-IN') }
         };
+        
+        console.log('📑 Cloning template:', payload);
         
         this.showLoading('Cloning...');
         try {
-          await fetch(this.API_URL, {
-            method: 'POST',
-            body: JSON.stringify(payload)
+          const response = await fetch(this.API_URL, { 
+            method: 'POST', 
+            body: JSON.stringify(payload) 
           });
+          const text = await response.text();
+          
           this.hideLoading();
-          this.toast('✅ Cloned', newName, 'success');
-          await this.loadTemplates();
+          
+          if (text.includes('Saved') || text.includes('success')) {
+            this.toast('✅ Cloned', newName, 'success');
+            await this.loadTemplates();
+          } else {
+            this.toast('⚠️ Warning', 'Check if cloned correctly', 'warning');
+          }
         } catch (error) {
           this.hideLoading();
           this.toast('❌ Failed', error.message, 'error');
         }
       },
 
+      // ✅ FIXED: Delete with correct format like reference code
       async deleteTemplate(id) {
-        if (!confirm('Delete?')) return;
+        if (!confirm('क्या आप इस यजमान को बादलों से हटाना चाहते हैं?')) return;
         
         this.showLoading('Deleting...');
         try {
-          await fetch(this.API_URL, {
+          const response = await fetch(this.API_URL, {
             method: 'POST',
-            body: JSON.stringify({ action: 'deleteTemplate', sheet: 'Templates', id: id })
+            body: JSON.stringify({ action: 'deleteTemplate', id: id })
           });
+          const text = await response.text();
+          
           this.hideLoading();
-          this.toast('✅ Deleted', 'Template removed', 'success');
-          await this.loadTemplates();
+          
+          if (text.includes('Deleted') || text.includes('success')) {
+            this.toast('✅ Deleted', 'Template removed', 'success');
+            await this.loadTemplates();
+          } else {
+            this.toast('⚠️ Warning', 'Check if deleted correctly', 'warning');
+          }
         } catch (error) {
           this.hideLoading();
           this.toast('❌ Failed', error.message, 'error');
@@ -2224,7 +2295,6 @@
       },
 
       proceedToPreview() {
-        // Initialize editable data with current values
         this.state.editableData = {
           yajmanName: this.state.yajmanName || '',
           yajmanPhone: this.state.yajmanPhone || '',
@@ -2246,7 +2316,6 @@
           const container = document.getElementById('pdfPreviewContainer');
           container.innerHTML = previewHTML;
           
-          // Make fields editable after rendering
           this.makeFieldsEditable();
           
           this.hideLoading();
@@ -2258,7 +2327,6 @@
         }
       },
 
-      // Create HTML for preview with editable fields
       createPDFPreviewHTML(materials) {
         const pandit = this.pandits[this.state.selectedPandit];
         const pages = [];
@@ -2343,13 +2411,11 @@
             const currentMaxRows = pageNum === 1 ? this.PDF_CONFIG.FIRST_PAGE_ROWS : this.PDF_CONFIG.SUBSEQUENT_PAGE_ROWS;
             
             if (currentRowCount >= currentMaxRows) {
-              // Close current table and page
               tableHTML += rowsHTML + '</tbody></table>';
               contentHTML += tableHTML;
               currentPageHTML += contentHTML + createPageEnd();
               pages.push(currentPageHTML);
               
-              // Start new page
               pageNum++;
               currentPageHTML = createPageStart(false);
               contentHTML = headingHTML.replace(group.poojaName, group.poojaName + ' (जारी...)');
@@ -2384,14 +2450,12 @@
           contentHTML += headingHTML + tableHTML;
         });
         
-        // Close last page
         currentPageHTML += contentHTML + createPageEnd();
         pages.push(currentPageHTML);
         
         return pages.join('');
       },
 
-      // Make preview fields editable
       makeFieldsEditable() {
         document.querySelectorAll('.editable').forEach(el => {
           el.addEventListener('blur', (e) => {
@@ -2410,7 +2474,6 @@
         });
       },
 
-      // Create PDF pages for download (using editable data)
       createPDFPages(materials) {
         const container = document.getElementById('pdfPagesContainer');
         container.innerHTML = '';
