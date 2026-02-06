@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Vedic Studio Pro v11 - Complete Edition</title>
+  <title>Vedic Studio Pro v13 - Enhanced Edition</title>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -37,7 +37,7 @@
       color: white; 
       display: flex; 
       height: 100vh;
-      height: 100dvh; /* Dynamic viewport height for mobile */
+      height: 100dvh;
     }
 
     /* Scrollbar Styling */
@@ -213,7 +213,7 @@
       padding: 12px 15px; 
       border-radius: 8px; 
       font-family: inherit; 
-      font-size: 16px; /* Prevents zoom on iOS */
+      font-size: 16px;
       transition: border-color 0.3s, box-shadow 0.3s;
       -webkit-appearance: none;
       appearance: none;
@@ -236,6 +236,84 @@
       resize: vertical; 
       min-height: 80px;
       font-family: 'Noto Serif Devanagari', serif;
+    }
+
+    /* Pandit Selector Special Styling */
+    .pandit-selector {
+      background: linear-gradient(135deg, var(--gold-d), var(--gold));
+      border: none;
+      color: #000;
+      font-weight: 600;
+    }
+    
+    .pandit-info {
+      margin-top: 10px;
+      padding: 10px;
+      background: rgba(191, 149, 63, 0.1);
+      border-radius: 8px;
+      border: 1px solid var(--gold);
+      font-size: 12px;
+    }
+    
+    .pandit-info .name {
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+    
+    .pandit-info .detail {
+      color: #9ca3af;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    /* Theme Grid */
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    
+    .theme-chip {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .theme-chip:hover {
+      transform: scale(1.1);
+      z-index: 1;
+    }
+    
+    .theme-chip.active {
+      border-color: white;
+      box-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+    
+    .theme-chip::after {
+      content: attr(data-name);
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.7);
+      font-size: 8px;
+      padding: 2px;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .theme-chip:hover::after {
+      opacity: 1;
     }
 
     /* Range Slider */
@@ -341,7 +419,7 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      min-height: 44px; /* Touch friendly */
+      min-height: 44px;
     }
     
     .quick-btn:hover, .quick-btn:active {
@@ -374,7 +452,7 @@
       transition: all 0.3s; 
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      min-height: 50px; /* Touch friendly */
+      min-height: 50px;
     }
     
     .btn:disabled { 
@@ -467,7 +545,7 @@
       padding: 30px;
       position: relative;
       overflow: hidden;
-      min-width: 0; /* Prevents flex overflow */
+      min-width: 0;
     }
     
     /* Decorative Background */
@@ -604,6 +682,33 @@
       color: #9ca3af;
     }
 
+    /* Current Pandit Indicator */
+    .current-pandit {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.7);
+      padding: 10px 15px;
+      border-radius: 10px;
+      border: 1px solid var(--gold);
+      z-index: 10;
+      text-align: right;
+    }
+    
+    .current-pandit .label {
+      font-size: 10px;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .current-pandit .name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold);
+      margin-top: 2px;
+    }
+
     /* Utility Classes */
     .hidden { display: none !important; }
     
@@ -669,6 +774,14 @@
       .view {
         padding: 20px;
       }
+      
+      .current-pandit {
+        display: none;
+      }
+      
+      .theme-grid {
+        grid-template-columns: repeat(5, 1fr);
+      }
     }
 
     /* ============ MOBILE STYLES ============ */
@@ -682,12 +795,10 @@
         flex-direction: column;
       }
       
-      /* Show mobile header */
       .mobile-header {
         display: flex;
       }
       
-      /* Sidebar becomes slide-out drawer */
       .sidebar {
         position: fixed;
         top: var(--header-height);
@@ -705,7 +816,7 @@
       }
       
       .sidebar-header {
-        display: none; /* Hidden on mobile, using mobile-header instead */
+        display: none;
       }
       
       .sidebar-overlay {
@@ -717,7 +828,6 @@
         pointer-events: auto;
       }
       
-      /* Main view adjustments */
       .view {
         margin-top: var(--header-height);
         height: calc(100vh - var(--header-height));
@@ -726,7 +836,6 @@
         padding-bottom: 20px;
       }
       
-      /* Date display repositioned */
       .date-display {
         top: 10px;
         left: 10px;
@@ -741,12 +850,14 @@
         font-size: 10px;
       }
       
-      /* Canvas container */
+      .current-pandit {
+        display: none;
+      }
+      
       .canvas-container {
         margin-bottom: 10px;
       }
       
-      /* Navigation adjustments */
       .nav {
         margin-top: 10px;
         padding: 10px 20px;
@@ -764,17 +875,14 @@
         font-size: 14px;
       }
       
-      /* Hide desktop shortcuts hint */
       .shortcuts-hint {
         display: none;
       }
       
-      /* Show swipe hint */
       .swipe-hint {
         display: block;
       }
       
-      /* Toast adjustments */
       .toast-container {
         top: calc(var(--header-height) + 10px);
         right: 10px;
@@ -786,7 +894,6 @@
         padding: 10px 14px;
       }
       
-      /* Form adjustments */
       .group {
         padding: 12px;
       }
@@ -795,7 +902,6 @@
         max-height: 250px;
       }
       
-      /* Download buttons - 2 column on mobile */
       .download-section .btn {
         padding: 12px 15px;
         font-size: 13px;
@@ -810,6 +916,10 @@
       
       .download-grid .btn-png {
         grid-column: 1 / -1;
+      }
+      
+      .theme-grid {
+        grid-template-columns: repeat(6, 1fr);
       }
     }
 
@@ -843,6 +953,10 @@
       
       .date-display .date {
         font-size: 12px;
+      }
+      
+      .theme-grid {
+        grid-template-columns: repeat(4, 1fr);
       }
     }
 
@@ -940,6 +1054,21 @@
       <span id="statusText">सिस्टम लोड हो रहा है...</span>
     </div>
     
+    <!-- PANDIT SELECTOR -->
+    <div class="group">
+      <div class="group-title">🙏 पंडित जी चुनें</div>
+      <select id="panditSelect" class="pandit-selector" onchange="vs.onPanditChange()">
+        <option value="yugal">पं. युगल आचार्य</option>
+        <option value="purushottam">पं. पुरुषोत्तम शर्मा</option>
+      </select>
+      <div class="pandit-info" id="panditInfo">
+        <div class="name" id="panditInfoName">पं. युगल आचार्य</div>
+        <div class="detail" id="panditInfoTitle">📿 वैदिक ज्योतिषाचार्य</div>
+        <div class="detail" id="panditInfoPhone">📞 +91 9928139485</div>
+        <div class="detail" id="panditInfoAddress">🌐 astroyugalacharya.in</div>
+      </div>
+    </div>
+    
     <!-- Design Mode -->
     <div class="group">
       <div class="group-title">📐 डिज़ाइन मोड</div>
@@ -951,16 +1080,34 @@
       </select>
     </div>
 
-    <!-- Theme -->
+    <!-- 🆕 ENHANCED THEME SELECTOR -->
     <div class="group">
-      <div class="group-title">🎨 प्रीमियम थीम</div>
-      <select id="th" onchange="vs.draw()">
-        <option value="saumya">🤍 सौम्य (Royal White)</option>
-        <option value="dharma">🧡 धर्म (Sacred Copper)</option>
-        <option value="akash">🖤 आकाश (Celestial Dark)</option>
-        <option value="ratna">💎 रत्न (Gemstone Blue)</option>
-        <option value="pushp">🌸 पुष्प (Lotus Pink)</option>
+      <div class="group-title">🎨 प्रीमियम थीम (12 विकल्प)</div>
+      <select id="th" onchange="vs.onThemeChange()">
+        <optgroup label="🌟 क्लासिक थीम्स">
+          <option value="saumya">🤍 सौम्य (Royal White)</option>
+          <option value="dharma">🧡 धर्म (Sacred Copper)</option>
+          <option value="akash">🖤 आकाश (Celestial Dark)</option>
+        </optgroup>
+        <optgroup label="💎 रत्न थीम्स">
+          <option value="ratna">💙 नीलम (Sapphire Blue)</option>
+          <option value="panna">💚 पन्ना (Emerald Green)</option>
+          <option value="manik">❤️ माणिक (Ruby Red)</option>
+        </optgroup>
+        <optgroup label="🌸 नेचर थीम्स">
+          <option value="pushp">🌸 पुष्प (Lotus Pink)</option>
+          <option value="kesari">🧡 केसरी (Saffron)</option>
+          <option value="chandni">🌙 चांदनी (Moonlight)</option>
+        </optgroup>
+        <optgroup label="✨ प्रीमियम थीम्स">
+          <option value="sandhya">🌅 संध्या (Sunset)</option>
+          <option value="samudra">🌊 समुद्र (Ocean)</option>
+          <option value="vaibhav">👑 वैभव (Royal Gold)</option>
+        </optgroup>
       </select>
+      
+      <!-- Visual Theme Chips -->
+      <div class="theme-grid" id="themeGrid"></div>
     </div>
 
     <!-- Font Size -->
@@ -1033,6 +1180,11 @@
     <div class="day" id="todayDay"></div>
   </div>
   
+  <div class="current-pandit">
+    <div class="label">वर्तमान पंडित</div>
+    <div class="name" id="currentPanditName">पं. युगल आचार्य</div>
+  </div>
+  
   <div class="canvas-container" id="canvasContainer">
     <div class="canvas-frame">
       <canvas id="canvas"></canvas>
@@ -1060,7 +1212,7 @@
 
 <script>
 // =====================================================
-// VEDIC STUDIO PRO v11 - Mobile Responsive Edition
+// VEDIC STUDIO PRO v13 - Enhanced Edition
 // =====================================================
 
 const vs = {
@@ -1076,6 +1228,50 @@ const vs = {
   isMobile: false,
   touchStartX: 0,
   touchStartY: 0,
+  
+  // PANDIT DATA
+  pandits: {
+    yugal: {
+      id: 'yugal',
+      name: 'पं. युगल आचार्य',
+      nameShort: 'युगल आचार्य',
+      title: 'वैदिक ज्योतिषाचार्य एवं वास्तु विशेषज्ञ',
+      titleShort: 'वैदिक ज्योतिषाचार्य',
+      phone: '+91 9928139485',
+      phoneDisplay: '📞 +91 9928139485',
+      website: 'www.astroyugalacharya.in',
+      websiteDisplay: '🌐 www.astroyugalacharya.in',
+      address: 'जयपुर, राजस्थान',
+      addressDisplay: '📍 जयपुर, राजस्थान',
+      handle: '@astroyugalacharya',
+      handleDisplay: 'astroyugalacharya.in',
+      socials: '📱 WhatsApp | 📷 Instagram | 📘 Facebook',
+      hasQR: true, // 🆕 QR Code enabled
+      qrUrl: 'https://jaiminihome-ship-it.github.io/POOJASAMAGRI/qr.png'
+    },
+    purushottam: {
+      id: 'purushottam',
+      name: 'पं. पुरुषोत्तम शर्मा',
+      nameShort: 'पुरुषोत्तम शर्मा',
+      title: 'ज्योतिषाचार्य',
+      titleShort: 'ज्योतिषाचार्य',
+      phone: '+91 9680992496',
+      phoneDisplay: '📞 +91 9680992496',
+      website: '',
+      websiteDisplay: '',
+      address: 'श्री राम मंदिर, गिरनार कॉलोनी, वैशाली नगर, जयपुर',
+      addressDisplay: '📍 श्री राम मंदिर, गिरनार कॉलोनी, वैशाली नगर, जयपुर',
+      addressShort: 'वैशाली नगर, जयपुर',
+      handle: '',
+      handleDisplay: 'वैशाली नगर, जयपुर',
+      socials: '📱 WhatsApp पर संपर्क करें',
+      hasQR: false, // 🆕 No QR Code for Purushottam
+      qrUrl: ''
+    }
+  },
+  
+  // Current Selected Pandit
+  currentPandit: 'yugal',
   
   // Rashi Names with Symbols
   rashis: [
@@ -1097,53 +1293,223 @@ const vs = {
   currentIdx: 0,
   isReady: false,
   
-  // Themes
+  // 🆕 ENHANCED THEMES (12 Beautiful Themes)
   themes: {
+    // Classic Themes
     saumya: { 
+      name: 'सौम्य',
       bg: '#fffaf4', 
       bgGrad: ['#fffaf4', '#fff5e6'],
       txt: '#2d3436', 
       acc: '#BF953F', 
       acc2: '#d4af37',
       bdr: '#d4af37',
-      footer: '#f5f0e8'
+      footer: '#f5f0e8',
+      chip: 'linear-gradient(135deg, #fffaf4, #d4af37)'
     },
     dharma: { 
+      name: 'धर्म',
       bg: '#fff9f0', 
       bgGrad: ['#fff9f0', '#ffedd5'],
       txt: '#5c3a1a', 
       acc: '#b45309', 
       acc2: '#d97706',
       bdr: '#f59e0b',
-      footer: '#fef3c7'
+      footer: '#fef3c7',
+      chip: 'linear-gradient(135deg, #fff9f0, #f59e0b)'
     },
     akash: { 
+      name: 'आकाश',
       bg: '#0a0a0f', 
       bgGrad: ['#0a0a0f', '#1a1a2e'],
       txt: '#e5e7eb', 
       acc: '#FCF6BA', 
       acc2: '#BF953F',
       bdr: '#BF953F',
-      footer: '#111827'
+      footer: '#111827',
+      chip: 'linear-gradient(135deg, #1a1a2e, #BF953F)'
     },
+    
+    // Gemstone Themes
     ratna: {
+      name: 'नीलम',
       bg: '#0f172a',
       bgGrad: ['#0f172a', '#1e3a5f'],
       txt: '#e0f2fe',
       acc: '#38bdf8',
       acc2: '#0ea5e9',
       bdr: '#0284c7',
-      footer: '#0c4a6e'
+      footer: '#0c4a6e',
+      chip: 'linear-gradient(135deg, #1e3a5f, #38bdf8)'
     },
+    panna: {
+      name: 'पन्ना',
+      bg: '#022c22',
+      bgGrad: ['#022c22', '#064e3b'],
+      txt: '#d1fae5',
+      acc: '#34d399',
+      acc2: '#10b981',
+      bdr: '#059669',
+      footer: '#065f46',
+      chip: 'linear-gradient(135deg, #064e3b, #34d399)'
+    },
+    manik: {
+      name: 'माणिक',
+      bg: '#1c1917',
+      bgGrad: ['#1c1917', '#44403c'],
+      txt: '#fef2f2',
+      acc: '#f87171',
+      acc2: '#ef4444',
+      bdr: '#dc2626',
+      footer: '#292524',
+      chip: 'linear-gradient(135deg, #44403c, #f87171)'
+    },
+    
+    // Nature Themes
     pushp: {
+      name: 'पुष्प',
       bg: '#fdf2f8',
       bgGrad: ['#fdf2f8', '#fce7f3'],
       txt: '#831843',
       acc: '#db2777',
       acc2: '#ec4899',
       bdr: '#f472b6',
-      footer: '#fbcfe8'
+      footer: '#fbcfe8',
+      chip: 'linear-gradient(135deg, #fce7f3, #db2777)'
+    },
+    kesari: {
+      name: 'केसरी',
+      bg: '#fff7ed',
+      bgGrad: ['#fff7ed', '#ffedd5'],
+      txt: '#7c2d12',
+      acc: '#ea580c',
+      acc2: '#f97316',
+      bdr: '#fb923c',
+      footer: '#fed7aa',
+      chip: 'linear-gradient(135deg, #ffedd5, #ea580c)'
+    },
+    chandni: {
+      name: 'चांदनी',
+      bg: '#f8fafc',
+      bgGrad: ['#f8fafc', '#e2e8f0'],
+      txt: '#1e293b',
+      acc: '#64748b',
+      acc2: '#94a3b8',
+      bdr: '#cbd5e1',
+      footer: '#e2e8f0',
+      chip: 'linear-gradient(135deg, #e2e8f0, #64748b)'
+    },
+    
+    // Premium Themes
+    sandhya: {
+      name: 'संध्या',
+      bg: '#1a1a2e',
+      bgGrad: ['#16213e', '#1a1a2e', '#0f0f23'],
+      txt: '#fef3c7',
+      acc: '#f59e0b',
+      acc2: '#d97706',
+      bdr: '#b45309',
+      footer: '#1e1e3f',
+      gradientStops: [0, 0.5, 1],
+      chip: 'linear-gradient(135deg, #f59e0b, #ef4444, #8b5cf6)'
+    },
+    samudra: {
+      name: 'समुद्र',
+      bg: '#0c1929',
+      bgGrad: ['#0c1929', '#164e63', '#0e7490'],
+      txt: '#ecfeff',
+      acc: '#22d3ee',
+      acc2: '#06b6d4',
+      bdr: '#0891b2',
+      footer: '#083344',
+      gradientStops: [0, 0.6, 1],
+      chip: 'linear-gradient(135deg, #0c1929, #22d3ee)'
+    },
+    vaibhav: {
+      name: 'वैभव',
+      bg: '#1a1207',
+      bgGrad: ['#1a1207', '#2d1f0a', '#3d2a0d'],
+      txt: '#fef3c7',
+      acc: '#fbbf24',
+      acc2: '#f59e0b',
+      bdr: '#d97706',
+      footer: '#2d1f0a',
+      gradientStops: [0, 0.5, 1],
+      chip: 'linear-gradient(135deg, #fbbf24, #f59e0b, #b45309)'
     }
+  },
+  
+  // ============ GET CURRENT PANDIT ============
+  getPandit() {
+    return this.pandits[this.currentPandit];
+  },
+  
+  // ============ PANDIT CHANGE HANDLER ============
+  onPanditChange() {
+    const select = document.getElementById('panditSelect');
+    this.currentPandit = select.value;
+    const pandit = this.getPandit();
+    
+    // Update info panel
+    document.getElementById('panditInfoName').textContent = pandit.name;
+    document.getElementById('panditInfoTitle').textContent = '📿 ' + pandit.title;
+    document.getElementById('panditInfoPhone').textContent = pandit.phoneDisplay;
+    
+    if (pandit.website) {
+      document.getElementById('panditInfoAddress').textContent = '🌐 ' + pandit.website;
+    } else {
+      document.getElementById('panditInfoAddress').textContent = pandit.addressDisplay;
+    }
+    
+    // Update current pandit display in view
+    document.getElementById('currentPanditName').textContent = pandit.name;
+    
+    // Reload QR if needed
+    if (pandit.hasQR && pandit.qrUrl) {
+      this.loadQRCode();
+    }
+    
+    // Redraw canvas
+    this.draw();
+    
+    // Save preference
+    this.saveData();
+    
+    this.toast(`${pandit.name} चुने गए`, 'success');
+  },
+  
+  // 🆕 Theme change handler
+  onThemeChange() {
+    const themeName = document.getElementById('th').value;
+    this.updateThemeChips(themeName);
+    this.draw();
+  },
+  
+  // 🆕 Build theme chips
+  buildThemeChips() {
+    const grid = document.getElementById('themeGrid');
+    grid.innerHTML = Object.entries(this.themes).map(([key, theme]) => `
+      <div class="theme-chip ${key === 'saumya' ? 'active' : ''}" 
+           data-theme="${key}" 
+           data-name="${theme.name}"
+           style="background: ${theme.chip}"
+           onclick="vs.selectTheme('${key}')">
+      </div>
+    `).join('');
+  },
+  
+  // 🆕 Select theme via chip
+  selectTheme(themeName) {
+    document.getElementById('th').value = themeName;
+    this.updateThemeChips(themeName);
+    this.draw();
+  },
+  
+  // 🆕 Update theme chip active state
+  updateThemeChips(activeTheme) {
+    document.querySelectorAll('.theme-chip').forEach(chip => {
+      chip.classList.toggle('active', chip.dataset.theme === activeTheme);
+    });
   },
   
   // ============ INITIALIZATION ============
@@ -1163,6 +1529,9 @@ const vs = {
     // Build Rashi Input List
     this.buildRashiList();
     
+    // 🆕 Build Theme Chips
+    this.buildThemeChips();
+    
     // Setup mobile menu
     this.setupMobileMenu();
     
@@ -1177,6 +1546,12 @@ const vs = {
     this.updateStatus('loading', 'फॉन्ट्स लोड हो रहे हैं...');
     await this.waitForFonts();
     
+    // Load saved data (including pandit preference)
+    this.loadSavedData();
+    
+    // Initialize pandit info display
+    this.onPanditChange();
+    
     // Ready!
     this.isReady = true;
     this.updateStatus('ready', 'सिस्टम तैयार ✓');
@@ -1187,10 +1562,9 @@ const vs = {
     this.setupKeyboardShortcuts();
     
     // Auto-save to localStorage
-    this.loadSavedData();
     setInterval(() => this.saveData(), 30000);
     
-    this.toast('Vedic Studio Pro तैयार है!', 'success');
+    this.toast('Vedic Studio Pro v13 तैयार है!', 'success');
     
     // Show swipe hint on mobile (once)
     if (this.isMobile && !localStorage.getItem('swipeHintShown')) {
@@ -1228,7 +1602,6 @@ const vs = {
     menuToggle.addEventListener('click', toggleMenu);
     overlay.addEventListener('click', closeMenu);
     
-    // Close menu when selecting an option on mobile
     sidebar.querySelectorAll('select, .quick-btn, .btn').forEach(el => {
       el.addEventListener('change', () => {
         if (this.isMobile) setTimeout(closeMenu, 300);
@@ -1258,15 +1631,13 @@ const vs = {
       const deltaX = touchEndX - this.touchStartX;
       const deltaY = touchEndY - this.touchStartY;
       
-      // Only trigger if horizontal swipe is dominant and significant
       if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
         if (deltaX > 0) {
-          this.slide(-1); // Swipe right = previous
+          this.slide(-1);
         } else {
-          this.slide(1); // Swipe left = next
+          this.slide(1);
         }
         
-        // Haptic feedback if available
         if (navigator.vibrate) {
           navigator.vibrate(10);
         }
@@ -1277,6 +1648,15 @@ const vs = {
   // Load QR Code from URL
   loadQRCode() {
     return new Promise((resolve) => {
+      const pandit = this.getPandit();
+      
+      // 🆕 Only load QR if pandit has QR enabled
+      if (!pandit.hasQR || !pandit.qrUrl) {
+        this.qrLoaded = false;
+        resolve(false);
+        return;
+      }
+      
       this.qrImage = new Image();
       this.qrImage.crossOrigin = 'anonymous';
       
@@ -1287,12 +1667,12 @@ const vs = {
       };
       
       this.qrImage.onerror = (err) => {
-        console.warn('⚠️ QR Code failed to load, using fallback:', err);
+        console.warn('⚠️ QR Code failed to load:', err);
         this.qrLoaded = false;
         resolve(false);
       };
       
-      this.qrImage.src = 'https://jaiminihome-ship-it.github.io/POOJASAMAGRI/qr.png';
+      this.qrImage.src = pandit.qrUrl;
     });
   },
   
@@ -1339,7 +1719,6 @@ const vs = {
       if (e.key === 'ArrowLeft') this.slide(-1);
       if (e.key === 'ArrowRight') this.slide(1);
       if (e.key === 'Escape') {
-        // Close mobile menu on escape
         document.getElementById('sidebar').classList.remove('open');
         document.getElementById('menuToggle').classList.remove('active');
         document.getElementById('sidebarOverlay').classList.remove('active');
@@ -1400,13 +1779,12 @@ const vs = {
   // ============ MODE SYNC ============
   sync() {
     const mode = document.getElementById('mode').value;
+    const pandit = this.getPandit();
     
-    // Toggle visibility
     document.getElementById('rashiBox').classList.toggle('hidden', mode !== 'rashi');
     document.getElementById('editBox').classList.toggle('hidden', mode === 'rashi');
     document.getElementById('navPanel').classList.toggle('hidden', mode !== 'rashi');
     
-    // Update edit box title
     const titles = {
       alert: '📢 सूचना कंटेंट',
       panchang: '📅 पंचांग विवरण',
@@ -1414,11 +1792,10 @@ const vs = {
     };
     document.getElementById('editTitle').textContent = titles[mode] || '✏️ कंटेंट एडिटर';
     
-    // Set default content
     const defaults = {
       alert: { h: 'विशेष ग्रह परिवर्तन', b: 'महत्वपूर्ण ज्योतिषीय सूचना यहाँ लिखें...' },
       panchang: { h: 'आज का पंचांग', b: 'तिथि:\nनक्षत्र:\nयोग:\nकरण:\nराहुकाल:' },
-      letterhead: { h: '॥ शुभम् भवतु ॥', b: 'आदरणीय,\n\nयहाँ अपना पत्र लिखें...\n\nभवदीय,\nपं. युगल आचार्य' }
+      letterhead: { h: '॥ शुभम् भवतु ॥', b: `आदरणीय,\n\nयहाँ अपना पत्र लिखें...\n\nभवदीय,\n${pandit.name}` }
     };
     
     if (defaults[mode]) {
@@ -1480,6 +1857,7 @@ const vs = {
   // ============ SAVE/LOAD DATA ============
   saveData() {
     const data = {
+      pandit: this.currentPandit,
       mode: document.getElementById('mode').value,
       theme: document.getElementById('th').value,
       fontSize: document.getElementById('fs').value,
@@ -1495,9 +1873,18 @@ const vs = {
       const saved = localStorage.getItem('vedicStudioData');
       if (saved) {
         const data = JSON.parse(saved);
+        
+        if (data.pandit && this.pandits[data.pandit]) {
+          this.currentPandit = data.pandit;
+          document.getElementById('panditSelect').value = data.pandit;
+        }
+        
         document.getElementById('mode').value = data.mode || 'rashi';
         document.getElementById('th').value = data.theme || 'saumya';
         document.getElementById('fs').value = data.fontSize || 42;
+        
+        // Update theme chips
+        this.updateThemeChips(data.theme || 'saumya');
         
         if (data.rashiTexts) {
           document.querySelectorAll('.rashi-text').forEach((t, i) => {
@@ -1519,6 +1906,7 @@ const vs = {
     const themeName = document.getElementById('th').value;
     const fontSize = parseInt(document.getElementById('fs').value);
     const theme = this.themes[themeName];
+    const pandit = this.getPandit();
     
     document.getElementById('fv').textContent = `${fontSize}px`;
     
@@ -1535,12 +1923,23 @@ const vs = {
     const W = this.can.width;
     const H = this.can.height;
     
-    // Background Gradient
+    // 🆕 Enhanced Background Gradient (supports multi-stop gradients)
     const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
-    bgGrad.addColorStop(0, theme.bgGrad[0]);
-    bgGrad.addColorStop(1, theme.bgGrad[1]);
+    if (theme.gradientStops && theme.bgGrad.length > 2) {
+      theme.bgGrad.forEach((color, i) => {
+        bgGrad.addColorStop(theme.gradientStops[i], color);
+      });
+    } else {
+      bgGrad.addColorStop(0, theme.bgGrad[0]);
+      bgGrad.addColorStop(1, theme.bgGrad[1]);
+    }
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, W, H);
+    
+    // 🆕 Add subtle pattern overlay for premium themes
+    if (['sandhya', 'samudra', 'vaibhav'].includes(themeName)) {
+      this.drawPatternOverlay(ctx, W, H, theme);
+    }
     
     // Decorative Corner Patterns
     this.drawCornerPatterns(ctx, W, H, theme);
@@ -1550,16 +1949,36 @@ const vs = {
     
     // Mode-specific content
     if (mode === 'letterhead') {
-      this.drawLetterhead(ctx, W, H, theme, fontSize);
+      this.drawLetterhead(ctx, W, H, theme, fontSize, pandit);
     } else if (mode === 'rashi') {
       const idx = forceIndex !== null ? forceIndex : this.currentIdx;
-      this.drawRashifal(ctx, W, H, theme, fontSize, idx);
+      this.drawRashifal(ctx, W, H, theme, fontSize, idx, pandit);
     } else {
-      this.drawSinglePost(ctx, W, H, theme, fontSize, mode);
+      this.drawSinglePost(ctx, W, H, theme, fontSize, mode, pandit);
     }
     
     // Footer
-    this.drawFooter(ctx, W, H, theme, mode);
+    this.drawFooter(ctx, W, H, theme, mode, pandit);
+  },
+  
+  // 🆕 Pattern overlay for premium themes
+  drawPatternOverlay(ctx, W, H, theme) {
+    ctx.save();
+    ctx.globalAlpha = 0.03;
+    
+    // Draw subtle mandala-like pattern
+    const centerX = W / 2;
+    const centerY = H / 2;
+    
+    for (let i = 0; i < 8; i++) {
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 200 + i * 100, 0, Math.PI * 2);
+      ctx.strokeStyle = theme.acc;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+    
+    ctx.restore();
   },
   
   drawCornerPatterns(ctx, W, H, theme) {
@@ -1576,30 +1995,46 @@ const vs = {
       ctx.lineTo(x + sx * 40, y);
       ctx.stroke();
       
+      // Add decorative dot
       ctx.beginPath();
       ctx.arc(x + sx * 8, y + sy * 8, 4, 0, Math.PI * 2);
       ctx.fillStyle = theme.acc;
+      ctx.fill();
+      
+      // 🆕 Add extra flourish
+      ctx.beginPath();
+      ctx.arc(x + sx * 20, y + sy * 20, 2, 0, Math.PI * 2);
       ctx.fill();
     });
   },
   
   drawBorder(ctx, W, H, theme) {
+    // Outer border
     ctx.strokeStyle = theme.bdr;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 4;
     ctx.strokeRect(25, 25, W-50, H-50);
     
+    // Inner decorative border
     ctx.strokeStyle = theme.acc;
     ctx.lineWidth = 1;
     ctx.setLineDash([10, 5]);
     ctx.strokeRect(40, 40, W-80, H-80);
     ctx.setLineDash([]);
     
+    // Bold inner frame
     ctx.lineWidth = 8;
     ctx.strokeStyle = theme.acc + '40';
     ctx.strokeRect(55, 55, W-110, H-110);
+    
+    // 🆕 Extra decorative line
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = theme.acc + '20';
+    ctx.strokeRect(65, 65, W-130, H-130);
   },
   
-  drawLetterhead(ctx, W, H, theme, fontSize) {
+  // 🆕 FIXED: Letterhead with proper text wrapping
+  drawLetterhead(ctx, W, H, theme, fontSize, pandit) {
+    // Header section
     ctx.fillStyle = theme.footer;
     ctx.fillRect(60, 60, W-120, 220);
     
@@ -1607,15 +2042,16 @@ const vs = {
     
     ctx.textAlign = 'left';
     ctx.fillStyle = theme.acc;
-    ctx.font = 'bold 58px "Cinzel Decorative"';
-    ctx.fillText('पं. युगल आचार्य', 260, 150);
+    ctx.font = 'bold 52px "Cinzel Decorative"';
+    ctx.fillText(pandit.name, 260, 145);
     
     ctx.fillStyle = theme.txt;
-    ctx.font = '600 26px "Outfit"';
-    ctx.fillText('वैदिक ज्योतिषाचार्य एवं वास्तु विशेषज्ञ', 260, 195);
-    ctx.font = '400 22px "Outfit"';
-    ctx.fillText('📍 जयपुर, राजस्थान | ☎ +91 9928139485', 260, 235);
+    ctx.font = '600 24px "Outfit"';
+    ctx.fillText(pandit.title, 260, 190);
+    ctx.font = '400 20px "Outfit"';
+    ctx.fillText(`${pandit.addressDisplay} | ☎ ${pandit.phone}`, 260, 225);
     
+    // Divider line
     ctx.strokeStyle = theme.acc;
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -1623,21 +2059,36 @@ const vs = {
     ctx.lineTo(W-80, 300);
     ctx.stroke();
     
+    // Decorative element
+    ctx.beginPath();
+    ctx.arc(W/2, 300, 8, 0, Math.PI * 2);
+    ctx.fillStyle = theme.acc;
+    ctx.fill();
+    
     const heading = document.getElementById('mainH').value || '॥ शुभम् भवतु ॥';
     const body = document.getElementById('mainB').value || '';
     
+    // Heading
     ctx.textAlign = 'center';
     ctx.fillStyle = theme.acc;
-    ctx.font = 'bold 42px "Cinzel Decorative"';
-    ctx.fillText(heading, W/2, 380);
+    ctx.font = 'bold 40px "Cinzel Decorative"';
+    ctx.fillText(heading, W/2, 370);
     
+    // 🆕 FIXED: Body text with proper wrapping and page boundaries
     ctx.textAlign = 'left';
     ctx.fillStyle = theme.txt;
     ctx.font = `${fontSize}px "Noto Serif Devanagari"`;
-    this.wrapText(ctx, body, 100, 470, W-200, fontSize * 1.6);
+    
+    const marginX = 100;
+    const marginTop = 440;
+    const maxWidth = W - (marginX * 2);
+    const lineHeight = fontSize * 1.6;
+    const maxY = H - 250; // Leave space for footer
+    
+    this.wrapTextWithLimit(ctx, body, marginX, marginTop, maxWidth, lineHeight, maxY);
   },
   
-  drawRashifal(ctx, W, H, theme, fontSize, idx) {
+  drawRashifal(ctx, W, H, theme, fontSize, idx, pandit) {
     const rashi = this.rashis[idx];
     const textareas = document.querySelectorAll('.rashi-text');
     const content = textareas[idx]?.value || 'राशिफल यहाँ दिखेगा...';
@@ -1649,50 +2100,61 @@ const vs = {
     
     ctx.textAlign = 'left';
     ctx.fillStyle = theme.acc;
-    ctx.font = 'bold 48px "Cinzel Decorative"';
-    ctx.fillText('पं. युगल आचार्य', 240, 140);
-    ctx.font = '400 22px "Outfit"';
+    ctx.font = 'bold 44px "Cinzel Decorative"';
+    ctx.fillText(pandit.name, 240, 138);
+    ctx.font = '400 20px "Outfit"';
     ctx.fillStyle = theme.txt;
-    ctx.fillText('वैदिक ज्योतिषाचार्य | astroyugalacharya.in', 240, 180);
+    ctx.fillText(`${pandit.titleShort} | ${pandit.handleDisplay}`, 240, 175);
     
     const dateInput = document.getElementById('postDate').value;
     const date = dateInput ? new Date(dateInput) : new Date();
     const dateStr = `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`;
     ctx.textAlign = 'right';
-    ctx.font = 'bold 28px "Outfit"';
+    ctx.font = 'bold 26px "Outfit"';
     ctx.fillStyle = theme.acc;
-    ctx.fillText(dateStr, W-80, 130);
-    ctx.font = '400 20px "Outfit"';
-    ctx.fillText('दैनिक राशिफल', W-80, 165);
+    ctx.fillText(dateStr, W-80, 125);
+    ctx.font = '400 18px "Outfit"';
+    ctx.fillText('दैनिक राशिफल', W-80, 155);
     
     ctx.textAlign = 'center';
     
+    // Rashi symbol circle
     ctx.beginPath();
-    ctx.arc(W/2, 360, 80, 0, Math.PI * 2);
+    ctx.arc(W/2, 355, 75, 0, Math.PI * 2);
     ctx.fillStyle = theme.acc + '20';
     ctx.fill();
     ctx.strokeStyle = theme.acc;
     ctx.lineWidth = 3;
     ctx.stroke();
     
-    ctx.font = '100px serif';
+    // Inner circle
+    ctx.beginPath();
+    ctx.arc(W/2, 355, 60, 0, Math.PI * 2);
+    ctx.strokeStyle = theme.acc + '40';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    
+    ctx.font = '90px serif';
     ctx.fillStyle = theme.acc;
-    ctx.fillText(rashi.symbol, W/2, 395);
+    ctx.fillText(rashi.symbol, W/2, 385);
     
-    ctx.font = 'bold 72px "Cinzel Decorative"';
-    ctx.fillText(rashi.name, W/2, 520);
+    ctx.font = 'bold 68px "Cinzel Decorative"';
+    ctx.fillText(rashi.name, W/2, 510);
     
-    ctx.font = '600 28px "Outfit"';
+    ctx.font = '600 26px "Outfit"';
     ctx.fillStyle = theme.txt + '80';
-    ctx.fillText(rashi.en, W/2, 565);
+    ctx.fillText(rashi.en, W/2, 555);
     
+    // Rashifal content
     ctx.textAlign = 'center';
     ctx.fillStyle = theme.txt;
     ctx.font = `${fontSize}px "Noto Serif Devanagari"`;
-    this.wrapText(ctx, content, W/2, 660, W-180, fontSize * 1.7, 'center');
+    
+    const maxY = H - 220;
+    this.wrapTextWithLimit(ctx, content, W/2, 640, W-180, fontSize * 1.7, maxY, 'center');
   },
   
-  drawSinglePost(ctx, W, H, theme, fontSize, mode) {
+  drawSinglePost(ctx, W, H, theme, fontSize, mode, pandit) {
     const heading = document.getElementById('mainH').value || 'शीर्षक';
     const body = document.getElementById('mainB').value || 'विवरण यहाँ...';
     
@@ -1703,11 +2165,11 @@ const vs = {
     
     ctx.textAlign = 'left';
     ctx.fillStyle = theme.acc;
-    ctx.font = 'bold 48px "Cinzel Decorative"';
-    ctx.fillText('पं. युगल आचार्य', 240, 140);
-    ctx.font = '400 22px "Outfit"';
+    ctx.font = 'bold 44px "Cinzel Decorative"';
+    ctx.fillText(pandit.name, 240, 138);
+    ctx.font = '400 20px "Outfit"';
     ctx.fillStyle = theme.txt;
-    ctx.fillText('वैदिक ज्योतिषाचार्य | astroyugalacharya.in', 240, 180);
+    ctx.fillText(`${pandit.titleShort} | ${pandit.handleDisplay}`, 240, 175);
     
     const badges = {
       alert: { text: '📢 विशेष सूचना', color: '#dc2626' },
@@ -1716,43 +2178,99 @@ const vs = {
     const badge = badges[mode] || { text: '📌 Update', color: theme.acc };
     
     ctx.textAlign = 'right';
-    ctx.font = 'bold 24px "Outfit"';
+    ctx.font = 'bold 22px "Outfit"';
     ctx.fillStyle = badge.color;
-    ctx.fillText(badge.text, W-80, 140);
+    ctx.fillText(badge.text, W-80, 135);
     
+    // Heading
     ctx.textAlign = 'center';
     ctx.fillStyle = theme.acc;
-    ctx.font = 'bold 62px "Cinzel Decorative"';
-    this.wrapText(ctx, heading, W/2, 360, W-150, 80, 'center');
+    ctx.font = 'bold 56px "Cinzel Decorative"';
+    this.wrapTextWithLimit(ctx, heading, W/2, 350, W-150, 70, 450, 'center');
     
+    // Body
     ctx.fillStyle = theme.txt;
     ctx.font = `${fontSize}px "Noto Serif Devanagari"`;
-    this.wrapText(ctx, body, W/2, 520, W-160, fontSize * 1.7, 'center');
+    const maxY = H - 220;
+    this.wrapTextWithLimit(ctx, body, W/2, 480, W-160, fontSize * 1.7, maxY, 'center');
   },
   
-  drawFooter(ctx, W, H, theme, mode) {
+  // 🆕 UPDATED: Footer with conditional QR code
+  drawFooter(ctx, W, H, theme, mode, pandit) {
     const footerY = H - 200;
     
     ctx.fillStyle = theme.footer;
     ctx.fillRect(55, footerY, W-110, 145);
     
-    this.drawQR(ctx, 85, footerY + 20, 105, theme);
+    // 🆕 Only show QR for pandits with hasQR = true
+    let textStartX = 85;
+    if (pandit.hasQR && this.qrLoaded) {
+      this.drawQR(ctx, 85, footerY + 20, 105, theme);
+      textStartX = 210;
+    } else {
+      // Draw decorative element instead of QR
+      this.drawDecorativeElement(ctx, 85, footerY + 20, 105, theme);
+      textStartX = 210;
+    }
     
     ctx.textAlign = 'left';
     ctx.fillStyle = theme.acc;
-    ctx.font = 'bold 32px "Cinzel Decorative"';
-    ctx.fillText('पं. युगल आचार्य', 210, footerY + 55);
+    ctx.font = 'bold 30px "Cinzel Decorative"';
+    ctx.fillText(pandit.name, textStartX, footerY + 52);
     
     ctx.fillStyle = theme.txt;
-    ctx.font = '400 22px "Outfit"';
-    ctx.fillText('📞 +91 9928139485', 210, footerY + 90);
-    ctx.fillText('🌐 www.astroyugalacharya.in', 210, footerY + 120);
+    ctx.font = '400 20px "Outfit"';
+    ctx.fillText(pandit.phoneDisplay, textStartX, footerY + 85);
+    
+    if (pandit.website) {
+      ctx.fillText(pandit.websiteDisplay, textStartX, footerY + 115);
+    } else {
+      const addressText = pandit.addressShort ? `📍 ${pandit.addressShort}` : pandit.addressDisplay;
+      ctx.fillText(addressText, textStartX, footerY + 115);
+    }
     
     ctx.textAlign = 'right';
-    ctx.font = '400 20px "Outfit"';
+    ctx.font = '400 18px "Outfit"';
     ctx.fillStyle = theme.txt + 'aa';
-    ctx.fillText('📱 WhatsApp | 📷 Instagram | 📘 Facebook', W-85, footerY + 90);
-    ctx.fillText('@astroyugalacharya', W-85, footerY + 120);
+    ctx.fillText(pandit.socials, W-85, footerY + 85);
+    ctx.fillText(pandit.handle || pandit.addressShort || '', W-85, footerY + 115);
+  },
+  
+  // 🆕 Decorative element for when QR is not available
+  drawDecorativeElement(ctx, x, y, size, theme) {
+    ctx.save();
+    
+    // Decorative mandala-like pattern
+    const centerX = x + size/2;
+    const centerY = y + size/2;
+    
+    // Outer circle
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, size/2 - 5, 0, Math.PI * 2);
+    ctx.fillStyle = theme.acc + '20';
+    ctx.fill();
+    ctx.strokeStyle = theme.acc;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    // Inner circles
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, size/3, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, size/5, 0, Math.PI * 2);
+    ctx.fillStyle = theme.acc;
+    ctx.fill();
+    
+    // Om symbol
+    ctx.font = `${size * 0.4}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = theme.acc;
+    ctx.fillText('🙏', centerX, centerY);
+    
+    ctx.restore();
   },
   
   drawLogo(ctx, x, y, size, theme) {
@@ -1766,7 +2284,14 @@ const vs = {
     ctx.lineWidth = 2;
     ctx.stroke();
     
-    ctx.font = `${size * 0.6}px serif`;
+    // Inner ring
+    ctx.beginPath();
+    ctx.arc(x + size/2, y + size/2, size/2 - 15, 0, Math.PI * 2);
+    ctx.strokeStyle = theme.acc + '50';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    
+    ctx.font = `${size * 0.5}px serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = theme.acc;
@@ -1776,6 +2301,14 @@ const vs = {
   },
   
   drawQR(ctx, x, y, size, theme) {
+    const pandit = this.getPandit();
+    
+    // 🆕 Check if pandit has QR enabled
+    if (!pandit.hasQR) {
+      this.drawDecorativeElement(ctx, x, y, size, theme);
+      return;
+    }
+    
     if (this.qrLoaded && this.qrImage) {
       try {
         ctx.fillStyle = '#fff';
@@ -1825,6 +2358,7 @@ const vs = {
     });
   },
   
+  // Original wrapText function
   wrapText(ctx, text, x, y, maxWidth, lineHeight, align = 'left') {
     ctx.textAlign = align;
     const paragraphs = text.split('\n');
@@ -1859,6 +2393,95 @@ const vs = {
     return currentY;
   },
   
+  // 🆕 NEW: Enhanced wrapText with Y limit (prevents overflow)
+  wrapTextWithLimit(ctx, text, x, y, maxWidth, lineHeight, maxY, align = 'left') {
+    ctx.textAlign = align;
+    const paragraphs = text.split('\n');
+    let currentY = y;
+    let stopped = false;
+    
+    for (let p = 0; p < paragraphs.length && !stopped; p++) {
+      const para = paragraphs[p];
+      
+      if (para.trim() === '') {
+        currentY += lineHeight * 0.5;
+        if (currentY > maxY) {
+          stopped = true;
+          break;
+        }
+        continue;
+      }
+      
+      // Split by spaces but also handle Hindi text without spaces
+      let words = para.split(' ');
+      
+      // If no spaces found, try to break by character clusters
+      if (words.length === 1 && para.length > 20) {
+        words = this.breakLongText(para, ctx, maxWidth);
+      }
+      
+      let line = '';
+      
+      for (let i = 0; i < words.length && !stopped; i++) {
+        const word = words[i];
+        const testLine = line + word + ' ';
+        const metrics = ctx.measureText(testLine);
+        
+        if (metrics.width > maxWidth && i > 0) {
+          // Check if we're about to exceed Y limit
+          if (currentY > maxY) {
+            // Add ellipsis and stop
+            ctx.fillText(line.trim() + '...', x, currentY);
+            stopped = true;
+            break;
+          }
+          
+          ctx.fillText(line.trim(), x, currentY);
+          line = word + ' ';
+          currentY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      
+      if (!stopped && line.trim()) {
+        if (currentY > maxY) {
+          ctx.fillText(line.trim() + '...', x, currentY);
+          stopped = true;
+        } else {
+          ctx.fillText(line.trim(), x, currentY);
+          currentY += lineHeight;
+        }
+      }
+    }
+    
+    return currentY;
+  },
+  
+  // 🆕 Break long text without spaces into smaller chunks
+  breakLongText(text, ctx, maxWidth) {
+    const chunks = [];
+    let current = '';
+    
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      const testStr = current + char;
+      
+      if (ctx.measureText(testStr).width > maxWidth * 0.9) {
+        chunks.push(current);
+        current = char;
+      } else {
+        current = testStr;
+      }
+    }
+    
+    if (current) {
+      chunks.push(current);
+    }
+    
+    return chunks;
+  },
+  
   // ============ DOWNLOAD FUNCTIONS ============
   
   async downloadPNG() {
@@ -1876,10 +2499,11 @@ const vs = {
       this.setProgress(90);
       
       const mode = document.getElementById('mode').value;
-      let filename = `Vedic_${mode}`;
+      const pandit = this.getPandit();
+      let filename = `${pandit.nameShort}_${mode}`;
       
       if (mode === 'rashi') {
-        filename = `${this.currentIdx + 1}_${this.rashis[this.currentIdx].name}_${this.rashis[this.currentIdx].en}`;
+        filename = `${pandit.nameShort}_${this.currentIdx + 1}_${this.rashis[this.currentIdx].name}_${this.rashis[this.currentIdx].en}`;
       }
       
       filename += `_${Date.now()}.png`;
@@ -1915,7 +2539,8 @@ const vs = {
     
     try {
       const zip = new JSZip();
-      const folder = zip.folder('Rashifal_Images');
+      const pandit = this.getPandit();
+      const folder = zip.folder(`${pandit.nameShort}_Rashifal`);
       let processed = 0;
       
       for (let i = 0; i < 12; i++) {
@@ -1943,7 +2568,7 @@ const vs = {
       });
       
       const dateStr = new Date().toISOString().split('T')[0];
-      this.downloadBlob(zipBlob, `Rashifal_${dateStr}.zip`);
+      this.downloadBlob(zipBlob, `${pandit.nameShort}_Rashifal_${dateStr}.zip`);
       
       this.setProgress(100);
       await this.delay(300);
@@ -1966,6 +2591,7 @@ const vs = {
     if (!this.isReady) return;
     
     const mode = document.getElementById('mode').value;
+    const pandit = this.getPandit();
     this.log('PDF बन रही है...', 'loading');
     this.setProgress(20);
     
@@ -2022,7 +2648,7 @@ const vs = {
         }
         
         const dateStr = new Date().toISOString().split('T')[0];
-        pdf.save(`Rashifal_${dateStr}.pdf`);
+        pdf.save(`${pandit.nameShort}_Rashifal_${dateStr}.pdf`);
         
         this.draw();
         
@@ -2054,7 +2680,7 @@ const vs = {
         const y = (pageHeight - imgHeight) / 2;
         
         pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
-        pdf.save(`Vedic_${mode}_${Date.now()}.pdf`);
+        pdf.save(`${pandit.nameShort}_${mode}_${Date.now()}.pdf`);
       }
       
       this.setProgress(100);
