@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Vedic Studio Pro v11 - Complete Edition</title>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Cinzel+Decorative:wght@700;900&family=Noto+Serif+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root { 
+      --gold: #BF953F; 
+      --gold-l: #FCF6BA; 
+      --gold-d: #8B6914;
+      --dark: #050505; 
+      --panel: #0f172a;
+      --card: #1e293b;
+      --success: #10b981;
+      --error: #ef4444;
+      --info: #3b82f6;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body { 
+      font-family: 'Outfit', sans-serif; 
+      background: var(--dark); 
+      color: white; 
+      display: flex; 
+      height: 100vh; 
+      overflow: hidden; 
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--dark); }
+    ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+    /* Sidebar */
+    .sidebar { 
+      width: 380px; 
+      min-width: 380px; 
+      background: var(--panel); 
+      border-right: 2px solid var(--gold); 
+      display: flex; 
+      flex-direction: column; 
+      z-index: 10; 
+    }
+    
+    .sidebar-header {
+      background: linear-gradient(135deg, var(--gold-d), var(--gold));
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .sidebar-header h1 {
+      font-family: 'Cinzel Decorative';
+      color: #000;
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+    
+    .sidebar-header p {
+      color: #000;
+      opacity: 0.8;
+      font-size: 12px;
+    }
+    
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 15px;
+      background: var(--card);
+      border-radius: 10px;
+      border-left: 4px solid var(--gold);
+    }
+    
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    
+    .status-dot.loading { background: #f59e0b; animation: pulse 1s infinite; }
+    .status-dot.ready { background: var(--success); }
+    .status-dot.error { background: var(--error); }
+    
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* Form Groups */
+    .group { 
+      background: var(--card); 
+      padding: 15px; 
+      border-radius: 12px; 
+    }
+    
+    .group-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 10px;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+    }
+    
+    select, input[type="text"], textarea { 
+      width: 100%; 
+      background: #000; 
+      border: 1px solid #374151; 
+      color: white; 
+      padding: 12px 15px; 
+      border-radius: 8px; 
+      font-family: inherit; 
+      font-size: 14px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    
+    select:focus, input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(191, 149, 63, 0.2);
+    }
+    
+    textarea { 
+      resize: vertical; 
+      min-height: 80px;
+      font-family: 'Noto Serif Devanagari', serif;
+    }
+
+    /* Range Slider */
+    .range-group {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 6px;
+      background: #374151;
+      border-radius: 3px;
+      outline: none;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-l));
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    
+    .range-value {
+      background: var(--gold);
+      color: #000;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 13px;
+      min-width: 55px;
+      text-align: center;
+    }
+
+    /* Rashi List */
+    .rashi-list { 
+      max-height: 300px; 
+      overflow-y: auto; 
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 5px;
+    }
+    
+    .r-item { 
+      background: #000; 
+      padding: 12px; 
+      border-radius: 10px;
+      border: 1px solid #374151;
+      transition: border-color 0.3s;
+    }
+    
+    .r-item:focus-within {
+      border-color: var(--gold);
+    }
+    
+    .r-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    
+    .r-item-header label {
+      font-weight: 600;
+      color: var(--gold);
+      font-size: 14px;
+    }
+    
+    .r-item-header span {
+      font-size: 11px;
+      color: #6b7280;
+    }
+    
+    .r-item textarea {
+      font-size: 13px;
+      min-height: 60px;
+    }
+
+    /* Quick Actions Row */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    
+    .quick-btn {
+      padding: 10px;
+      border: 1px solid #374151;
+      background: transparent;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    
+    .quick-btn:hover {
+      border-color: var(--gold);
+      background: rgba(191, 149, 63, 0.1);
+    }
+
+    /* Download Buttons */
+    .download-section {
+      background: var(--card);
+      padding: 15px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .btn { 
+      width: 100%; 
+      padding: 14px 20px; 
+      border: none; 
+      border-radius: 10px; 
+      cursor: pointer; 
+      font-weight: 700; 
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.3s; 
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .btn:disabled { 
+      opacity: 0.5; 
+      cursor: not-allowed; 
+      transform: none !important;
+    }
+    
+    .btn:not(:disabled):hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+    
+    .btn:not(:disabled):active {
+      transform: translateY(0);
+    }
+    
+    .btn-png { 
+      background: linear-gradient(135deg, var(--gold), var(--gold-l)); 
+      color: #000; 
+    }
+    
+    .btn-zip { 
+      background: linear-gradient(135deg, #0891b2, #22d3ee); 
+      color: #000; 
+    }
+    
+    .btn-pdf { 
+      background: linear-gradient(135deg, #dc2626, #f87171); 
+      color: white; 
+    }
+    
+    .btn-copy {
+      background: linear-gradient(135deg, #7c3aed, #a78bfa);
+      color: white;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      display: none;
+      background: #000;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 8px;
+    }
+    
+    .progress-container.active { display: block; }
+    
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--gold-l));
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    /* Log Messages */
+    .log-area {
+      font-size: 12px;
+      text-align: center;
+      min-height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .log-area.success { color: var(--success); }
+    .log-area.error { color: var(--error); }
+    .log-area.info { color: var(--info); }
+    .log-area .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Preview Workspace */
+    .view { 
+      flex: 1; 
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      padding: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Decorative Background */
+    .view::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, rgba(191, 149, 63, 0.03) 0%, transparent 50%);
+      animation: rotate 60s linear infinite;
+    }
+    
+    @keyframes rotate { to { transform: rotate(360deg); } }
+    
+    .canvas-frame { 
+      position: relative;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(191, 149, 63, 0.3);
+      border-radius: 8px; 
+      overflow: hidden;
+      max-height: 80vh;
+      max-width: 90%;
+    }
+    
+    canvas { 
+      display: block;
+      max-width: 100%; 
+      max-height: 80vh;
+      object-fit: contain;
+    }
+
+    /* Navigation */
+    .nav { 
+      margin-top: 25px; 
+      display: flex; 
+      align-items: center; 
+      gap: 15px; 
+      background: var(--panel); 
+      padding: 15px 30px; 
+      border-radius: 50px; 
+      border: 2px solid var(--gold);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+    
+    .nav-btn { 
+      background: transparent;
+      border: 2px solid var(--gold);
+      color: var(--gold); 
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      font-size: 20px; 
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .nav-btn:hover {
+      background: var(--gold);
+      color: #000;
+    }
+    
+    .nav-label {
+      min-width: 150px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    
+    .nav-label small {
+      display: block;
+      font-size: 11px;
+      color: var(--gold);
+      margin-top: 2px;
+    }
+
+    /* Keyboard Shortcuts Hint */
+    .shortcuts-hint {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.7);
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 11px;
+      color: #6b7280;
+    }
+    
+    .shortcuts-hint kbd {
+      background: #374151;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin: 0 2px;
+    }
+
+    /* Utility Classes */
+    .hidden { display: none !important; }
+    
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .toast {
+      background: var(--panel);
+      border: 1px solid var(--gold);
+      padding: 15px 20px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideIn 0.3s ease;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+    
+    .toast.success { border-color: var(--success); }
+    .toast.error { border-color: var(--error); }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Date Display */
+    .date-display {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.7);
+      padding: 12px 18px;
+      border-radius: 10px;
+      border: 1px solid var(--gold);
+    }
+    
+    .date-display .date {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    
+    .date-display .day {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    /* Mobile Warning */
+    @media (max-width: 900px) {
+      .sidebar { width: 100%; min-width: unset; max-height: 50vh; }
+      body { flex-direction: column; }
+      .view { min-height: 50vh; }
+      .shortcuts-hint { display: none; }
+    }
+
+    /* Print Styles */
+    @media print {
+      body * { visibility: hidden; }
+      .canvas-frame, .canvas-frame * { visibility: visible; }
+      .canvas-frame { 
+        position: fixed; 
+        left: 50%; 
+        top: 50%; 
+        transform: translate(-50%, -50%);
+        box-shadow: none;
+        max-width: 100%;
+        max-height: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h1>⚜️ Vedic Studio </h1>
+    <p>Desined By Niranjan </p>
+  </div>
+  
+  <div class="sidebar-content">
+    <!-- Status -->
+    <div class="status-bar">
+      <div id="statusDot" class="status-dot loading"></div>
+      <span id="statusText">सिस्टम लोड हो रहा है...</span>
+    </div>
+    
+    <!-- Design Mode -->
+    <div class="group">
+      <div class="group-title">📐 डिज़ाइन मोड</div>
+      <select id="mode" onchange="vs.sync()">
+        <option value="rashi">📊 दैनिक राशिफल (12 Images)</option>
+        <option value="alert">📢 विशेष सूचना (Single)</option>
+        <option value="panchang">📅 पंचांग (Daily)</option>
+        <option value="letterhead">📄 लेटरहेड (A4)</option>
+      </select>
+    </div>
+
+    <!-- Theme -->
+    <div class="group">
+      <div class="group-title">🎨 प्रीमियम थीम</div>
+      <select id="th" onchange="vs.draw()">
+        <option value="saumya">🤍 सौम्य (Royal White)</option>
+        <option value="dharma">🧡 धर्म (Sacred Copper)</option>
+        <option value="akash">🖤 आकाश (Celestial Dark)</option>
+        <option value="ratna">💎 रत्न (Gemstone Blue)</option>
+        <option value="pushp">🌸 पुष्प (Lotus Pink)</option>
+      </select>
+    </div>
+
+    <!-- Font Size -->
+    <div class="group">
+      <div class="group-title">🔤 फॉन्ट साइज़</div>
+      <div class="range-group">
+        <input type="range" id="fs" min="28" max="80" value="42" oninput="vs.draw()">
+        <span class="range-value" id="fv">42px</span>
+      </div>
+    </div>
+
+    <!-- Date Selection -->
+    <div class="group">
+      <div class="group-title">📅 तिथि</div>
+      <input type="date" id="postDate" onchange="vs.draw()">
+    </div>
+
+    <!-- Rashi Inputs -->
+    <div id="rashiBox" class="group">
+      <div class="group-title">🔯 राशिफल टेक्स्ट</div>
+      <div class="quick-actions" style="margin-bottom: 12px;">
+        <button class="quick-btn" onclick="vs.clearAll()">🗑️ सब मिटाएं</button>
+        <button class="quick-btn" onclick="vs.fillSample()">📝 सैंपल भरें</button>
+      </div>
+      <div class="rashi-list" id="rashiList"></div>
+    </div>
+
+    <!-- Single Edit Box -->
+    <div id="editBox" class="group hidden">
+      <div class="group-title" id="editTitle">✏️ कंटेंट एडिटर</div>
+      <input type="text" id="mainH" placeholder="हेडिंग लिखें..." oninput="vs.draw()" style="margin-bottom: 10px; font-weight: 600;">
+      <textarea id="mainB" rows="8" placeholder="विस्तृत संदेश यहाँ लिखें..." oninput="vs.draw()"></textarea>
+    </div>
+
+    <!-- Download Section -->
+    <div class="download-section">
+      <div class="group-title">💾 डाउनलोड विकल्प</div>
+      
+      <div class="progress-container" id="progressContainer">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      
+      <button class="btn btn-png" id="btnPng" onclick="vs.downloadPNG()">
+        <span>🖼️</span> PNG इमेज डाउनलोड
+      </button>
+      
+      <button class="btn btn-zip" id="btnZip" onclick="vs.downloadZIP()">
+        <span>📦</span> ZIP बैच (सभी राशि)
+      </button>
+      
+      <button class="btn btn-pdf" id="btnPdf" onclick="vs.downloadPDF()">
+        <span>📄</span> PDF डाउनलोड
+      </button>
+      
+      <button class="btn btn-copy" onclick="vs.copyToClipboard()">
+        <span>📋</span> क्लिपबोर्ड में कॉपी
+      </button>
+      
+      <div class="log-area" id="logArea"></div>
+    </div>
+  </div>
+</div>
+
+<div class="view">
+  <div class="date-display">
+    <div class="date" id="todayDate"></div>
+    <div class="day" id="todayDay"></div>
+  </div>
+  
+  <div class="canvas-frame">
+    <canvas id="canvas"></canvas>
+  </div>
+  
+  <div id="navPanel" class="nav">
+    <button class="nav-btn" onclick="vs.slide(-1)">◀</button>
+    <div class="nav-label">
+      <span id="navName">मेष</span>
+      <small id="navCount">1 / 12</small>
+    </div>
+    <button class="nav-btn" onclick="vs.slide(1)">▶</button>
+  </div>
+  
+  <div class="shortcuts-hint">
+    <kbd>←</kbd> <kbd>→</kbd> Navigate &nbsp;|&nbsp; 
+    <kbd>Ctrl</kbd>+<kbd>S</kbd> Save PNG &nbsp;|&nbsp;
+    <kbd>Ctrl</kbd>+<kbd>P</kbd> Print
+  </div>
+</div>
+
+<script>
+// =====================================================
+// VEDIC STUDIO PRO v11 - Complete Professional Edition
+// =====================================================
+
+const vs = {
+  // Canvas & Context
+  can: document.getElementById('canvas'),
+  ctx: null,
+  
+  // Rashi Names with Symbols
+  rashis: [
+    { name: "मेष", symbol: "♈", en: "Aries" },
+    { name: "वृष", symbol: "♉", en: "Taurus" },
+    { name: "मिथुन", symbol: "♊", en: "Gemini" },
+    { name: "कर्क", symbol: "♋", en: "Cancer" },
+    { name: "सिंह", symbol: "♌", en: "Leo" },
+    { name: "कन्या", symbol: "♍", en: "Virgo" },
+    { name: "तुला", symbol: "♎", en: "Libra" },
+    { name: "वृश्चिक", symbol: "♏", en: "Scorpio" },
+    { name: "धनु", symbol: "♐", en: "Sagittarius" },
+    { name: "मकर", symbol: "♑", en: "Capricorn" },
+    { name: "कुंभ", symbol: "♒", en: "Aquarius" },
+    { name: "मीन", symbol: "♓", en: "Pisces" }
+  ],
+  
+  // Current State
+  currentIdx: 0,
+  isReady: false,
+  
+  // Themes
+  themes: {
+    saumya: { 
+      bg: '#fffaf4', 
+      bgGrad: ['#fffaf4', '#fff5e6'],
+      txt: '#2d3436', 
+      acc: '#BF953F', 
+      acc2: '#d4af37',
+      bdr: '#d4af37',
+      footer: '#f5f0e8'
+    },
+    dharma: { 
+      bg: '#fff9f0', 
+      bgGrad: ['#fff9f0', '#ffedd5'],
+      txt: '#5c3a1a', 
+      acc: '#b45309', 
+      acc2: '#d97706',
+      bdr: '#f59e0b',
+      footer: '#fef3c7'
+    },
+    akash: { 
+      bg: '#0a0a0f', 
+      bgGrad: ['#0a0a0f', '#1a1a2e'],
+      txt: '#e5e7eb', 
+      acc: '#FCF6BA', 
+      acc2: '#BF953F',
+      bdr: '#BF953F',
+      footer: '#111827'
+    },
+    ratna: {
+      bg: '#0f172a',
+      bgGrad: ['#0f172a', '#1e3a5f'],
+      txt: '#e0f2fe',
+      acc: '#38bdf8',
+      acc2: '#0ea5e9',
+      bdr: '#0284c7',
+      footer: '#0c4a6e'
+    },
+    pushp: {
+      bg: '#fdf2f8',
+      bgGrad: ['#fdf2f8', '#fce7f3'],
+      txt: '#831843',
+      acc: '#db2777',
+      acc2: '#ec4899',
+      bdr: '#f472b6',
+      footer: '#fbcfe8'
+    }
+  },
+  
+  // ============ INITIALIZATION ============
+  async init() {
+    this.ctx = this.can.getContext('2d');
+    this.updateStatus('loading', 'फॉन्ट्स लोड हो रहे हैं...');
+    
+    // Set today's date
+    const today = new Date();
+    document.getElementById('postDate').valueAsDate = today;
+    this.updateDateDisplay();
+    
+    // Build Rashi Input List
+    this.buildRashiList();
+    
+    // Wait for fonts
+    await this.waitForFonts();
+    
+    // Ready!
+    this.isReady = true;
+    this.updateStatus('ready', 'सिस्टम तैयार ✓');
+    this.enableButtons();
+    this.sync();
+    
+    // Keyboard shortcuts
+    this.setupKeyboardShortcuts();
+    
+    // Auto-save to localStorage
+    this.loadSavedData();
+    setInterval(() => this.saveData(), 30000);
+    
+    this.toast('Vedic Studio Pro तैयार है!', 'success');
+  },
+  
+  buildRashiList() {
+    const container = document.getElementById('rashiList');
+    container.innerHTML = this.rashis.map((r, i) => `
+      <div class="r-item">
+        <div class="r-item-header">
+          <label>${r.symbol} ${r.name}</label>
+          <span>${r.en}</span>
+        </div>
+        <textarea 
+          class="rashi-text" 
+          data-index="${i}" 
+          placeholder="${r.name} राशि का फल लिखें..."
+          oninput="vs.onRashiInput(${i})"
+        ></textarea>
+      </div>
+    `).join('');
+  },
+  
+  async waitForFonts() {
+    const fonts = [
+      'bold 48px "Cinzel Decorative"',
+      '400 32px "Noto Serif Devanagari"',
+      '600 24px "Outfit"'
+    ];
+    
+    try {
+      await Promise.all(fonts.map(f => document.fonts.load(f)));
+      return true;
+    } catch (e) {
+      console.warn('Font loading warning:', e);
+      return false;
+    }
+  },
+  
+  setupKeyboardShortcuts() {
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        this.downloadPNG();
+      }
+      if (e.key === 'ArrowLeft') this.slide(-1);
+      if (e.key === 'ArrowRight') this.slide(1);
+    });
+  },
+  
+  // ============ UI HELPERS ============
+  updateStatus(state, text) {
+    document.getElementById('statusDot').className = `status-dot ${state}`;
+    document.getElementById('statusText').textContent = text;
+  },
+  
+  updateDateDisplay() {
+    const dateInput = document.getElementById('postDate').value;
+    const date = dateInput ? new Date(dateInput) : new Date();
+    
+    const days = ['रविवार', 'सोमवार', 'मंगलवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'];
+    const months = ['जनवरी', 'फरवरी', 'मार्च', 'अप्रैल', 'मई', 'जून', 'जुलाई', 'अगस्त', 'सितंबर', 'अक्टूबर', 'नवंबर', 'दिसंबर'];
+    
+    document.getElementById('todayDate').textContent = `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+    document.getElementById('todayDay').textContent = days[date.getDay()];
+  },
+  
+  log(msg, type = '') {
+    const el = document.getElementById('logArea');
+    el.className = `log-area ${type}`;
+    if (type === 'loading') {
+      el.innerHTML = `<div class="spinner"></div> ${msg}`;
+    } else {
+      el.textContent = msg;
+    }
+  },
+  
+  toast(msg, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+      <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+      <span>${msg}</span>
+    `;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+  },
+  
+  setProgress(percent) {
+    const container = document.getElementById('progressContainer');
+    const bar = document.getElementById('progressBar');
+    container.classList.toggle('active', percent > 0 && percent < 100);
+    bar.style.width = `${percent}%`;
+  },
+  
+  enableButtons() {
+    document.querySelectorAll('.btn').forEach(b => b.disabled = false);
+  },
+  
+  // ============ MODE SYNC ============
+  sync() {
+    const mode = document.getElementById('mode').value;
+    
+    // Toggle visibility
+    document.getElementById('rashiBox').classList.toggle('hidden', mode !== 'rashi');
+    document.getElementById('editBox').classList.toggle('hidden', mode === 'rashi');
+    document.getElementById('navPanel').classList.toggle('hidden', mode !== 'rashi');
+    
+    // Update edit box title
+    const titles = {
+      alert: '📢 सूचना कंटेंट',
+      panchang: '📅 पंचांग विवरण',
+      letterhead: '📄 पत्र कंटेंट'
+    };
+    document.getElementById('editTitle').textContent = titles[mode] || '✏️ कंटेंट एडिटर';
+    
+    // Set default content
+    const defaults = {
+      alert: { h: 'विशेष ग्रह परिवर्तन', b: 'महत्वपूर्ण ज्योतिषीय सूचना यहाँ लिखें...' },
+      panchang: { h: 'आज का पंचांग', b: 'तिथि:\nनक्षत्र:\nयोग:\nकरण:\nराहुकाल:' },
+      letterhead: { h: '॥ शुभम् भवतु ॥', b: 'आदरणीय,\n\nयहाँ अपना पत्र लिखें...\n\nभवदीय,\nपं. युगल आचार्य' }
+    };
+    
+    if (defaults[mode]) {
+      document.getElementById('mainH').value = defaults[mode].h;
+      document.getElementById('mainB').value = defaults[mode].b;
+    }
+    
+    this.updateDateDisplay();
+    this.draw();
+  },
+  
+  // ============ NAVIGATION ============
+  slide(dir) {
+    this.currentIdx = (this.currentIdx + dir + 12) % 12;
+    document.getElementById('navName').textContent = `${this.rashis[this.currentIdx].symbol} ${this.rashis[this.currentIdx].name}`;
+    document.getElementById('navCount').textContent = `${this.currentIdx + 1} / 12`;
+    this.draw();
+  },
+  
+  onRashiInput(idx) {
+    if (this.currentIdx !== idx) {
+      this.currentIdx = idx;
+      document.getElementById('navName').textContent = `${this.rashis[idx].symbol} ${this.rashis[idx].name}`;
+      document.getElementById('navCount').textContent = `${idx + 1} / 12`;
+    }
+    this.draw();
+  },
+  
+  // ============ QUICK ACTIONS ============
+  clearAll() {
+    document.querySelectorAll('.rashi-text').forEach(t => t.value = '');
+    this.draw();
+    this.toast('सभी टेक्स्ट मिटा दिया गया', 'info');
+  },
+  
+  fillSample() {
+    const samples = [
+      'आज का दिन शुभ रहेगा। व्यापार में लाभ के योग हैं। परिवार में खुशी का माहौल रहेगा।',
+      'आर्थिक मामलों में सावधानी रखें। स्वास्थ्य का ध्यान रखें। यात्रा टालें।',
+      'नए कार्य शुरू करने के लिए उत्तम दिन। मित्रों से सहयोग मिलेगा।',
+      'भाग्य साथ देगा। नौकरी में प्रगति के योग। प्रेम संबंधों में मधुरता।',
+      'सम्मान में वृद्धि होगी। राजनीतिक सफलता मिलेगी। आत्मविश्वास बढ़ेगा।',
+      'विस्तार से काम करें। छोटी-छोटी बातों पर ध्यान दें। स्वास्थ्य उत्तम रहेगा।',
+      'साझेदारी में लाभ। विवाह के योग। कानूनी मामले सुलझेंगे।',
+      'गुप्त शत्रुओं से सावधान। अचानक धन लाभ। शोध कार्य में सफलता।',
+      'भाग्योदय का समय। धार्मिक यात्रा के योग। गुरु कृपा प्राप्त होगी।',
+      'कर्म में सफलता। पदोन्नति के योग। सामाजिक प्रतिष्ठा बढ़ेगी।',
+      'मित्रों से लाभ। आय में वृद्धि। इच्छाएं पूर्ण होंगी।',
+      'आध्यात्मिक उन्नति। व्यय अधिक रहेगा। विदेश यात्रा के योग।'
+    ];
+    document.querySelectorAll('.rashi-text').forEach((t, i) => t.value = samples[i]);
+    this.draw();
+    this.toast('सैंपल टेक्स्ट भर दिया गया', 'success');
+  },
+  
+  // ============ SAVE/LOAD DATA ============
+  saveData() {
+    const data = {
+      mode: document.getElementById('mode').value,
+      theme: document.getElementById('th').value,
+      fontSize: document.getElementById('fs').value,
+      rashiTexts: Array.from(document.querySelectorAll('.rashi-text')).map(t => t.value),
+      mainH: document.getElementById('mainH').value,
+      mainB: document.getElementById('mainB').value
+    };
+    localStorage.setItem('vedicStudioData', JSON.stringify(data));
+  },
+  
+  loadSavedData() {
+    try {
+      const saved = localStorage.getItem('vedicStudioData');
+      if (saved) {
+        const data = JSON.parse(saved);
+        document.getElementById('mode').value = data.mode || 'rashi';
+        document.getElementById('th').value = data.theme || 'saumya';
+        document.getElementById('fs').value = data.fontSize || 42;
+        
+        if (data.rashiTexts) {
+          document.querySelectorAll('.rashi-text').forEach((t, i) => {
+            t.value = data.rashiTexts[i] || '';
+          });
+        }
+        
+        document.getElementById('mainH').value = data.mainH || '';
+        document.getElementById('mainB').value = data.mainB || '';
+      }
+    } catch (e) {
+      console.warn('Could not load saved data:', e);
+    }
+  },
+  
+  // ============ MAIN DRAWING ENGINE ============
+  draw(forceIndex = null) {
+    const mode = document.getElementById('mode').value;
+    const themeName = document.getElementById('th').value;
+    const fontSize = parseInt(document.getElementById('fs').value);
+    const theme = this.themes[themeName];
+    
+    document.getElementById('fv').textContent = `${fontSize}px`;
+    
+    // Canvas Size
+    if (mode === 'letterhead') {
+      this.can.width = 1240;
+      this.can.height = 1754;
+    } else {
+      this.can.width = 1080;
+      this.can.height = 1350;
+    }
+    
+    const ctx = this.ctx;
+    const W = this.can.width;
+    const H = this.can.height;
+    
+    // Background Gradient
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+    bgGrad.addColorStop(0, theme.bgGrad[0]);
+    bgGrad.addColorStop(1, theme.bgGrad[1]);
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, W, H);
+    
+    // Decorative Corner Patterns
+    this.drawCornerPatterns(ctx, W, H, theme);
+    
+    // Main Border
+    this.drawBorder(ctx, W, H, theme);
+    
+    // Mode-specific content
+    if (mode === 'letterhead') {
+      this.drawLetterhead(ctx, W, H, theme, fontSize);
+    } else if (mode === 'rashi') {
+      const idx = forceIndex !== null ? forceIndex : this.currentIdx;
+      this.drawRashifal(ctx, W, H, theme, fontSize, idx);
+    } else {
+      this.drawSinglePost(ctx, W, H, theme, fontSize, mode);
+    }
+    
+    // Footer
+    this.drawFooter(ctx, W, H, theme, mode);
+  },
+  
+  drawCornerPatterns(ctx, W, H, theme) {
+    ctx.strokeStyle = theme.acc + '30';
+    ctx.lineWidth = 2;
+    
+    // Corner flourishes
+    const corners = [[30, 30], [W-30, 30], [30, H-30], [W-30, H-30]];
+    corners.forEach(([x, y], i) => {
+      ctx.beginPath();
+      const sx = i % 2 === 0 ? 1 : -1;
+      const sy = i < 2 ? 1 : -1;
+      ctx.moveTo(x, y + sy * 40);
+      ctx.lineTo(x, y);
+      ctx.lineTo(x + sx * 40, y);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.arc(x + sx * 8, y + sy * 8, 4, 0, Math.PI * 2);
+      ctx.fillStyle = theme.acc;
+      ctx.fill();
+    });
+  },
+  
+  drawBorder(ctx, W, H, theme) {
+    // Outer border
+    ctx.strokeStyle = theme.bdr;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(25, 25, W-50, H-50);
+    
+    // Inner decorative border
+    ctx.strokeStyle = theme.acc;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([10, 5]);
+    ctx.strokeRect(40, 40, W-80, H-80);
+    ctx.setLineDash([]);
+    
+    // Bold inner frame
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = theme.acc + '40';
+    ctx.strokeRect(55, 55, W-110, H-110);
+  },
+  
+  drawLetterhead(ctx, W, H, theme, fontSize) {
+    // Header section
+    ctx.fillStyle = theme.footer;
+    ctx.fillRect(60, 60, W-120, 220);
+    
+    // Logo placeholder
+    this.drawLogo(ctx, 80, 90, 160, theme);
+    
+    // Name & Title
+    ctx.textAlign = 'left';
+    ctx.fillStyle = theme.acc;
+    ctx.font = 'bold 58px "Cinzel Decorative"';
+    ctx.fillText('पं. युगल आचार्य', 260, 150);
+    
+    ctx.fillStyle = theme.txt;
+    ctx.font = '600 26px "Outfit"';
+    ctx.fillText('वैदिक ज्योतिषाचार्य एवं वास्तु विशेषज्ञ', 260, 195);
+    ctx.font = '400 22px "Outfit"';
+    ctx.fillText('📍 जयपुर, राजस्थान | ☎ +91 9928139485', 260, 235);
+    
+    // Divider
+    ctx.strokeStyle = theme.acc;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(80, 300);
+    ctx.lineTo(W-80, 300);
+    ctx.stroke();
+    
+    // Content
+    const heading = document.getElementById('mainH').value || '॥ शुभम् भवतु ॥';
+    const body = document.getElementById('mainB').value || '';
+    
+    ctx.textAlign = 'center';
+    ctx.fillStyle = theme.acc;
+    ctx.font = 'bold 42px "Cinzel Decorative"';
+    ctx.fillText(heading, W/2, 380);
+    
+    ctx.textAlign = 'left';
+    ctx.fillStyle = theme.txt;
+    ctx.font = `${fontSize}px "Noto Serif Devanagari"`;
+    this.wrapText(ctx, body, 100, 470, W-200, fontSize * 1.6);
+  },
+  
+  drawRashifal(ctx, W, H, theme, fontSize, idx) {
+    const rashi = this.rashis[idx];
+    const textareas = document.querySelectorAll('.rashi-text');
+    const content = textareas[idx]?.value || 'राशिफल यहाँ दिखेगा...';
+    
+    // Header band
+    ctx.fillStyle = theme.footer;
+    ctx.fillRect(55, 55, W-110, 180);
+    
+    // Logo
+    this.drawLogo(ctx, 80, 75, 140, theme);
+    
+    // Brand Name
+    ctx.textAlign = 'left';
+    ctx.fillStyle = theme.acc;
+    ctx.font = 'bold 48px "Cinzel Decorative"';
+    ctx.fillText('पं. युगल आचार्य', 240, 140);
+    ctx.font = '400 22px "Outfit"';
+    ctx.fillStyle = theme.txt;
+    ctx.fillText('वैदिक ज्योतिषाचार्य | astroyugalacharya.in', 240, 180);
+    
+    // Date
+    const dateInput = document.getElementById('postDate').value;
+    const date = dateInput ? new Date(dateInput) : new Date();
+    const dateStr = `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`;
+    ctx.textAlign = 'right';
+    ctx.font = 'bold 28px "Outfit"';
+    ctx.fillStyle = theme.acc;
+    ctx.fillText(dateStr, W-80, 130);
+    ctx.font = '400 20px "Outfit"';
+    ctx.fillText('दैनिक राशिफल', W-80, 165);
+    
+    // Rashi Symbol & Name
+    ctx.textAlign = 'center';
+    
+    // Symbol circle
+    ctx.beginPath();
+    ctx.arc(W/2, 360, 80, 0, Math.PI * 2);
+    ctx.fillStyle = theme.acc + '20';
+    ctx.fill();
+    ctx.strokeStyle = theme.acc;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    
+    ctx.font = '100px serif';
+    ctx.fillStyle = theme.acc;
+    ctx.fillText(rashi.symbol, W/2, 395);
+    
+    ctx.font = 'bold 72px "Cinzel Decorative"';
+    ctx.fillText(rashi.name, W/2, 520);
+    
+    ctx.font = '600 28px "Outfit"';
+    ctx.fillStyle = theme.txt + '80';
+    ctx.fillText(rashi.en, W/2, 565);
+    
+    // Rashifal Content
+    ctx.textAlign = 'center';
+    ctx.fillStyle = theme.txt;
+    ctx.font = `${fontSize}px "Noto Serif Devanagari"`;
+    this.wrapText(ctx, content, W/2, 660, W-180, fontSize * 1.7, 'center');
+  },
+  
+  drawSinglePost(ctx, W, H, theme, fontSize, mode) {
+    const heading = document.getElementById('mainH').value || 'शीर्षक';
+    const body = document.getElementById('mainB').value || 'विवरण यहाँ...';
+    
+    // Header
+    ctx.fillStyle = theme.footer;
+    ctx.fillRect(55, 55, W-110, 180);
+    
+    this.drawLogo(ctx, 80, 75, 140, theme);
+    
+    ctx.textAlign = 'left';
+    ctx.fillStyle = theme.acc;
+    ctx.font = 'bold 48px "Cinzel Decorative"';
+    ctx.fillText('पं. युगल आचार्य', 240, 140);
+    ctx.font = '400 22px "Outfit"';
+    ctx.fillStyle = theme.txt;
+    ctx.fillText('वैदिक ज्योतिषाचार्य | astroyugalacharya.in', 240, 180);
+    
+    // Mode badge
+    const badges = {
+      alert: { text: '📢 विशेष सूचना', color: '#dc2626' },
+      panchang: { text: '📅 दैनिक पंचांग', color: '#0891b2' }
+    };
+    const badge = badges[mode] || { text: '📌 Update', color: theme.acc };
+    
+    ctx.textAlign = 'right';
+    ctx.font = 'bold 24px "Outfit"';
+    ctx.fillStyle = badge.color;
+    ctx.fillText(badge.text, W-80, 140);
+    
+    // Main Heading
+    ctx.textAlign = 'center';
+    ctx.fillStyle = theme.acc;
+    ctx.font = 'bold 62px "Cinzel Decorative"';
+    this.wrapText(ctx, heading, W/2, 360, W-150, 80, 'center');
+    
+    // Body Content
+    ctx.fillStyle = theme.txt;
+    ctx.font = `${fontSize}px "Noto Serif Devanagari"`;
+    this.wrapText(ctx, body, W/2, 520, W-160, fontSize * 1.7, 'center');
+  },
+  
+  drawFooter(ctx, W, H, theme, mode) {
+    const footerY = H - 200;
+    
+    // Footer background
+    ctx.fillStyle = theme.footer;
+    ctx.fillRect(55, footerY, W-110, 145);
+    
+    // QR Code placeholder
+    this.drawQR(ctx, 85, footerY + 20, 105, theme);
+    
+    // Contact Info
+    ctx.textAlign = 'left';
+    ctx.fillStyle = theme.acc;
+    ctx.font = 'bold 32px "Cinzel Decorative"';
+    ctx.fillText('पं. युगल आचार्य', 210, footerY + 55);
+    
+    ctx.fillStyle = theme.txt;
+    ctx.font = '400 22px "Outfit"';
+    ctx.fillText('📞 +91 9928139485', 210, footerY + 90);
+    ctx.fillText('🌐 www.astroyugalacharya.in', 210, footerY + 120);
+    
+    // Social handles
+    ctx.textAlign = 'right';
+    ctx.font = '400 20px "Outfit"';
+    ctx.fillStyle = theme.txt + 'aa';
+    ctx.fillText('📱 WhatsApp | 📷 Instagram | 📘 Facebook', W-85, footerY + 90);
+    ctx.fillText('@astroyugalacharya', W-85, footerY + 120);
+  },
+  
+  drawLogo(ctx, x, y, size, theme) {
+    // Decorative Logo Placeholder
+    ctx.save();
+    
+    // Circle background
+    ctx.beginPath();
+    ctx.arc(x + size/2, y + size/2, size/2 - 5, 0, Math.PI * 2);
+    ctx.fillStyle = theme.acc + '20';
+    ctx.fill();
+    ctx.strokeStyle = theme.acc;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    // Om Symbol
+    ctx.font = `${size * 0.6}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = theme.acc;
+    ctx.fillText('🕉️', x + size/2, y + size/2);
+    
+    ctx.restore();
+  },
+  
+  drawQR(ctx, x, y, size, theme) {
+    // QR Code Placeholder with pattern
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(x, y, size, size);
+    
+    ctx.strokeStyle = theme.acc;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, size, size);
+    
+    // Simple QR pattern
+    ctx.fillStyle = '#000';
+    const cellSize = size / 10;
+    const pattern = [
+      [1,1,1,0,1,0,1,1,1,0],
+      [1,0,1,0,0,1,1,0,1,0],
+      [1,1,1,0,1,1,1,1,1,0],
+      [0,0,0,0,1,0,0,0,0,0],
+      [1,0,1,1,0,1,0,1,1,1],
+      [0,1,0,0,1,0,1,0,0,1],
+      [1,1,1,0,1,1,0,1,1,1],
+      [1,0,1,0,0,0,0,1,0,1],
+      [1,1,1,0,1,0,1,1,1,0],
+      [0,0,0,0,1,0,0,0,0,0]
+    ];
+    
+    pattern.forEach((row, i) => {
+      row.forEach((cell, j) => {
+        if (cell) {
+          ctx.fillRect(x + j * cellSize, y + i * cellSize, cellSize - 1, cellSize - 1);
+        }
+      });
+    });
+  },
+  
+  wrapText(ctx, text, x, y, maxWidth, lineHeight, align = 'left') {
+    ctx.textAlign = align;
+    const paragraphs = text.split('\n');
+    let currentY = y;
+    
+    paragraphs.forEach(para => {
+      if (para.trim() === '') {
+        currentY += lineHeight * 0.5;
+        return;
+      }
+      
+      const words = para.split(' ');
+      let line = '';
+      
+      words.forEach((word, i) => {
+        const testLine = line + word + ' ';
+        const metrics = ctx.measureText(testLine);
+        
+        if (metrics.width > maxWidth && i > 0) {
+          ctx.fillText(line.trim(), x, currentY);
+          line = word + ' ';
+          currentY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      });
+      
+      ctx.fillText(line.trim(), x, currentY);
+      currentY += lineHeight;
+    });
+    
+    return currentY;
+  },
+  
+  // ============ DOWNLOAD FUNCTIONS ============
+  
+  // 1. PNG Download
+  async downloadPNG() {
+    if (!this.isReady) return;
+    
+    this.log('PNG तैयार हो रहा...', 'loading');
+    this.setProgress(30);
+    
+    try {
+      await this.delay(100);
+      this.draw();
+      this.setProgress(60);
+      
+      const blob = await this.canvasToBlob();
+      this.setProgress(90);
+      
+      const mode = document.getElementById('mode').value;
+      let filename = `Vedic_${mode}`;
+      
+      if (mode === 'rashi') {
+        filename = `${this.currentIdx + 1}_${this.rashis[this.currentIdx].name}_${this.rashis[this.currentIdx].en}`;
+      }
+      
+      filename += `_${Date.now()}.png`;
+      
+      this.downloadBlob(blob, filename);
+      this.setProgress(100);
+      
+      await this.delay(300);
+      this.setProgress(0);
+      this.log('✅ PNG डाउनलोड सफल!', 'success');
+      this.toast('PNG डाउनलोड हो गया!', 'success');
+      
+    } catch (err) {
+      console.error('PNG Error:', err);
+      this.setProgress(0);
+      this.log('❌ Error: ' + err.message, 'error');
+      this.toast('डाउनलोड फेल हुआ', 'error');
+    }
+  },
+  
+  // 2. ZIP Batch Download
+  async downloadZIP() {
+    if (!this.isReady) return;
+    
+    const textareas = document.querySelectorAll('.rashi-text');
+    const filledCount = Array.from(textareas).filter(t => t.value.trim()).length;
+    
+    if (filledCount === 0) {
+      this.toast('कम से कम एक राशि में टेक्स्ट लिखें!', 'error');
+      return;
+    }
+    
+    this.log(`📦 ${filledCount} इमेज बन रही हैं...`, 'loading');
+    
+    try {
+      const zip = new JSZip();
+      const folder = zip.folder('Rashifal_Images');
+      let processed = 0;
+      
+      for (let i = 0; i < 12; i++) {
+        if (textareas[i].value.trim()) {
+          this.draw(i);
+          await this.delay(50);
+          
+          const blob = await this.canvasToBlob();
+          const filename = `${String(i + 1).padStart(2, '0')}_${this.rashis[i].name}_${this.rashis[i].en}.png`;
+          folder.file(filename, blob);
+          
+          processed++;
+          this.setProgress((processed / filledCount) * 80);
+          this.log(`✓ ${this.rashis[i].name} (${processed}/${filledCount})`, 'loading');
+        }
+      }
+      
+      this.log('ZIP बन रही है...', 'loading');
+      this.setProgress(90);
+      
+      const zipBlob = await zip.generateAsync({ 
+        type: 'blob',
+        compression: 'DEFLATE',
+        compressionOptions: { level: 6 }
+      });
+      
+      const dateStr = new Date().toISOString().split('T')[0];
+      this.downloadBlob(zipBlob, `Rashifal_${dateStr}.zip`);
+      
+      this.setProgress(100);
+      await this.delay(300);
+      this.setProgress(0);
+      
+      // Reset view
+      this.draw();
+      
+      this.log(`✅ ${filledCount} इमेज ZIP में डाउनलोड!`, 'success');
+      this.toast(`${filledCount} राशिफल इमेज डाउनलोड हुईं!`, 'success');
+      
+    } catch (err) {
+      console.error('ZIP Error:', err);
+      this.setProgress(0);
+      this.log('❌ ZIP Error: ' + err.message, 'error');
+      this.toast('ZIP बनाने में error', 'error');
+    }
+  },
+  
+  // 3. PDF Download
+  async downloadPDF() {
+    if (!this.isReady) return;
+    
+    const mode = document.getElementById('mode').value;
+    this.log('PDF बन रही है...', 'loading');
+    this.setProgress(20);
+    
+    try {
+      const { jsPDF } = window.jspdf;
+      
+      if (mode === 'rashi') {
+        // Multi-page PDF with all filled rashis
+        const textareas = document.querySelectorAll('.rashi-text');
+        const filledIndices = [];
+        textareas.forEach((t, i) => {
+          if (t.value.trim()) filledIndices.push(i);
+        });
+        
+        if (filledIndices.length === 0) {
+          this.toast('कम से कम एक राशि में टेक्स्ट लिखें!', 'error');
+          this.setProgress(0);
+          return;
+        }
+        
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        });
+        
+        for (let i = 0; i < filledIndices.length; i++) {
+          const idx = filledIndices[i];
+          this.draw(idx);
+          await this.delay(100);
+          
+          const imgData = this.can.toDataURL('image/jpeg', 0.95);
+          
+          if (i > 0) pdf.addPage();
+          
+          // Calculate dimensions to fit A4
+          const pageWidth = pdf.internal.pageSize.getWidth();
+          const pageHeight = pdf.internal.pageSize.getHeight();
+          const imgRatio = this.can.width / this.can.height;
+          
+          let imgWidth = pageWidth - 20;
+          let imgHeight = imgWidth / imgRatio;
+          
+          if (imgHeight > pageHeight - 20) {
+            imgHeight = pageHeight - 20;
+            imgWidth = imgHeight * imgRatio;
+          }
+          
+          const x = (pageWidth - imgWidth) / 2;
+          const y = (pageHeight - imgHeight) / 2;
+          
+          pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+          
+          this.setProgress(20 + ((i + 1) / filledIndices.length) * 70);
+          this.log(`PDF पेज ${i + 1}/${filledIndices.length}...`, 'loading');
+        }
+        
+        const dateStr = new Date().toISOString().split('T')[0];
+        pdf.save(`Rashifal_${dateStr}.pdf`);
+        
+        // Reset view
+        this.draw();
+        
+      } else {
+        // Single page PDF
+        this.draw();
+        await this.delay(100);
+        
+        const pdf = new jsPDF({
+          orientation: mode === 'letterhead' ? 'portrait' : 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        });
+        
+        const imgData = this.can.toDataURL('image/jpeg', 0.95);
+        
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const imgRatio = this.can.width / this.can.height;
+        
+        let imgWidth = pageWidth - 20;
+        let imgHeight = imgWidth / imgRatio;
+        
+        if (imgHeight > pageHeight - 20) {
+          imgHeight = pageHeight - 20;
+          imgWidth = imgHeight * imgRatio;
+        }
+        
+        const x = (pageWidth - imgWidth) / 2;
+        const y = (pageHeight - imgHeight) / 2;
+        
+        pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+        pdf.save(`Vedic_${mode}_${Date.now()}.pdf`);
+      }
+      
+      this.setProgress(100);
+      await this.delay(300);
+      this.setProgress(0);
+      this.log('✅ PDF डाउनलोड सफल!', 'success');
+      this.toast('PDF डाउनलोड हो गई!', 'success');
+      
+    } catch (err) {
+      console.error('PDF Error:', err);
+      this.setProgress(0);
+      this.log('❌ PDF Error: ' + err.message, 'error');
+      this.toast('PDF बनाने में error', 'error');
+    }
+  },
+  
+  // 4. Copy to Clipboard
+  async copyToClipboard() {
+    if (!this.isReady) return;
+    
+    this.log('क्लिपबोर्ड में कॉपी हो रहा...', 'loading');
+    
+    try {
+      this.draw();
+      await this.delay(100);
+      
+      const blob = await this.canvasToBlob();
+      
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blob })
+      ]);
+      
+      this.log('✅ क्लिपबोर्ड में कॉपी हो गया!', 'success');
+      this.toast('इमेज कॉपी हो गई! अब Paste करें', 'success');
+      
+    } catch (err) {
+      console.error('Clipboard Error:', err);
+      this.log('❌ Clipboard not supported', 'error');
+      this.toast('Clipboard access denied', 'error');
+    }
+  },
+  
+  // ============ UTILITY FUNCTIONS ============
+  
+  canvasToBlob() {
+    return new Promise((resolve, reject) => {
+      try {
+        this.can.toBlob(blob => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('Canvas toBlob returned null'));
+          }
+        }, 'image/png', 1.0);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  },
+  
+  downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 1000);
+  },
+  
+  delay(ms) {
+    return new Promise(r => setTimeout(r, ms));
+  }
+};
+
+// Initialize on load
+window.addEventListener('load', () => vs.init());
+</script>
+
+</body>
+</html>
