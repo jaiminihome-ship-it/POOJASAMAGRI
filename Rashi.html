@@ -2,7 +2,7 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <title>Vedic Studio Pro v11 - Complete Edition</title>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -20,39 +20,105 @@
       --success: #10b981;
       --error: #ef4444;
       --info: #3b82f6;
+      --sidebar-width: 380px;
+      --header-height: 60px;
     }
     
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
     
     body { 
       font-family: 'Outfit', sans-serif; 
       background: var(--dark); 
       color: white; 
       display: flex; 
-      height: 100vh; 
-      overflow: hidden; 
+      height: 100vh;
+      height: 100dvh; /* Dynamic viewport height for mobile */
     }
 
     /* Scrollbar Styling */
-    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: var(--dark); }
     ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
 
-    /* Sidebar */
+    /* ============ MOBILE HEADER ============ */
+    .mobile-header {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--header-height);
+      background: linear-gradient(135deg, var(--gold-d), var(--gold));
+      z-index: 1000;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 15px;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.5);
+    }
+    
+    .mobile-header h1 {
+      font-family: 'Cinzel Decorative';
+      color: #000;
+      font-size: 18px;
+    }
+    
+    .menu-toggle {
+      width: 44px;
+      height: 44px;
+      background: rgba(0,0,0,0.2);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.3s;
+    }
+    
+    .menu-toggle span {
+      width: 24px;
+      height: 3px;
+      background: #000;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+    
+    .menu-toggle.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+    
+    .menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+    
+    .menu-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(6px, -6px);
+    }
+
+    /* ============ SIDEBAR ============ */
     .sidebar { 
-      width: 380px; 
-      min-width: 380px; 
+      width: var(--sidebar-width); 
+      min-width: var(--sidebar-width); 
       background: var(--panel); 
       border-right: 2px solid var(--gold); 
       display: flex; 
       flex-direction: column; 
-      z-index: 10; 
+      z-index: 100;
+      transition: transform 0.3s ease;
     }
     
     .sidebar-header {
       background: linear-gradient(135deg, var(--gold-d), var(--gold));
       padding: 20px;
       text-align: center;
+      flex-shrink: 0;
     }
     
     .sidebar-header h1 {
@@ -75,6 +141,25 @@
       display: flex;
       flex-direction: column;
       gap: 15px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Overlay for mobile */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 99;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .sidebar-overlay.active {
+      opacity: 1;
     }
 
     /* Status Bar */
@@ -120,7 +205,7 @@
       font-weight: 600;
     }
     
-    select, input[type="text"], textarea { 
+    select, input[type="text"], input[type="date"], textarea { 
       width: 100%; 
       background: #000; 
       border: 1px solid #374151; 
@@ -128,8 +213,17 @@
       padding: 12px 15px; 
       border-radius: 8px; 
       font-family: inherit; 
-      font-size: 14px;
+      font-size: 16px; /* Prevents zoom on iOS */
       transition: border-color 0.3s, box-shadow 0.3s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23BF953F' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      padding-right: 40px;
     }
     
     select:focus, input:focus, textarea:focus {
@@ -154,16 +248,16 @@
     input[type="range"] {
       flex: 1;
       -webkit-appearance: none;
-      height: 6px;
+      height: 8px;
       background: #374151;
-      border-radius: 3px;
+      border-radius: 4px;
       outline: none;
     }
     
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 20px;
-      height: 20px;
+      width: 28px;
+      height: 28px;
       background: linear-gradient(135deg, var(--gold), var(--gold-l));
       border-radius: 50%;
       cursor: pointer;
@@ -189,6 +283,7 @@
       flex-direction: column;
       gap: 8px;
       padding-right: 5px;
+      -webkit-overflow-scrolling: touch;
     }
     
     .r-item { 
@@ -222,7 +317,7 @@
     }
     
     .r-item textarea {
-      font-size: 13px;
+      font-size: 14px;
       min-height: 60px;
     }
 
@@ -234,7 +329,7 @@
     }
     
     .quick-btn {
-      padding: 10px;
+      padding: 12px 10px;
       border: 1px solid #374151;
       background: transparent;
       color: white;
@@ -246,9 +341,10 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
+      min-height: 44px; /* Touch friendly */
     }
     
-    .quick-btn:hover {
+    .quick-btn:hover, .quick-btn:active {
       border-color: var(--gold);
       background: rgba(191, 149, 63, 0.1);
     }
@@ -278,6 +374,7 @@
       transition: all 0.3s; 
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      min-height: 50px; /* Touch friendly */
     }
     
     .btn:disabled { 
@@ -286,7 +383,8 @@
       transform: none !important;
     }
     
-    .btn:not(:disabled):hover {
+    .btn:not(:disabled):hover,
+    .btn:not(:disabled):active {
       transform: translateY(-2px);
       box-shadow: 0 5px 20px rgba(0,0,0,0.3);
     }
@@ -358,7 +456,7 @@
     
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Preview Workspace */
+    /* ============ PREVIEW WORKSPACE ============ */
     .view { 
       flex: 1; 
       background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
@@ -369,6 +467,7 @@
       padding: 30px;
       position: relative;
       overflow: hidden;
+      min-width: 0; /* Prevents flex overflow */
     }
     
     /* Decorative Background */
@@ -381,45 +480,59 @@
       height: 200%;
       background: radial-gradient(circle at center, rgba(191, 149, 63, 0.03) 0%, transparent 50%);
       animation: rotate 60s linear infinite;
+      pointer-events: none;
     }
     
     @keyframes rotate { to { transform: rotate(360deg); } }
+    
+    .canvas-container {
+      position: relative;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
     
     .canvas-frame { 
       position: relative;
       box-shadow: 0 25px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(191, 149, 63, 0.3);
       border-radius: 8px; 
       overflow: hidden;
-      max-height: 80vh;
-      max-width: 90%;
+      max-height: 100%;
+      max-width: 100%;
+      touch-action: pinch-zoom pan-x pan-y;
     }
     
     canvas { 
       display: block;
       max-width: 100%; 
-      max-height: 80vh;
+      max-height: 100%;
       object-fit: contain;
     }
 
     /* Navigation */
     .nav { 
-      margin-top: 25px; 
+      margin-top: 20px; 
       display: flex; 
       align-items: center; 
       gap: 15px; 
       background: var(--panel); 
-      padding: 15px 30px; 
+      padding: 12px 25px; 
       border-radius: 50px; 
       border: 2px solid var(--gold);
       box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      flex-shrink: 0;
     }
     
     .nav-btn { 
       background: transparent;
       border: 2px solid var(--gold);
       color: var(--gold); 
-      width: 45px;
-      height: 45px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       font-size: 20px; 
       cursor: pointer;
@@ -427,15 +540,16 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
     
-    .nav-btn:hover {
+    .nav-btn:hover, .nav-btn:active {
       background: var(--gold);
       color: #000;
     }
     
     .nav-label {
-      min-width: 150px;
+      min-width: 120px;
       text-align: center;
       font-weight: 700;
       font-size: 16px;
@@ -467,40 +581,6 @@
       margin: 0 2px;
     }
 
-    /* Utility Classes */
-    .hidden { display: none !important; }
-    
-    /* Toast Notifications */
-    .toast-container {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    
-    .toast {
-      background: var(--panel);
-      border: 1px solid var(--gold);
-      padding: 15px 20px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      animation: slideIn 0.3s ease;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-    }
-    
-    .toast.success { border-color: var(--success); }
-    .toast.error { border-color: var(--error); }
-    
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-
     /* Date Display */
     .date-display {
       position: absolute;
@@ -510,6 +590,7 @@
       padding: 12px 18px;
       border-radius: 10px;
       border: 1px solid var(--gold);
+      z-index: 10;
     }
     
     .date-display .date {
@@ -523,12 +604,285 @@
       color: #9ca3af;
     }
 
-    /* Mobile Warning */
-    @media (max-width: 900px) {
-      .sidebar { width: 100%; min-width: unset; max-height: 50vh; }
-      body { flex-direction: column; }
-      .view { min-height: 50vh; }
-      .shortcuts-hint { display: none; }
+    /* Utility Classes */
+    .hidden { display: none !important; }
+    
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: calc(100vw - 40px);
+    }
+    
+    .toast {
+      background: var(--panel);
+      border: 1px solid var(--gold);
+      padding: 12px 16px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideIn 0.3s ease;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      font-size: 14px;
+    }
+    
+    .toast.success { border-color: var(--success); }
+    .toast.error { border-color: var(--error); }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Swipe Indicator (Mobile) */
+    .swipe-hint {
+      display: none;
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: var(--gold);
+      animation: fadeInOut 3s ease forwards;
+    }
+    
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0; }
+      20%, 80% { opacity: 1; }
+    }
+
+    /* ============ TABLET STYLES ============ */
+    @media (max-width: 1024px) {
+      :root {
+        --sidebar-width: 340px;
+      }
+      
+      .view {
+        padding: 20px;
+      }
+    }
+
+    /* ============ MOBILE STYLES ============ */
+    @media (max-width: 768px) {
+      :root {
+        --sidebar-width: 100%;
+        --header-height: 56px;
+      }
+      
+      body {
+        flex-direction: column;
+      }
+      
+      /* Show mobile header */
+      .mobile-header {
+        display: flex;
+      }
+      
+      /* Sidebar becomes slide-out drawer */
+      .sidebar {
+        position: fixed;
+        top: var(--header-height);
+        left: 0;
+        bottom: 0;
+        width: 85%;
+        max-width: 360px;
+        transform: translateX(-100%);
+        z-index: 100;
+        border-right: 2px solid var(--gold);
+      }
+      
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      
+      .sidebar-header {
+        display: none; /* Hidden on mobile, using mobile-header instead */
+      }
+      
+      .sidebar-overlay {
+        display: block;
+        pointer-events: none;
+      }
+      
+      .sidebar-overlay.active {
+        pointer-events: auto;
+      }
+      
+      /* Main view adjustments */
+      .view {
+        margin-top: var(--header-height);
+        height: calc(100vh - var(--header-height));
+        height: calc(100dvh - var(--header-height));
+        padding: 15px;
+        padding-bottom: 20px;
+      }
+      
+      /* Date display repositioned */
+      .date-display {
+        top: 10px;
+        left: 10px;
+        padding: 8px 12px;
+      }
+      
+      .date-display .date {
+        font-size: 14px;
+      }
+      
+      .date-display .day {
+        font-size: 10px;
+      }
+      
+      /* Canvas container */
+      .canvas-container {
+        margin-bottom: 10px;
+      }
+      
+      /* Navigation adjustments */
+      .nav {
+        margin-top: 10px;
+        padding: 10px 20px;
+        gap: 12px;
+      }
+      
+      .nav-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+      }
+      
+      .nav-label {
+        min-width: 100px;
+        font-size: 14px;
+      }
+      
+      /* Hide desktop shortcuts hint */
+      .shortcuts-hint {
+        display: none;
+      }
+      
+      /* Show swipe hint */
+      .swipe-hint {
+        display: block;
+      }
+      
+      /* Toast adjustments */
+      .toast-container {
+        top: calc(var(--header-height) + 10px);
+        right: 10px;
+        left: 10px;
+      }
+      
+      .toast {
+        font-size: 13px;
+        padding: 10px 14px;
+      }
+      
+      /* Form adjustments */
+      .group {
+        padding: 12px;
+      }
+      
+      .rashi-list {
+        max-height: 250px;
+      }
+      
+      /* Download buttons - 2 column on mobile */
+      .download-section .btn {
+        padding: 12px 15px;
+        font-size: 13px;
+        min-height: 48px;
+      }
+      
+      .download-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      
+      .download-grid .btn-png {
+        grid-column: 1 / -1;
+      }
+    }
+
+    /* ============ SMALL MOBILE STYLES ============ */
+    @media (max-width: 400px) {
+      .sidebar {
+        width: 100%;
+        max-width: 100%;
+      }
+      
+      .nav {
+        padding: 8px 15px;
+        gap: 8px;
+        border-radius: 30px;
+      }
+      
+      .nav-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+      }
+      
+      .nav-label {
+        min-width: 80px;
+        font-size: 13px;
+      }
+      
+      .date-display {
+        padding: 6px 10px;
+      }
+      
+      .date-display .date {
+        font-size: 12px;
+      }
+    }
+
+    /* ============ LANDSCAPE MOBILE ============ */
+    @media (max-width: 768px) and (orientation: landscape) {
+      .view {
+        padding: 10px;
+        flex-direction: row;
+        gap: 15px;
+      }
+      
+      .canvas-container {
+        flex: 1;
+        margin-bottom: 0;
+      }
+      
+      .nav {
+        flex-direction: column;
+        padding: 15px 10px;
+        border-radius: 25px;
+        margin-top: 0;
+        gap: 8px;
+      }
+      
+      .nav-btn {
+        width: 40px;
+        height: 40px;
+      }
+      
+      .nav-label {
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        transform: rotate(180deg);
+        min-width: unset;
+      }
+      
+      .date-display {
+        top: 5px;
+        left: 5px;
+      }
     }
 
     /* Print Styles */
@@ -545,16 +899,38 @@
         max-height: 100%;
       }
     }
+
+    /* High DPI adjustments */
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+      .canvas-frame {
+        image-rendering: -webkit-optimize-contrast;
+      }
+    }
   </style>
 </head>
 <body>
 
+<!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
 
-<div class="sidebar">
+<!-- Mobile Header -->
+<header class="mobile-header">
+  <h1>⚜️ Vedic Studio</h1>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</header>
+
+<!-- Sidebar Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <h1>⚜️ Vedic Studio </h1>
-    <p>Desined By Niranjan </p>
+    <h1>⚜️ Vedic Studio</h1>
+    <p>Designed By Niranjan</p>
   </div>
   
   <div class="sidebar-content">
@@ -616,7 +992,7 @@
     <div id="editBox" class="group hidden">
       <div class="group-title" id="editTitle">✏️ कंटेंट एडिटर</div>
       <input type="text" id="mainH" placeholder="हेडिंग लिखें..." oninput="vs.draw()" style="margin-bottom: 10px; font-weight: 600;">
-      <textarea id="mainB" rows="8" placeholder="विस्तृत संदेश यहाँ लिखें..." oninput="vs.draw()"></textarea>
+      <textarea id="mainB" rows="6" placeholder="विस्तृत संदेश यहाँ लिखें..." oninput="vs.draw()"></textarea>
     </div>
 
     <!-- Download Section -->
@@ -627,62 +1003,79 @@
         <div class="progress-bar" id="progressBar"></div>
       </div>
       
-      <button class="btn btn-png" id="btnPng" onclick="vs.downloadPNG()">
-        <span>🖼️</span> PNG इमेज डाउनलोड
-      </button>
-      
-      <button class="btn btn-zip" id="btnZip" onclick="vs.downloadZIP()">
-        <span>📦</span> ZIP बैच (सभी राशि)
-      </button>
-      
-      <button class="btn btn-pdf" id="btnPdf" onclick="vs.downloadPDF()">
-        <span>📄</span> PDF डाउनलोड
-      </button>
-      
-      <button class="btn btn-copy" onclick="vs.copyToClipboard()">
-        <span>📋</span> क्लिपबोर्ड में कॉपी
-      </button>
+      <div class="download-grid">
+        <button class="btn btn-png" id="btnPng" onclick="vs.downloadPNG()">
+          <span>🖼️</span> PNG डाउनलोड
+        </button>
+        
+        <button class="btn btn-zip" id="btnZip" onclick="vs.downloadZIP()">
+          <span>📦</span> ZIP बैच
+        </button>
+        
+        <button class="btn btn-pdf" id="btnPdf" onclick="vs.downloadPDF()">
+          <span>📄</span> PDF
+        </button>
+        
+        <button class="btn btn-copy" onclick="vs.copyToClipboard()">
+          <span>📋</span> कॉपी
+        </button>
+      </div>
       
       <div class="log-area" id="logArea"></div>
     </div>
   </div>
-</div>
+</aside>
 
-<div class="view">
+<!-- Main View -->
+<main class="view">
   <div class="date-display">
     <div class="date" id="todayDate"></div>
     <div class="day" id="todayDay"></div>
   </div>
   
-  <div class="canvas-frame">
-    <canvas id="canvas"></canvas>
+  <div class="canvas-container" id="canvasContainer">
+    <div class="canvas-frame">
+      <canvas id="canvas"></canvas>
+    </div>
   </div>
   
-  <div id="navPanel" class="nav">
-    <button class="nav-btn" onclick="vs.slide(-1)">◀</button>
+  <nav id="navPanel" class="nav">
+    <button class="nav-btn" onclick="vs.slide(-1)" aria-label="Previous">◀</button>
     <div class="nav-label">
       <span id="navName">मेष</span>
       <small id="navCount">1 / 12</small>
     </div>
-    <button class="nav-btn" onclick="vs.slide(1)">▶</button>
-  </div>
+    <button class="nav-btn" onclick="vs.slide(1)" aria-label="Next">▶</button>
+  </nav>
   
   <div class="shortcuts-hint">
     <kbd>←</kbd> <kbd>→</kbd> Navigate &nbsp;|&nbsp; 
-    <kbd>Ctrl</kbd>+<kbd>S</kbd> Save PNG &nbsp;|&nbsp;
-    <kbd>Ctrl</kbd>+<kbd>P</kbd> Print
+    <kbd>Ctrl</kbd>+<kbd>S</kbd> Save PNG
   </div>
-</div>
+  
+  <div class="swipe-hint" id="swipeHint">
+    👆 स्वाइप करें राशि बदलने के लिए
+  </div>
+</main>
 
 <script>
 // =====================================================
-// VEDIC STUDIO PRO v11 - Complete Professional Edition
+// VEDIC STUDIO PRO v11 - Mobile Responsive Edition
 // =====================================================
 
 const vs = {
   // Canvas & Context
   can: document.getElementById('canvas'),
   ctx: null,
+  
+  // QR Code Image
+  qrImage: null,
+  qrLoaded: false,
+  
+  // Mobile State
+  isMobile: false,
+  touchStartX: 0,
+  touchStartY: 0,
   
   // Rashi Names with Symbols
   rashis: [
@@ -756,7 +1149,11 @@ const vs = {
   // ============ INITIALIZATION ============
   async init() {
     this.ctx = this.can.getContext('2d');
-    this.updateStatus('loading', 'फॉन्ट्स लोड हो रहे हैं...');
+    this.updateStatus('loading', 'सिस्टम लोड हो रहा है...');
+    
+    // Detect mobile
+    this.checkMobile();
+    window.addEventListener('resize', () => this.checkMobile());
     
     // Set today's date
     const today = new Date();
@@ -766,7 +1163,18 @@ const vs = {
     // Build Rashi Input List
     this.buildRashiList();
     
+    // Setup mobile menu
+    this.setupMobileMenu();
+    
+    // Setup touch/swipe gestures
+    this.setupTouchGestures();
+    
+    // Load QR Code Image
+    this.updateStatus('loading', 'QR कोड लोड हो रहा है...');
+    await this.loadQRCode();
+    
     // Wait for fonts
+    this.updateStatus('loading', 'फॉन्ट्स लोड हो रहे हैं...');
     await this.waitForFonts();
     
     // Ready!
@@ -783,6 +1191,109 @@ const vs = {
     setInterval(() => this.saveData(), 30000);
     
     this.toast('Vedic Studio Pro तैयार है!', 'success');
+    
+    // Show swipe hint on mobile (once)
+    if (this.isMobile && !localStorage.getItem('swipeHintShown')) {
+      setTimeout(() => {
+        document.getElementById('swipeHint').style.display = 'block';
+        localStorage.setItem('swipeHintShown', 'true');
+      }, 1000);
+    }
+  },
+  
+  checkMobile() {
+    this.isMobile = window.innerWidth <= 768;
+  },
+  
+  // ============ MOBILE MENU ============
+  setupMobileMenu() {
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    
+    const toggleMenu = () => {
+      const isOpen = sidebar.classList.toggle('open');
+      menuToggle.classList.toggle('active', isOpen);
+      overlay.classList.toggle('active', isOpen);
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    };
+    
+    const closeMenu = () => {
+      sidebar.classList.remove('open');
+      menuToggle.classList.remove('active');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    };
+    
+    menuToggle.addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', closeMenu);
+    
+    // Close menu when selecting an option on mobile
+    sidebar.querySelectorAll('select, .quick-btn, .btn').forEach(el => {
+      el.addEventListener('change', () => {
+        if (this.isMobile) setTimeout(closeMenu, 300);
+      });
+      el.addEventListener('click', () => {
+        if (this.isMobile && el.classList.contains('btn')) {
+          setTimeout(closeMenu, 300);
+        }
+      });
+    });
+  },
+  
+  // ============ TOUCH GESTURES ============
+  setupTouchGestures() {
+    const container = document.getElementById('canvasContainer');
+    
+    container.addEventListener('touchstart', (e) => {
+      this.touchStartX = e.touches[0].clientX;
+      this.touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    
+    container.addEventListener('touchend', (e) => {
+      if (!this.isMobile) return;
+      
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+      const deltaX = touchEndX - this.touchStartX;
+      const deltaY = touchEndY - this.touchStartY;
+      
+      // Only trigger if horizontal swipe is dominant and significant
+      if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+        if (deltaX > 0) {
+          this.slide(-1); // Swipe right = previous
+        } else {
+          this.slide(1); // Swipe left = next
+        }
+        
+        // Haptic feedback if available
+        if (navigator.vibrate) {
+          navigator.vibrate(10);
+        }
+      }
+    }, { passive: true });
+  },
+  
+  // Load QR Code from URL
+  loadQRCode() {
+    return new Promise((resolve) => {
+      this.qrImage = new Image();
+      this.qrImage.crossOrigin = 'anonymous';
+      
+      this.qrImage.onload = () => {
+        this.qrLoaded = true;
+        console.log('✅ QR Code loaded successfully');
+        resolve(true);
+      };
+      
+      this.qrImage.onerror = (err) => {
+        console.warn('⚠️ QR Code failed to load, using fallback:', err);
+        this.qrLoaded = false;
+        resolve(false);
+      };
+      
+      this.qrImage.src = 'https://jaiminihome-ship-it.github.io/POOJASAMAGRI/qr.png';
+    });
   },
   
   buildRashiList() {
@@ -827,6 +1338,12 @@ const vs = {
       }
       if (e.key === 'ArrowLeft') this.slide(-1);
       if (e.key === 'ArrowRight') this.slide(1);
+      if (e.key === 'Escape') {
+        // Close mobile menu on escape
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('menuToggle').classList.remove('active');
+        document.getElementById('sidebarOverlay').classList.remove('active');
+      }
     });
   },
   
@@ -915,6 +1432,9 @@ const vs = {
   
   // ============ NAVIGATION ============
   slide(dir) {
+    const mode = document.getElementById('mode').value;
+    if (mode !== 'rashi') return;
+    
     this.currentIdx = (this.currentIdx + dir + 12) % 12;
     document.getElementById('navName').textContent = `${this.rashis[this.currentIdx].symbol} ${this.rashis[this.currentIdx].name}`;
     document.getElementById('navCount').textContent = `${this.currentIdx + 1} / 12`;
@@ -1046,7 +1566,6 @@ const vs = {
     ctx.strokeStyle = theme.acc + '30';
     ctx.lineWidth = 2;
     
-    // Corner flourishes
     const corners = [[30, 30], [W-30, 30], [30, H-30], [W-30, H-30]];
     corners.forEach(([x, y], i) => {
       ctx.beginPath();
@@ -1065,33 +1584,27 @@ const vs = {
   },
   
   drawBorder(ctx, W, H, theme) {
-    // Outer border
     ctx.strokeStyle = theme.bdr;
     ctx.lineWidth = 3;
     ctx.strokeRect(25, 25, W-50, H-50);
     
-    // Inner decorative border
     ctx.strokeStyle = theme.acc;
     ctx.lineWidth = 1;
     ctx.setLineDash([10, 5]);
     ctx.strokeRect(40, 40, W-80, H-80);
     ctx.setLineDash([]);
     
-    // Bold inner frame
     ctx.lineWidth = 8;
     ctx.strokeStyle = theme.acc + '40';
     ctx.strokeRect(55, 55, W-110, H-110);
   },
   
   drawLetterhead(ctx, W, H, theme, fontSize) {
-    // Header section
     ctx.fillStyle = theme.footer;
     ctx.fillRect(60, 60, W-120, 220);
     
-    // Logo placeholder
     this.drawLogo(ctx, 80, 90, 160, theme);
     
-    // Name & Title
     ctx.textAlign = 'left';
     ctx.fillStyle = theme.acc;
     ctx.font = 'bold 58px "Cinzel Decorative"';
@@ -1103,7 +1616,6 @@ const vs = {
     ctx.font = '400 22px "Outfit"';
     ctx.fillText('📍 जयपुर, राजस्थान | ☎ +91 9928139485', 260, 235);
     
-    // Divider
     ctx.strokeStyle = theme.acc;
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -1111,7 +1623,6 @@ const vs = {
     ctx.lineTo(W-80, 300);
     ctx.stroke();
     
-    // Content
     const heading = document.getElementById('mainH').value || '॥ शुभम् भवतु ॥';
     const body = document.getElementById('mainB').value || '';
     
@@ -1131,14 +1642,11 @@ const vs = {
     const textareas = document.querySelectorAll('.rashi-text');
     const content = textareas[idx]?.value || 'राशिफल यहाँ दिखेगा...';
     
-    // Header band
     ctx.fillStyle = theme.footer;
     ctx.fillRect(55, 55, W-110, 180);
     
-    // Logo
     this.drawLogo(ctx, 80, 75, 140, theme);
     
-    // Brand Name
     ctx.textAlign = 'left';
     ctx.fillStyle = theme.acc;
     ctx.font = 'bold 48px "Cinzel Decorative"';
@@ -1147,7 +1655,6 @@ const vs = {
     ctx.fillStyle = theme.txt;
     ctx.fillText('वैदिक ज्योतिषाचार्य | astroyugalacharya.in', 240, 180);
     
-    // Date
     const dateInput = document.getElementById('postDate').value;
     const date = dateInput ? new Date(dateInput) : new Date();
     const dateStr = `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`;
@@ -1158,10 +1665,8 @@ const vs = {
     ctx.font = '400 20px "Outfit"';
     ctx.fillText('दैनिक राशिफल', W-80, 165);
     
-    // Rashi Symbol & Name
     ctx.textAlign = 'center';
     
-    // Symbol circle
     ctx.beginPath();
     ctx.arc(W/2, 360, 80, 0, Math.PI * 2);
     ctx.fillStyle = theme.acc + '20';
@@ -1181,7 +1686,6 @@ const vs = {
     ctx.fillStyle = theme.txt + '80';
     ctx.fillText(rashi.en, W/2, 565);
     
-    // Rashifal Content
     ctx.textAlign = 'center';
     ctx.fillStyle = theme.txt;
     ctx.font = `${fontSize}px "Noto Serif Devanagari"`;
@@ -1192,7 +1696,6 @@ const vs = {
     const heading = document.getElementById('mainH').value || 'शीर्षक';
     const body = document.getElementById('mainB').value || 'विवरण यहाँ...';
     
-    // Header
     ctx.fillStyle = theme.footer;
     ctx.fillRect(55, 55, W-110, 180);
     
@@ -1206,7 +1709,6 @@ const vs = {
     ctx.fillStyle = theme.txt;
     ctx.fillText('वैदिक ज्योतिषाचार्य | astroyugalacharya.in', 240, 180);
     
-    // Mode badge
     const badges = {
       alert: { text: '📢 विशेष सूचना', color: '#dc2626' },
       panchang: { text: '📅 दैनिक पंचांग', color: '#0891b2' }
@@ -1218,13 +1720,11 @@ const vs = {
     ctx.fillStyle = badge.color;
     ctx.fillText(badge.text, W-80, 140);
     
-    // Main Heading
     ctx.textAlign = 'center';
     ctx.fillStyle = theme.acc;
     ctx.font = 'bold 62px "Cinzel Decorative"';
     this.wrapText(ctx, heading, W/2, 360, W-150, 80, 'center');
     
-    // Body Content
     ctx.fillStyle = theme.txt;
     ctx.font = `${fontSize}px "Noto Serif Devanagari"`;
     this.wrapText(ctx, body, W/2, 520, W-160, fontSize * 1.7, 'center');
@@ -1233,14 +1733,11 @@ const vs = {
   drawFooter(ctx, W, H, theme, mode) {
     const footerY = H - 200;
     
-    // Footer background
     ctx.fillStyle = theme.footer;
     ctx.fillRect(55, footerY, W-110, 145);
     
-    // QR Code placeholder
     this.drawQR(ctx, 85, footerY + 20, 105, theme);
     
-    // Contact Info
     ctx.textAlign = 'left';
     ctx.fillStyle = theme.acc;
     ctx.font = 'bold 32px "Cinzel Decorative"';
@@ -1251,7 +1748,6 @@ const vs = {
     ctx.fillText('📞 +91 9928139485', 210, footerY + 90);
     ctx.fillText('🌐 www.astroyugalacharya.in', 210, footerY + 120);
     
-    // Social handles
     ctx.textAlign = 'right';
     ctx.font = '400 20px "Outfit"';
     ctx.fillStyle = theme.txt + 'aa';
@@ -1260,10 +1756,8 @@ const vs = {
   },
   
   drawLogo(ctx, x, y, size, theme) {
-    // Decorative Logo Placeholder
     ctx.save();
     
-    // Circle background
     ctx.beginPath();
     ctx.arc(x + size/2, y + size/2, size/2 - 5, 0, Math.PI * 2);
     ctx.fillStyle = theme.acc + '20';
@@ -1272,7 +1766,6 @@ const vs = {
     ctx.lineWidth = 2;
     ctx.stroke();
     
-    // Om Symbol
     ctx.font = `${size * 0.6}px serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -1283,7 +1776,24 @@ const vs = {
   },
   
   drawQR(ctx, x, y, size, theme) {
-    // QR Code Placeholder with pattern
+    if (this.qrLoaded && this.qrImage) {
+      try {
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(x, y, size, size);
+        ctx.drawImage(this.qrImage, x, y, size, size);
+        ctx.strokeStyle = theme.acc;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, y, size, size);
+      } catch (err) {
+        console.warn('Error drawing QR image, using fallback:', err);
+        this.drawQRFallback(ctx, x, y, size, theme);
+      }
+    } else {
+      this.drawQRFallback(ctx, x, y, size, theme);
+    }
+  },
+  
+  drawQRFallback(ctx, x, y, size, theme) {
     ctx.fillStyle = '#fff';
     ctx.fillRect(x, y, size, size);
     
@@ -1291,7 +1801,6 @@ const vs = {
     ctx.lineWidth = 2;
     ctx.strokeRect(x, y, size, size);
     
-    // Simple QR pattern
     ctx.fillStyle = '#000';
     const cellSize = size / 10;
     const pattern = [
@@ -1352,7 +1861,6 @@ const vs = {
   
   // ============ DOWNLOAD FUNCTIONS ============
   
-  // 1. PNG Download
   async downloadPNG() {
     if (!this.isReady) return;
     
@@ -1392,7 +1900,6 @@ const vs = {
     }
   },
   
-  // 2. ZIP Batch Download
   async downloadZIP() {
     if (!this.isReady) return;
     
@@ -1442,7 +1949,6 @@ const vs = {
       await this.delay(300);
       this.setProgress(0);
       
-      // Reset view
       this.draw();
       
       this.log(`✅ ${filledCount} इमेज ZIP में डाउनलोड!`, 'success');
@@ -1456,7 +1962,6 @@ const vs = {
     }
   },
   
-  // 3. PDF Download
   async downloadPDF() {
     if (!this.isReady) return;
     
@@ -1468,7 +1973,6 @@ const vs = {
       const { jsPDF } = window.jspdf;
       
       if (mode === 'rashi') {
-        // Multi-page PDF with all filled rashis
         const textareas = document.querySelectorAll('.rashi-text');
         const filledIndices = [];
         textareas.forEach((t, i) => {
@@ -1496,7 +2000,6 @@ const vs = {
           
           if (i > 0) pdf.addPage();
           
-          // Calculate dimensions to fit A4
           const pageWidth = pdf.internal.pageSize.getWidth();
           const pageHeight = pdf.internal.pageSize.getHeight();
           const imgRatio = this.can.width / this.can.height;
@@ -1521,16 +2024,14 @@ const vs = {
         const dateStr = new Date().toISOString().split('T')[0];
         pdf.save(`Rashifal_${dateStr}.pdf`);
         
-        // Reset view
         this.draw();
         
       } else {
-        // Single page PDF
         this.draw();
         await this.delay(100);
         
         const pdf = new jsPDF({
-          orientation: mode === 'letterhead' ? 'portrait' : 'portrait',
+          orientation: 'portrait',
           unit: 'mm',
           format: 'a4'
         });
@@ -1570,7 +2071,6 @@ const vs = {
     }
   },
   
-  // 4. Copy to Clipboard
   async copyToClipboard() {
     if (!this.isReady) return;
     
