@@ -1,0 +1,2067 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="theme-color" content="#FF6F00">
+  <title>Vedic Studio Pro - Complete Pooja Management</title>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Noto+Serif+Devanagari:wght@400;600;700;900&family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ========================================
+       ROOT VARIABLES & RESET
+    ======================================== */
+    :root {
+      --bhagwa: #FF6F00;
+      --bhagwa-dark: #E65100;
+      --bhagwa-light: #FFB74D;
+      --bhagwa-pale: #FFF3E0;
+      --maroon: #800000;
+      --gold: #DAA520;
+      --deep-black: #1A1A2E;
+      --dark-bg: #0F0F23;
+      --card-bg: rgba(255,255,255,0.04);
+      --card-border: rgba(255,255,255,0.08);
+      --white: #FFFFFF;
+      --gray-100: #F5F5F5;
+      --gray-200: #EEEEEE;
+      --gray-300: #E0E0E0;
+      --gray-400: #BDBDBD;
+      --gray-500: #9E9E9E;
+      --gray-600: #757575;
+      --success: #00C853;
+      --error: #FF1744;
+      --warning: #FFD600;
+      --info: #2979FF;
+      --gradient-bhagwa: linear-gradient(135deg, #FF6F00 0%, #FF8F00 50%, #FFA726 100%);
+      --gradient-dark: linear-gradient(160deg, #0F0F23 0%, #1A1A2E 40%, #16213E 100%);
+      --gradient-gold: linear-gradient(135deg, #DAA520 0%, #FFD700 100%);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.1);
+      --shadow-md: 0 4px 20px rgba(0,0,0,0.15);
+      --shadow-lg: 0 8px 40px rgba(0,0,0,0.2);
+      --shadow-glow: 0 0 30px rgba(255,111,0,0.15);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-full: 9999px;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --font-ui: 'Poppins', sans-serif;
+      --font-hindi: 'Noto Serif Devanagari', serif;
+      --font-hindi-sans: 'Noto Sans Devanagari', sans-serif;
+      /* Customizable PDF settings */
+      --pdf-font-size: 14px;
+      --pdf-margin: 30px;
+      --pdf-show-checkbox: 1;
+      --pdf-show-remark: 1;
+      --pdf-show-header: 1;
+      --pdf-show-footer: 1;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    
+    body {
+      font-family: var(--font-ui);
+      background: var(--gradient-dark);
+      color: var(--white);
+      overflow-x: hidden;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: 
+        radial-gradient(ellipse at 15% 50%, rgba(255,111,0,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 85% 20%, rgba(218,165,32,0.05) 0%, transparent 50%);
+      pointer-events: none; z-index: 0;
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+    ::-webkit-scrollbar-thumb { background: var(--gradient-bhagwa); border-radius: 3px; }
+    ::selection { background: rgba(255,111,0,0.3); color: white; }
+
+    /* ========================================
+       LAYOUT SHELL
+    ======================================== */
+    .shell { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; min-height: 100vh; }
+
+    /* ========================================
+       TOP NAVIGATION BAR
+    ======================================== */
+    .topbar {
+      position: sticky; top: 0; z-index: 900;
+      padding: 0.75rem 1rem;
+    }
+    .topbar-inner {
+      background: rgba(15,15,35,0.92);
+      backdrop-filter: blur(24px) saturate(1.8);
+      border-radius: var(--radius-xl);
+      padding: 0.875rem 1.25rem;
+      display: flex; align-items: center; justify-content: space-between;
+      border: 1px solid rgba(255,111,0,0.15);
+      box-shadow: var(--shadow-md), var(--shadow-glow);
+    }
+    .brand { display: flex; align-items: center; gap: 0.75rem; }
+    .brand-logo {
+      width: 44px; height: 44px;
+      background: var(--gradient-bhagwa);
+      border-radius: var(--radius-md);
+      display: grid; place-items: center;
+      font-size: 1.4rem;
+      box-shadow: 0 4px 12px rgba(255,111,0,0.35);
+      animation: gentleFloat 4s ease-in-out infinite;
+    }
+    @keyframes gentleFloat {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+    .brand-info h1 {
+      font-size: 1.15rem; font-weight: 800; line-height: 1.2;
+      background: var(--gradient-bhagwa);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .brand-info p { font-size: 0.7rem; color: var(--gray-500); font-weight: 500; }
+    .topbar-actions { display: flex; gap: 0.4rem; }
+    .icon-btn {
+      width: 38px; height: 38px; border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04);
+      color: var(--gray-400); cursor: pointer;
+      display: grid; place-items: center; font-size: 1.15rem;
+      transition: all 0.25s var(--ease);
+    }
+    .icon-btn:hover { background: rgba(255,111,0,0.15); color: white; transform: translateY(-1px); }
+
+    /* ========================================
+       BOTTOM TAB BAR
+    ======================================== */
+    .tabbar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 900;
+      padding: 0.75rem 1rem; pointer-events: none;
+    }
+    .tabbar-inner {
+      background: rgba(15,15,35,0.96);
+      backdrop-filter: blur(24px) saturate(1.8);
+      border-radius: var(--radius-xl);
+      padding: 0.5rem 0.4rem;
+      display: grid; grid-template-columns: repeat(6,1fr); gap: 0.25rem;
+      border: 1px solid rgba(255,111,0,0.15);
+      box-shadow: 0 -4px 30px rgba(0,0,0,0.3);
+      max-width: 680px; margin: 0 auto;
+      pointer-events: all;
+    }
+    .tab {
+      background: none; border: none; color: var(--gray-500);
+      cursor: pointer; padding: 0.6rem 0.25rem;
+      border-radius: var(--radius-md);
+      display: flex; flex-direction: column; align-items: center; gap: 0.15rem;
+      font-size: 0.65rem; font-weight: 600; font-family: var(--font-ui);
+      transition: all 0.25s var(--ease); position: relative;
+    }
+    .tab .tab-ico { font-size: 1.35rem; transition: transform 0.25s var(--ease); }
+    .tab.on { color: white; }
+    .tab.on::before {
+      content: ''; position: absolute; inset: 0;
+      background: var(--gradient-bhagwa); opacity: 1;
+      border-radius: var(--radius-md); z-index: -1;
+    }
+    .tab:not(.on):hover { color: var(--bhagwa-light); }
+    .tab:not(.on):hover .tab-ico { transform: translateY(-2px); }
+
+    /* ========================================
+       MAIN CONTENT AREA
+    ======================================== */
+    .main { padding: 0 1rem 7rem; }
+
+    .page { display: none; animation: pageIn 0.4s var(--ease); }
+    .page.on { display: block; }
+    @keyframes pageIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-head { text-align: center; margin-bottom: 1.75rem; padding-top: 0.5rem; }
+    .page-title {
+      font-size: 1.75rem; font-weight: 800;
+      background: var(--gradient-bhagwa);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .page-sub { color: var(--gray-500); font-size: 0.9rem; margin-top: 0.25rem; }
+
+    /* ========================================
+       CARDS
+    ======================================== */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+    }
+    .card:hover { border-color: rgba(255,111,0,0.2); box-shadow: var(--shadow-glow); }
+    .card-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;
+    }
+    .card-label {
+      font-size: 1.1rem; font-weight: 700; color: white;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+
+    /* ========================================
+       FORM ELEMENTS
+    ======================================== */
+    .fg { margin-bottom: 1.25rem; }
+    .fl {
+      display: block; margin-bottom: 0.4rem; font-weight: 600;
+      color: var(--gray-300); font-size: 0.8rem;
+      text-transform: uppercase; letter-spacing: 0.6px;
+    }
+    .fi, .fs, .ft {
+      width: 100%; padding: 0.8rem 1rem;
+      background: rgba(255,255,255,0.04);
+      border: 2px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-md);
+      color: white; font-family: var(--font-ui); font-size: 0.95rem;
+      transition: all 0.25s var(--ease); outline: none;
+    }
+    .fi:focus, .fs:focus, .ft:focus {
+      border-color: var(--bhagwa);
+      background: rgba(255,111,0,0.04);
+      box-shadow: 0 0 0 3px rgba(255,111,0,0.1);
+    }
+    .ft { min-height: 100px; resize: vertical; font-family: var(--font-hindi-sans); }
+    .fs option { background: var(--deep-black); color: white; }
+
+    /* ========================================
+       BUTTONS
+    ======================================== */
+    .btn {
+      padding: 0.8rem 1.25rem; border: none; border-radius: var(--radius-md);
+      font-family: var(--font-ui); font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; transition: all 0.25s var(--ease);
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+      text-decoration: none; line-height: 1.4;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-p { background: var(--gradient-bhagwa); color: white; box-shadow: 0 4px 14px rgba(255,111,0,0.3); }
+    .btn-p:hover:not(:disabled) { box-shadow: 0 6px 22px rgba(255,111,0,0.45); transform: translateY(-1px); }
+    .btn-s { background: rgba(255,255,255,0.06); color: white; border: 1.5px solid rgba(255,255,255,0.12); }
+    .btn-s:hover:not(:disabled) { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+    .btn-g { background: linear-gradient(135deg, #00C853, #00E676); color: white; }
+    .btn-d { background: linear-gradient(135deg, #FF1744, #FF5252); color: white; }
+    .btn-w { width: 100%; }
+    .btn-sm { padding: 0.45rem 0.8rem; font-size: 0.8rem; }
+
+    /* ========================================
+       PANDIT SELECTION GRID
+    ======================================== */
+    .pandit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 1rem; }
+    .pandit-card {
+      background: rgba(255,255,255,0.03);
+      border: 2px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-lg); padding: 1.25rem;
+      cursor: pointer; transition: all 0.3s var(--ease);
+    }
+    .pandit-card:hover { border-color: rgba(255,111,0,0.3); }
+    .pandit-card.picked {
+      border-color: var(--bhagwa);
+      background: rgba(255,111,0,0.08);
+      box-shadow: 0 0 20px rgba(255,111,0,0.1);
+    }
+    .pandit-top { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+    .pandit-av {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--gradient-bhagwa);
+      display: grid; place-items: center; font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+    .pandit-nm { font-size: 1rem; font-weight: 700; color: white; }
+    .pandit-tl { font-size: 0.8rem; color: var(--gray-400); }
+    .pandit-det { display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.82rem; color: var(--gray-300); }
+    .pandit-det span { display: flex; align-items: center; gap: 0.4rem; }
+
+    /* ========================================
+       POOJA SELECTION LIST
+    ======================================== */
+    .pooja-list { display: grid; gap: 0.6rem; }
+    .pooja-row {
+      background: rgba(255,255,255,0.03);
+      border: 2px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-md); padding: 0.85rem;
+      display: flex; align-items: center; gap: 0.75rem;
+      cursor: pointer; transition: all 0.25s var(--ease);
+      user-select: none;
+    }
+    .pooja-row:hover { background: rgba(255,255,255,0.06); }
+    .pooja-row.picked { background: rgba(255,111,0,0.08); border-color: var(--bhagwa); }
+    .pooja-tick {
+      width: 22px; height: 22px; border: 2px solid var(--gray-500);
+      border-radius: 5px; display: grid; place-items: center;
+      flex-shrink: 0; transition: all 0.25s var(--ease); font-size: 0.75rem;
+    }
+    .pooja-row.picked .pooja-tick {
+      background: var(--gradient-bhagwa); border-color: var(--bhagwa); color: white;
+    }
+    .pooja-tick::after { content: '✓'; opacity: 0; transform: scale(0); transition: all 0.2s var(--ease); }
+    .pooja-row.picked .pooja-tick::after { opacity: 1; transform: scale(1); }
+    .pooja-body { flex: 1; min-width: 0; }
+    .pooja-nm { font-weight: 600; color: white; font-size: 0.95rem; }
+    .pooja-ct { font-size: 0.72rem; color: var(--gray-500); }
+    .pooja-arrows { display: flex; gap: 0.3rem; }
+    .arr-btn {
+      width: 28px; height: 28px; border-radius: 5px;
+      border: none; background: rgba(255,255,255,0.08);
+      color: white; cursor: pointer; display: grid; place-items: center;
+      font-size: 0.8rem; transition: all 0.2s var(--ease);
+    }
+    .arr-btn:hover { background: var(--bhagwa); }
+
+    /* ========================================
+       MATERIAL MANAGEMENT
+    ======================================== */
+    .mat-section { margin-bottom: 1.5rem; }
+    .mat-head {
+      background: rgba(255,111,0,0.1);
+      border-left: 4px solid var(--bhagwa);
+      padding: 0.85rem 1rem; border-radius: var(--radius-md);
+      margin-bottom: 0.75rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 0.5rem;
+    }
+    .mat-head-title { font-weight: 700; color: white; display: flex; align-items: center; gap: 0.5rem; }
+    .mat-grid { display: grid; gap: 0.4rem; }
+    .mat-row {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius-sm);
+      padding: 0.6rem 0.75rem;
+      display: grid;
+      grid-template-columns: 24px 1fr 80px 90px;
+      gap: 0.6rem; align-items: center;
+    }
+    .mat-chk { width: 18px; height: 18px; accent-color: var(--bhagwa); cursor: pointer; }
+    .mat-nm { color: white; font-weight: 500; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mat-qty, .mat-unit {
+      padding: 0.4rem 0.5rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 5px; color: white; font-size: 0.85rem;
+      font-family: var(--font-ui); outline: none;
+      transition: border-color 0.2s var(--ease);
+    }
+    .mat-qty:focus, .mat-unit:focus { border-color: var(--bhagwa); }
+    .mat-qty { text-align: center; }
+    .add-item-row {
+      display: flex; gap: 0.5rem; margin-top: 0.5rem;
+    }
+    .add-item-input {
+      flex: 1; padding: 0.5rem 0.75rem;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px dashed rgba(255,111,0,0.3);
+      border-radius: var(--radius-sm);
+      color: white; font-size: 0.85rem; outline: none;
+      font-family: var(--font-hindi-sans);
+    }
+    .add-item-input::placeholder { color: var(--gray-600); }
+    .add-item-input:focus { border-color: var(--bhagwa); background: rgba(255,111,0,0.04); }
+
+    /* ========================================
+       PDF PREVIEW AREA
+    ======================================== */
+    .preview-wrap {
+      background: #d0d0d0;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      max-height: 70vh; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 2rem; align-items: center;
+    }
+    .preview-page {
+      background: white; box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+      width: 100%; max-width: 210mm; position: relative;
+      border: none;
+    }
+    .preview-page-num {
+      position: absolute; top: 8px; right: 12px;
+      background: var(--bhagwa); color: white;
+      padding: 0.15rem 0.6rem; border-radius: var(--radius-full);
+      font-size: 0.7rem; font-weight: 700; z-index: 5;
+    }
+
+    /* ========================================
+       PDF PAGE INTERNAL STYLES (Preview + Render)
+    ======================================== */
+    .pdfpage {
+      padding: 30px; font-family: 'Noto Sans Devanagari', sans-serif;
+      color: #000; font-size: 14px; line-height: 1.5;
+      background: white; position: relative;
+      min-height: auto; /* preview: auto, render: fixed */
+    }
+    .pdfpage.render-mode { min-height: 297mm; width: 210mm; position: absolute; left: -9999px; top: 0; }
+
+    /* PDF Header */
+    .pdf-hdr {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;
+    }
+    .pdf-swastik { font-size: 60px; color: var(--bhagwa); font-weight: bold; line-height: 1; }
+    .pdf-hdr-center { text-align: center; flex: 1; }
+    .pdf-hdr-center h1 {
+      color: var(--bhagwa); font-size: 36px; font-weight: 800; margin: 0;
+      font-family: 'Noto Serif Devanagari', serif;
+    }
+    .pdf-hdr-center h2 {
+      color: #222; font-size: 26px; font-weight: 700; margin: 3px 0 0;
+      font-family: 'Noto Serif Devanagari', serif;
+    }
+    .pdf-divider { border-bottom: 3px solid var(--bhagwa); margin: 8px 0 12px; }
+    .pdf-swastika-line {
+      text-align: center; color: var(--bhagwa); font-size: 16px;
+      margin: 10px 0 6px; letter-spacing: 10px; font-weight: bold;
+      border-top: 2px solid var(--bhagwa); padding-top: 4px;
+    }
+
+    /* PDF Info Grid */
+    .pdf-info {
+      display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px 12px;
+      font-weight: 700; color: #111; font-size: 16px;
+      padding: 12px 14px; background: #fff8f0;
+      border-radius: 6px; border: 1.5px solid #ffe0b2;
+      margin-bottom: 6px;
+    }
+    .pdf-info b { color: var(--bhagwa); font-family: 'Noto Serif Devanagari', serif; }
+    .pdf-info .full { grid-column: span 2; }
+    .pdf-info .editable-inline {
+      border: none; border-bottom: 2px dotted var(--bhagwa);
+      font-size: 16px; font-weight: 700; color: #111;
+      background: transparent; outline: none;
+      font-family: 'Noto Sans Devanagari', sans-serif;
+      width: 85%;
+    }
+
+    /* PDF Pooja Heading */
+    .pdf-pooja-title {
+      background: var(--bhagwa); color: white;
+      padding: 6px 10px; margin: 10px 0 6px;
+      border-radius: 4px; font-weight: 700; font-size: 15px;
+      font-family: 'Noto Serif Devanagari', serif;
+    }
+
+    /* PDF Table */
+    .pdf-tbl {
+      width: 100%; border-collapse: collapse;
+      border: 2.5px solid #222; margin-bottom: 10px;
+    }
+    .pdf-tbl th, .pdf-tbl td {
+      border: 1.5px solid #555; padding: 5px 8px;
+      text-align: left; font-size: 13px; color: #111; font-weight: 600;
+    }
+    .pdf-tbl th {
+      background: var(--bhagwa-pale); color: var(--bhagwa);
+      font-family: 'Noto Serif Devanagari', serif; font-weight: 700;
+    }
+    .pdf-tbl .chk-cell { width: 24px; text-align: center; }
+    .pdf-tbl .chk-box {
+      width: 14px; height: 14px; border: 1.5px solid #555;
+      border-radius: 2px; display: inline-block;
+    }
+    .pdf-tbl .rmk-cell { width: 60px; }
+
+    /* PDF Remark Section */
+    .pdf-remark-section {
+      margin-top: 12px; border: 2px solid #555;
+      border-radius: 4px; padding: 10px;
+    }
+    .pdf-remark-title {
+      font-weight: 700; color: var(--bhagwa); font-size: 14px;
+      margin-bottom: 6px; font-family: 'Noto Serif Devanagari', serif;
+    }
+    .pdf-remark-lines {
+      min-height: 60px;
+    }
+    .pdf-remark-lines .remark-line {
+      border-bottom: 1px dotted #aaa; height: 24px;
+    }
+
+    /* PDF Footer */
+    .pdf-ftr {
+      margin-top: 12px; padding-top: 10px;
+      border-top: 3.5px solid var(--bhagwa);
+      text-align: center; color: #444; font-size: 12px; font-weight: 600;
+    }
+    .pdf-ftr div { margin-bottom: 3px; }
+    .pdf-ftr strong { color: #222; }
+
+    /* ========================================
+       TEMPLATE LIBRARY
+    ======================================== */
+    .tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px,1fr)); gap: 1rem; }
+    .tpl-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg); padding: 1.25rem;
+      transition: all 0.3s var(--ease);
+    }
+    .tpl-card:hover { border-color: rgba(255,111,0,0.3); transform: translateY(-3px); box-shadow: var(--shadow-glow); }
+    .tpl-name { font-size: 1.05rem; font-weight: 700; color: white; margin-bottom: 0.4rem; }
+    .tpl-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem; font-size: 0.8rem; color: var(--gray-400); }
+    .tpl-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4rem; }
+
+    /* ========================================
+       DATABASE TABLE
+    ======================================== */
+    .dbtbl { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03); border-radius: var(--radius-md); overflow: hidden; }
+    .dbtbl th, .dbtbl td { padding: 0.75rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.85rem; }
+    .dbtbl th { background: rgba(255,111,0,0.15); color: white; font-weight: 700; }
+    .dbtbl tr:hover { background: rgba(255,255,255,0.02); }
+    .db-acts { display: flex; gap: 0.3rem; }
+    .db-btn { padding: 0.2rem 0.6rem; border-radius: 4px; border: none; cursor: pointer; font-size: 0.72rem; font-weight: 600; }
+    .db-btn-e { background: var(--bhagwa); color: white; }
+    .db-btn-d { background: var(--error); color: white; }
+
+    /* ========================================
+       STATS DASHBOARD
+    ======================================== */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+    .stat {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg); padding: 1.25rem; text-align: center;
+    }
+    .stat-ico {
+      width: 44px; height: 44px; margin: 0 auto 0.75rem;
+      background: var(--gradient-bhagwa); border-radius: 50%;
+      display: grid; place-items: center; font-size: 1.3rem;
+    }
+    .stat-val { font-size: 1.75rem; font-weight: 800; color: white; }
+    .stat-lbl { font-size: 0.75rem; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ========================================
+       CUSTOMIZATION PANEL
+    ======================================== */
+    .cust-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+      gap: 0.75rem;
+    }
+    .cust-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius-md);
+      padding: 0.85rem;
+    }
+    .cust-item label {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.85rem; color: var(--gray-300); cursor: pointer;
+    }
+    .cust-item input[type="checkbox"] { accent-color: var(--bhagwa); width: 16px; height: 16px; }
+    .cust-item input[type="range"] { width: 100%; accent-color: var(--bhagwa); margin-top: 0.3rem; }
+    .cust-item .cust-val { font-size: 0.75rem; color: var(--bhagwa); font-weight: 700; text-align: right; }
+
+    /* ========================================
+       TOAST NOTIFICATIONS
+    ======================================== */
+    .toasts {
+      position: fixed; top: 1rem; right: 1rem; z-index: 9999;
+      display: flex; flex-direction: column; gap: 0.4rem;
+      max-width: 380px; pointer-events: none;
+    }
+    .toast-item {
+      background: rgba(15,15,35,0.95);
+      backdrop-filter: blur(20px);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1.25rem;
+      display: flex; align-items: center; gap: 0.75rem;
+      box-shadow: var(--shadow-lg);
+      border-left: 4px solid var(--bhagwa);
+      animation: toastIn 0.35s var(--ease);
+      pointer-events: all;
+    }
+    .toast-item.ok { border-left-color: var(--success); }
+    .toast-item.err { border-left-color: var(--error); }
+    .toast-item.warn { border-left-color: var(--warning); }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(100%); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .toast-ico { font-size: 1.25rem; flex-shrink: 0; }
+    .toast-body { flex: 1; }
+    .toast-ttl { font-weight: 600; color: white; font-size: 0.85rem; }
+    .toast-msg { font-size: 0.78rem; color: var(--gray-400); margin-top: 0.1rem; }
+
+    /* ========================================
+       LOADING OVERLAY
+    ======================================== */
+    .loader-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      place-items: center; flex-direction: column; gap: 1rem;
+    }
+    .loader-overlay.on { display: flex; align-items: center; justify-content: center; }
+    .loader-spin {
+      width: 36px; height: 36px;
+      border: 3px solid rgba(255,255,255,0.1);
+      border-top-color: var(--bhagwa);
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-txt { color: white; font-weight: 600; font-size: 1rem; }
+
+    /* ========================================
+       MODALS
+    ======================================== */
+    .modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+      z-index: 9999; place-items: center; padding: 1rem;
+    }
+    .modal.on { display: flex; align-items: center; justify-content: center; }
+    .modal-box {
+      background: var(--deep-black); border-radius: var(--radius-xl);
+      max-width: 580px; width: 100%; max-height: 90vh; overflow-y: auto;
+      border: 1px solid rgba(255,111,0,0.2);
+      animation: modalIn 0.3s var(--ease);
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-top {
+      padding: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-title { font-size: 1.25rem; font-weight: 700; color: white; }
+    .modal-x {
+      width: 36px; height: 36px; border-radius: 50%;
+      border: none; background: rgba(255,255,255,0.08); color: white;
+      cursor: pointer; display: grid; place-items: center; font-size: 1.3rem;
+      transition: all 0.25s var(--ease);
+    }
+    .modal-x:hover { background: var(--error); transform: rotate(90deg); }
+    .modal-body { padding: 1.25rem; }
+    .modal-foot {
+      padding: 1.25rem; border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex; gap: 0.75rem; justify-content: flex-end;
+    }
+
+    /* ========================================
+       RESPONSIVE
+    ======================================== */
+    @media (max-width: 768px) {
+      .page-title { font-size: 1.4rem; }
+      .pandit-grid, .tpl-grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2,1fr); }
+      .mat-row { grid-template-columns: 22px 1fr 65px 80px; gap: 0.4rem; padding: 0.5rem; }
+      .mat-nm { font-size: 0.82rem; }
+      .preview-wrap { padding: 0.75rem; }
+      .pdfpage { padding: 18px; }
+      .pdf-hdr-center h1 { font-size: 26px; }
+      .pdf-hdr-center h2 { font-size: 20px; }
+      .pdf-swastik { font-size: 40px; }
+      .pdf-info { font-size: 13px; grid-template-columns: 1fr; }
+      .pdf-info .full { grid-column: span 1; }
+      .cust-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ========================================
+       PRINT UTILITY - hidden render area
+    ======================================== */
+    #renderZone { position: absolute; left: -9999px; top: 0; z-index: -1; }
+    .u-hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- Toast container -->
+<div class="toasts" id="toasts"></div>
+
+<!-- Loading overlay -->
+<div class="loader-overlay" id="loader">
+  <div class="loader-spin"></div>
+  <div class="loader-txt" id="loaderTxt">Processing...</div>
+</div>
+
+<!-- ========== MODALS ========== -->
+
+<!-- Add to DB Modal -->
+<div class="modal" id="mAdd">
+  <div class="modal-box">
+    <div class="modal-top">
+      <h3 class="modal-title">➕ Add to Database</h3>
+      <button class="modal-x" onclick="V.modal('mAdd',0)">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg">
+        <label class="fl">Pooja Name</label>
+        <input class="fi" id="mAddPooja" placeholder="Enter pooja name">
+        <select class="fs" id="mAddSel" onchange="V.pickExisting()" style="margin-top:0.5rem">
+          <option value="">— or select existing —</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">Samagri Items (one per line)</label>
+        <textarea class="ft" id="mAddItems" placeholder="Enter samagri items, one per line"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-s" onclick="V.modal('mAdd',0)">Cancel</button>
+      <button class="btn btn-p" onclick="V.dbAdd()">Add to Database</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit DB Item Modal -->
+<div class="modal" id="mEdit">
+  <div class="modal-box">
+    <div class="modal-top">
+      <h3 class="modal-title">✏️ Edit Item</h3>
+      <button class="modal-x" onclick="V.modal('mEdit',0)">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg">
+        <label class="fl">Pooja Name</label>
+        <input class="fi" id="mEditPooja" readonly>
+      </div>
+      <div class="fg">
+        <label class="fl">Samagri Name</label>
+        <input class="fi" id="mEditSamagri">
+      </div>
+      <input type="hidden" id="mEditIdx">
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-s" onclick="V.modal('mEdit',0)">Cancel</button>
+      <button class="btn btn-p" onclick="V.dbUpdate()">Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal" id="mSettings">
+  <div class="modal-box">
+    <div class="modal-top">
+      <h3 class="modal-title">⚙️ PDF & Display Settings</h3>
+      <button class="modal-x" onclick="V.modal('mSettings',0)">×</button>
+    </div>
+    <div class="modal-body">
+      <h4 style="color:var(--bhagwa);margin-bottom:0.75rem;font-size:0.9rem;">📄 Page Layout</h4>
+      <div class="cust-grid" style="margin-bottom:1.25rem;">
+        <div class="cust-item">
+          <label class="fl">First Page Rows</label>
+          <input class="fi" type="number" id="sFirstRows" value="15" min="8" max="25" style="padding:0.5rem;">
+        </div>
+        <div class="cust-item">
+          <label class="fl">Next Page Rows</label>
+          <input class="fi" type="number" id="sNextRows" value="28" min="15" max="35" style="padding:0.5rem;">
+        </div>
+      </div>
+      <h4 style="color:var(--bhagwa);margin-bottom:0.75rem;font-size:0.9rem;">🎨 Customization</h4>
+      <div class="cust-grid">
+        <div class="cust-item">
+          <label><input type="checkbox" id="sShowChk" checked> Show Checkbox Column</label>
+        </div>
+        <div class="cust-item">
+          <label><input type="checkbox" id="sShowRmk" checked> Show Remark Column</label>
+        </div>
+        <div class="cust-item">
+          <label><input type="checkbox" id="sShowHdr" checked> Show Header</label>
+        </div>
+        <div class="cust-item">
+          <label><input type="checkbox" id="sShowFtr" checked> Show Footer</label>
+        </div>
+        <div class="cust-item" style="grid-column: span 2;">
+          <label class="fl">Font Size: <span class="cust-val" id="sFontVal">14px</span></label>
+          <input type="range" id="sFontSize" min="10" max="20" value="14" oninput="document.getElementById('sFontVal').textContent=this.value+'px'">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-s" onclick="V.modal('mSettings',0)">Close</button>
+      <button class="btn btn-p" onclick="V.saveSettings()">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ========== APP SHELL ========== -->
+<div class="shell">
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-logo">🕉️</div>
+        <div class="brand-info">
+          <h1>Vedic Studio Pro</h1>
+          <p>Complete Pooja System</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" onclick="V.modal('mSettings',1)" title="Settings">⚙️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+
+    <!-- ===== HOME ===== -->
+    <section id="pgHome" class="page on">
+      <div class="page-head">
+        <h2 class="page-title">Dashboard</h2>
+        <p class="page-sub">Welcome to your spiritual workspace</p>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-ico">👥</div><div class="stat-val" id="stYaj">0</div><div class="stat-lbl">Yajmans</div></div>
+        <div class="stat"><div class="stat-ico">🕉️</div><div class="stat-val" id="stPooja">0</div><div class="stat-lbl">Poojas</div></div>
+        <div class="stat"><div class="stat-ico">📦</div><div class="stat-val" id="stItems">0</div><div class="stat-lbl">Samagri</div></div>
+        <div class="stat"><div class="stat-ico">☁️</div><div class="stat-val" id="stCloud">0</div><div class="stat-lbl">Cloud Saved</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3 class="card-label"><span>⚡</span>Quick Actions</h3></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.75rem;">
+          <button class="btn btn-p" onclick="V.go('pgSetup')">➕ New Pooja</button>
+          <button class="btn btn-s" onclick="V.go('pgLib')">📚 Library</button>
+          <button class="btn btn-s" onclick="V.go('pgDB')">🗄️ Database</button>
+          <button class="btn btn-s" onclick="V.modal('mAdd',1)">➕ Add Data</button>
+          <button class="btn btn-s" onclick="V.go('pgRashi')">🌟 Rashifal</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SETUP ===== -->
+    <section id="pgSetup" class="page">
+      <div class="page-head">
+        <h2 class="page-title">New Pooja Setup</h2>
+        <p class="page-sub">Select pandit & enter yajman details</p>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3 class="card-label"><span>🙏</span>Select Pandit</h3></div>
+        <div class="pandit-grid" id="panditGrid"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3 class="card-label"><span>👤</span>Yajman Details</h3></div>
+        <div class="fg"><label class="fl">Yajman Name</label><input class="fi" id="inpYajman" placeholder="Enter name"></div>
+        <div class="fg"><label class="fl">Phone</label><input class="fi" id="inpPhone" placeholder="Phone number" type="tel"></div>
+        <div class="fg"><label class="fl">Date</label><input class="fi" id="inpDate" type="date"></div>
+      </div>
+      <button class="btn btn-p btn-w" onclick="V.stepPooja()">Next: Select Poojas →</button>
+    </section>
+
+    <!-- ===== POOJA SELECT ===== -->
+    <section id="pgPooja" class="page">
+      <div class="page-head">
+        <h2 class="page-title">Select Poojas</h2>
+        <p class="page-sub">Choose & arrange in desired order</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3 class="card-label"><span>🕉️</span>Available Poojas</h3>
+          <div style="display:flex;gap:0.4rem;">
+            <button class="btn btn-sm btn-s" onclick="V.selAll()">Select All</button>
+            <button class="btn btn-sm btn-s" onclick="V.selNone()">Clear</button>
+          </div>
+        </div>
+        <div class="pooja-list" id="poojaList"></div>
+      </div>
+      <button class="btn btn-p btn-w" onclick="V.stepMats()">Next: Manage Materials →</button>
+    </section>
+
+    <!-- ===== MATERIALS ===== -->
+    <section id="pgMats" class="page">
+      <div class="page-head">
+        <h2 class="page-title">Material Management</h2>
+        <p class="page-sub">Set quantities, add custom items</p>
+      </div>
+      <div id="matSections"></div>
+      <div class="card">
+        <button class="btn btn-g btn-w" onclick="V.saveCloud()">💾 Save to Cloud</button>
+        <button class="btn btn-p btn-w" style="margin-top:0.75rem;" onclick="V.stepPreview()">Next: Preview & Download →</button>
+      </div>
+    </section>
+
+    <!-- ===== PREVIEW ===== -->
+    <section id="pgPreview" class="page">
+      <div class="page-head">
+        <h2 class="page-title">Preview & Download</h2>
+        <p class="page-sub">Edit fields inline, then download</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3 class="card-label"><span>📄</span>Live Preview (Editable)</h3>
+          <button class="btn btn-sm btn-s" onclick="V.buildPreview()">🔄 Refresh</button>
+        </div>
+        <div class="preview-wrap" id="previewWrap">
+          <p style="color:#666;text-align:center;padding:2rem;">Click Refresh to generate preview</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3 class="card-label"><span>📥</span>Download Options</h3></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0.75rem;">
+          <button class="btn btn-p" onclick="V.dlPDF()">📄 PDF Download</button>
+          <button class="btn btn-g" onclick="V.dlImages()">🖼️ Images (ZIP)</button>
+          <button class="btn btn-s" onclick="V.share()">📤 Share / WhatsApp</button>
+          <button class="btn btn-s" onclick="window.print()">🖨️ Print</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== LIBRARY ===== -->
+    <section id="pgLib" class="page">
+      <div class="page-head">
+        <h2 class="page-title">Cloud Library</h2>
+        <p class="page-sub">Saved templates</p>
+      </div>
+      <div class="card"><div class="fg"><input class="fi" id="libSearch" placeholder="🔍 Search templates..." oninput="V.filterLib()"></div></div>
+      <div class="tpl-grid" id="tplGrid"><p style="color:var(--gray-500);text-align:center;padding:2rem;grid-column:1/-1;">Loading...</p></div>
+    </section>
+
+    <!-- ===== DATABASE ===== -->
+    <section id="pgDB" class="page">
+      <div class="page-head">
+        <h2 class="page-title">Database Management</h2>
+        <p class="page-sub">Edit pooja & samagri master data</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3 class="card-label"><span>🗄️</span>Master Database</h3>
+          <button class="btn btn-sm btn-p" onclick="V.modal('mAdd',1)">➕ Add New</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="dbtbl">
+            <thead><tr><th>#</th><th>Pooja</th><th>Samagri</th><th>Actions</th></tr></thead>
+            <tbody id="dbBody"><tr><td colspan="4" style="text-align:center;padding:2rem;">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3 class="card-label"><span>📊</span>Stats</h3></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+          <div style="text-align:center;padding:1rem;background:rgba(255,111,0,0.08);border-radius:var(--radius-md);">
+            <div style="font-size:1.75rem;font-weight:800;color:white;" id="dbStP">0</div>
+            <div style="font-size:0.8rem;color:var(--gray-500);">Total Poojas</div>
+          </div>
+          <div style="text-align:center;padding:1rem;background:rgba(255,111,0,0.08);border-radius:var(--radius-md);">
+            <div style="font-size:1.75rem;font-weight:800;color:white;" id="dbStS">0</div>
+            <div style="font-size:0.8rem;color:var(--gray-500);">Total Items</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== RASHIFAL ===== -->
+    <section id="pgRashi" class="page">
+      <div class="page-head">
+        <h2 class="page-title">Rashifal Creator</h2>
+        <p class="page-sub">Beautiful horoscope posts</p>
+      </div>
+      <iframe src="https://jaiminihome-ship-it.github.io/POOJASAMAGRI/Rashi.html"
+              style="width:100%;height:calc(100vh - 250px);border:none;border-radius:var(--radius-lg);background:white;">
+      </iframe>
+    </section>
+
+  </div><!-- /main -->
+
+  <!-- Tab Bar -->
+  <div class="tabbar">
+    <div class="tabbar-inner">
+      <button class="tab on" data-pg="pgHome" onclick="V.go('pgHome')"><span class="tab-ico">🏠</span><span>Home</span></button>
+      <button class="tab" data-pg="pgSetup" onclick="V.go('pgSetup')"><span class="tab-ico">➕</span><span>New</span></button>
+      <button class="tab" data-pg="pgLib" onclick="V.go('pgLib')"><span class="tab-ico">📚</span><span>Library</span></button>
+      <button class="tab" data-pg="pgDB" onclick="V.go('pgDB')"><span class="tab-ico">🗄️</span><span>Database</span></button>
+      <button class="tab" data-pg="pgRashi" onclick="V.go('pgRashi')"><span class="tab-ico">🌟</span><span>Rashifal</span></button>
+      <button class="tab" onclick="V.modal('mSettings',1)"><span class="tab-ico">⚙️</span><span>Settings</span></button>
+    </div>
+  </div>
+</div><!-- /shell -->
+
+<!-- Hidden render zone for PDF generation -->
+<div id="renderZone"></div>
+
+<!-- ================================================================
+     PART 2: ALL JAVASCRIPT - PDF ENGINE, PREVIEW, DOWNLOADS, LOGIC
+     ================================================================ -->
+<script>
+// ========================================================
+// VEDIC STUDIO PRO - COMPLETE APPLICATION ENGINE
+// ========================================================
+
+const V = {
+  // ---------- CONFIG ----------
+  API: "https://script.google.com/macros/s/AKfycbyhXVfu7WVAs2pQQLyH3lkkO3ZG-rmbqTmyygjqH8XeWyQPNgqx49whCIsa8WttKRZ4/exec",
+
+  CFG: {
+    firstRows: 15,    // max table-rows on page 1 (has header)
+    nextRows: 28,     // max table-rows on page 2+
+    showChk: true,    // checkbox column
+    showRmk: true,    // remark column
+    showHdr: true,    // header on page 1
+    showFtr: true,    // footer on every page
+    fontSize: 14      // base font size in PDF
+  },
+
+  // ---------- PANDIT DATA ----------
+  pandits: {
+    yugal: {
+      id:'yugal', name:'पं. युगल आचार्य',
+      title:'वैदिक ज्योतिषाचार्य एवं वास्तु विशेषज्ञ',
+      phone:'+91 9928139485', website:'www.astroyugalacharya.in',
+      address:'जयपुर, राजस्थान'
+    },
+    purushottam: {
+      id:'purushottam', name:'पं. पुरुषोत्तम शर्मा',
+      title:'ज्योतिषाचार्य',
+      phone:'+91 9680992496', website:'',
+      address:'श्री राम मंदिर, गिरनार कॉलोनी, वैशाली नगर, जयपुर'
+    }
+  },
+
+  // ---------- STATE ----------
+  S: {
+    pandit: 'yugal',
+    yajman: '', phone: '', date: '',
+    selPoojas: [],   // [{name, order}]
+    mats: [],        // [{pooja, name, qty, unit, on, custom}]
+    master: [],      // from API
+    templates: [],   // from API
+    editData: {}     // editable preview fields
+  },
+
+  // ============================================================
+  //  INITIALIZATION
+  // ============================================================
+  async init() {
+    console.log('🕉️ Vedic Studio Pro initializing...');
+    document.getElementById('inpDate').value = new Date().toISOString().split('T')[0];
+    this.loadCfg();
+    this.loadState();
+    await this.fetchMaster();
+    await this.fetchTemplates();
+    this.drawPandits();
+    this.syncStats();
+    this.toast('✨ Ready','System loaded','ok');
+  },
+
+  // ============================================================
+  //  NAVIGATION
+  // ============================================================
+  go(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+    document.getElementById(id).classList.add('on');
+    document.querySelectorAll('.tab').forEach(t => {
+      t.classList.toggle('on', t.dataset.pg === id);
+    });
+    window.scrollTo({top:0,behavior:'smooth'});
+  },
+
+  // ============================================================
+  //  MODALS
+  // ============================================================
+  modal(id, show) {
+    document.getElementById(id).classList.toggle('on', !!show);
+  },
+
+  // ============================================================
+  //  TOAST
+  // ============================================================
+  toast(title, msg, type='info') {
+    const c = document.getElementById('toasts');
+    const icos = {ok:'✅',err:'❌',warn:'⚠️',info:'ℹ️'};
+    const d = document.createElement('div');
+    d.className = `toast-item ${type}`;
+    d.innerHTML = `<div class="toast-ico">${icos[type]||'ℹ️'}</div><div class="toast-body"><div class="toast-ttl">${title}</div>${msg?`<div class="toast-msg">${msg}</div>`:''}</div>`;
+    c.appendChild(d);
+    setTimeout(() => d.remove(), 4000);
+  },
+
+  // ============================================================
+  //  LOADING
+  // ============================================================
+  load(txt='Processing...') {
+    document.getElementById('loaderTxt').textContent = txt;
+    document.getElementById('loader').classList.add('on');
+  },
+  unload() { document.getElementById('loader').classList.remove('on'); },
+
+  // ============================================================
+  //  SETTINGS
+  // ============================================================
+  loadCfg() {
+    try {
+      const s = JSON.parse(localStorage.getItem('vedicCfg')||'{}');
+      if(s.firstRows) this.CFG.firstRows = s.firstRows;
+      if(s.nextRows) this.CFG.nextRows = s.nextRows;
+      if(s.fontSize) this.CFG.fontSize = s.fontSize;
+      if(s.showChk !== undefined) this.CFG.showChk = s.showChk;
+      if(s.showRmk !== undefined) this.CFG.showRmk = s.showRmk;
+      if(s.showHdr !== undefined) this.CFG.showHdr = s.showHdr;
+      if(s.showFtr !== undefined) this.CFG.showFtr = s.showFtr;
+    } catch(e){}
+    // Sync UI
+    document.getElementById('sFirstRows').value = this.CFG.firstRows;
+    document.getElementById('sNextRows').value = this.CFG.nextRows;
+    document.getElementById('sFontSize').value = this.CFG.fontSize;
+    document.getElementById('sFontVal').textContent = this.CFG.fontSize+'px';
+    document.getElementById('sShowChk').checked = this.CFG.showChk;
+    document.getElementById('sShowRmk').checked = this.CFG.showRmk;
+    document.getElementById('sShowHdr').checked = this.CFG.showHdr;
+    document.getElementById('sShowFtr').checked = this.CFG.showFtr;
+  },
+
+  saveSettings() {
+    this.CFG.firstRows = parseInt(document.getElementById('sFirstRows').value)||15;
+    this.CFG.nextRows = parseInt(document.getElementById('sNextRows').value)||28;
+    this.CFG.fontSize = parseInt(document.getElementById('sFontSize').value)||14;
+    this.CFG.showChk = document.getElementById('sShowChk').checked;
+    this.CFG.showRmk = document.getElementById('sShowRmk').checked;
+    this.CFG.showHdr = document.getElementById('sShowHdr').checked;
+    this.CFG.showFtr = document.getElementById('sShowFtr').checked;
+    localStorage.setItem('vedicCfg', JSON.stringify(this.CFG));
+    this.modal('mSettings',0);
+    this.toast('✅ Saved','Settings updated','ok');
+  },
+
+  // ============================================================
+  //  STATE PERSISTENCE
+  // ============================================================
+  saveState() { localStorage.setItem('vedicState', JSON.stringify(this.S)); },
+  loadState() {
+    try {
+      const s = JSON.parse(localStorage.getItem('vedicState')||'{}');
+      Object.assign(this.S, s);
+    } catch(e){}
+  },
+
+  // ============================================================
+  //  API: MASTER DATA
+  // ============================================================
+  async fetchMaster() {
+    this.load('Loading master data...');
+    try {
+      const r = await fetch(this.API);
+      this.S.master = await r.json();
+      console.log('📦 Master:', this.S.master.length, 'items');
+      this.drawPoojaList();
+      this.drawDB();
+      this.syncDBStats();
+      this.fillExistingSel();
+    } catch(e) {
+      console.error('Master fetch fail:', e);
+      this.toast('⚠️ Error','Failed to load data','err');
+    }
+    this.unload();
+  },
+
+  // ============================================================
+  //  API: TEMPLATES
+  // ============================================================
+  async fetchTemplates() {
+    try {
+      const r = await fetch(this.API + '?action=getTemplates');
+      const data = await r.json();
+      if(Array.isArray(data)) {
+        this.S.templates = data.map(row => ({
+          id: row.id || Date.now().toString(),
+          name: row.name || 'Unknown',
+          date: row.date || '',
+          poojas: Array.isArray(row.poojas) ? row.poojas.join(', ') : (row.poojas||''),
+          poojasArr: Array.isArray(row.poojas) ? row.poojas :
+            (typeof row.poojas==='string' ? row.poojas.split(',').map(p=>p.trim()).filter(Boolean) : []),
+          samagri: row.samagri || []
+        }));
+      } else { this.S.templates = []; }
+      console.log('📚 Templates:', this.S.templates.length);
+    } catch(e) {
+      console.error('Templates fetch fail:', e);
+      this.S.templates = [];
+    }
+    this.drawLib();
+    this.syncStats();
+  },
+
+  // ============================================================
+  //  PANDIT SELECTION
+  // ============================================================
+  drawPandits() {
+    const g = document.getElementById('panditGrid');
+    g.innerHTML = Object.values(this.pandits).map(p => `
+      <div class="pandit-card ${this.S.pandit===p.id?'picked':''}" onclick="V.pickPandit('${p.id}')">
+        <div class="pandit-top">
+          <div class="pandit-av">🙏</div>
+          <div><div class="pandit-nm">${p.name}</div><div class="pandit-tl">${p.title}</div></div>
+        </div>
+        <div class="pandit-det">
+          <span>📞 ${p.phone}</span>
+          <span>📍 ${p.address}</span>
+          ${p.website?`<span>🌐 ${p.website}</span>`:''}
+        </div>
+      </div>
+    `).join('');
+  },
+
+  pickPandit(id) {
+    this.S.pandit = id;
+    this.drawPandits();
+    this.saveState();
+    this.toast('✅', this.pandits[id].name, 'ok');
+  },
+
+  // ============================================================
+  //  POOJA SELECTION
+  // ============================================================
+  _uniquePoojas() {
+    return [...new Set(this.S.master.map(x => x.pooja?.trim()))].filter(Boolean);
+  },
+
+  drawPoojaList() {
+    const all = this._uniquePoojas();
+    const g = document.getElementById('poojaList');
+    if(!all.length) { g.innerHTML = '<p style="color:var(--gray-500);text-align:center;padding:2rem;">No poojas found</p>'; return; }
+    g.innerHTML = all.map(name => {
+      const cnt = this.S.master.filter(x=>x.pooja===name).length;
+      const sel = this.S.selPoojas.some(p=>p.name===name);
+      const idx = this.S.selPoojas.findIndex(p=>p.name===name);
+      return `
+        <div class="pooja-row ${sel?'picked':''}" onclick="V.togPooja('${name}')">
+          <div class="pooja-tick"></div>
+          <div class="pooja-body"><div class="pooja-nm">${name}</div><div class="pooja-ct">${cnt} items</div></div>
+          ${sel?`<div class="pooja-arrows">
+            <button class="arr-btn" onclick="event.stopPropagation();V.moveP(${idx},-1)">▲</button>
+            <button class="arr-btn" onclick="event.stopPropagation();V.moveP(${idx},1)">▼</button>
+          </div>`:''}
+        </div>`;
+    }).join('');
+  },
+
+  togPooja(name) {
+    const i = this.S.selPoojas.findIndex(p=>p.name===name);
+    if(i>-1) this.S.selPoojas.splice(i,1);
+    else this.S.selPoojas.push({name,order:this.S.selPoojas.length});
+    this.drawPoojaList();
+    this.saveState();
+  },
+
+  moveP(i,dir) {
+    const j = i+dir;
+    if(j<0||j>=this.S.selPoojas.length) return;
+    [this.S.selPoojas[i],this.S.selPoojas[j]] = [this.S.selPoojas[j],this.S.selPoojas[i]];
+    this.drawPoojaList();
+    this.saveState();
+  },
+
+  selAll() {
+    this.S.selPoojas = this._uniquePoojas().map((name,i)=>({name,order:i}));
+    this.drawPoojaList(); this.saveState();
+    this.toast('✅','All selected','ok');
+  },
+  selNone() {
+    this.S.selPoojas = [];
+    this.drawPoojaList(); this.saveState();
+  },
+
+  // ============================================================
+  //  STEP NAVIGATION
+  // ============================================================
+  stepPooja() {
+    const y = document.getElementById('inpYajman').value.trim();
+    if(!y) { this.toast('⚠️','Enter yajman name','warn'); return; }
+    this.S.yajman = y;
+    this.S.phone = document.getElementById('inpPhone').value.trim();
+    this.S.date = document.getElementById('inpDate').value;
+    this.saveState();
+    this.go('pgPooja');
+  },
+
+  stepMats() {
+    if(!this.S.selPoojas.length) { this.toast('⚠️','Select at least one pooja','warn'); return; }
+    this.buildMats();
+    this.drawMats();
+    this.go('pgMats');
+  },
+
+  stepPreview() {
+    this.S.editData = {
+      yajman: this.S.yajman||'',
+      phone: this.S.phone||'',
+      date: this.S.date||'',
+      poojas: this.S.selPoojas.map(p=>p.name).join(', ')
+    };
+    this.go('pgPreview');
+    setTimeout(()=>this.buildPreview(), 400);
+  },
+
+  // ============================================================
+  //  MATERIAL MANAGEMENT (with Add Custom Item)
+  // ============================================================
+  buildMats() {
+    // Preserve existing custom items & quantities
+    const existing = new Map();
+    this.S.mats.forEach(m => existing.set(m.pooja+'||'+m.name, m));
+
+    const newMats = [];
+    this.S.selPoojas.forEach(p => {
+      const items = this.S.master.filter(d => d.pooja === p.name);
+      items.forEach(item => {
+        const key = p.name+'||'+item.samagri;
+        if(existing.has(key)) {
+          newMats.push(existing.get(key));
+        } else {
+          newMats.push({pooja:p.name, name:item.samagri, qty:'', unit:'', on:true, custom:false});
+        }
+      });
+      // Keep custom items that user added
+      this.S.mats.filter(m => m.pooja===p.name && m.custom).forEach(cm => {
+        if(!newMats.some(n => n.pooja===cm.pooja && n.name===cm.name)) {
+          newMats.push(cm);
+        }
+      });
+    });
+    this.S.mats = newMats;
+  },
+
+  drawMats() {
+    const c = document.getElementById('matSections');
+    c.innerHTML = this.S.selPoojas.map(p => {
+      const items = this.S.mats.filter(m=>m.pooja===p.name);
+      return `
+        <div class="card mat-section">
+          <div class="mat-head">
+            <div class="mat-head-title"><span>🕉️</span><span>${p.name}</span></div>
+            <button class="btn btn-sm btn-s" onclick="V.togAllMats('${p.name}')">Toggle All</button>
+          </div>
+          <div class="mat-grid">
+            ${items.map((m,i) => {
+              const gi = this.S.mats.indexOf(m); // global index
+              return `
+                <div class="mat-row">
+                  <input type="checkbox" class="mat-chk" ${m.on?'checked':''} onchange="V.S.mats[${gi}].on=this.checked;V.saveState()">
+                  <div class="mat-nm">${m.name}${m.custom?' ⭐':''}</div>
+                  <input class="mat-qty" placeholder="Qty" value="${m.qty}" oninput="V.S.mats[${gi}].qty=this.value;V.saveState()">
+                  <select class="mat-unit" onchange="V.S.mats[${gi}].unit=this.value;V.saveState()">
+                    <option value="">Unit</option>
+                    <option ${m.unit==='ग्राम'?'selected':''}>ग्राम</option>
+                    <option ${m.unit==='किग्रा'?'selected':''}>किग्रा</option>
+                    <option ${m.unit==='नग'?'selected':''}>नग</option>
+                    <option ${m.unit==='पैकेट'?'selected':''}>पैकेट</option>
+                    <option ${m.unit==='जोड़ा'?'selected':''}>जोड़ा</option>
+                    <option ${m.unit==='रुपये'?'selected':''}>रुपये</option>
+                    <option ${m.unit==='लीटर'?'selected':''}>लीटर</option>
+                    <option ${m.unit==='गज'?'selected':''}>गज</option>
+                    <option ${m.unit==='मीटर'?'selected':''}>मीटर</option>
+                  </select>
+                </div>`;
+            }).join('')}
+          </div>
+          <div class="add-item-row">
+            <input class="add-item-input" id="addInput_${p.name.replace(/\s/g,'_')}" placeholder="➕ नई सामग्री जोड़ें...">
+            <button class="btn btn-sm btn-p" onclick="V.addCustomItem('${p.name}')">Add</button>
+          </div>
+        </div>`;
+    }).join('');
+  },
+
+  addCustomItem(poojaName) {
+    const inputId = 'addInput_' + poojaName.replace(/\s/g,'_');
+    const input = document.getElementById(inputId);
+    const val = input.value.trim();
+    if(!val) { this.toast('⚠️','Enter item name','warn'); return; }
+
+    // Check duplicate
+    if(this.S.mats.some(m => m.pooja===poojaName && m.name===val)) {
+      this.toast('⚠️','Already exists','warn'); return;
+    }
+
+    this.S.mats.push({pooja:poojaName, name:val, qty:'', unit:'', on:true, custom:true});
+    input.value = '';
+    this.drawMats(); // Re-render preserving all data
+    this.saveState();
+    this.toast('✅', `"${val}" added`, 'ok');
+  },
+
+  togAllMats(poojaName) {
+    const items = this.S.mats.filter(m=>m.pooja===poojaName);
+    const allOn = items.every(m=>m.on);
+    items.forEach(m => m.on = !allOn);
+    this.drawMats();
+    this.saveState();
+  },
+
+  // ============================================================
+  //  PDF PAGE BUILDER - THE CORE ENGINE
+  //  Uses reference code approach: simple, reliable pagination
+  // ============================================================
+
+  /**
+   * Creates paired rows for 4-column table layout
+   * Returns: [[item1, item2], [item3, item4], ...]
+   */
+  _pairItems(items) {
+    const pairs = [];
+    for(let i=0; i<items.length; i+=2) {
+      pairs.push([items[i], items[i+1] || null]);
+    }
+    return pairs;
+  },
+
+  /**
+   * Generates table HTML for a chunk of paired items
+   */
+  _tableHTML(pairs) {
+    const chkTH = this.CFG.showChk ? '<th class="chk-cell">☐</th>' : '';
+    const rmkTH = this.CFG.showRmk ? '<th class="rmk-cell">टिप्पणी</th>' : '';
+    const chkTH2 = this.CFG.showChk ? '<th class="chk-cell">☐</th>' : '';
+    const rmkTH2 = this.CFG.showRmk ? '<th class="rmk-cell">टिप्पणी</th>' : '';
+
+    let rows = pairs.map(p => {
+      const c1chk = this.CFG.showChk ? '<td class="chk-cell"><span class="chk-box"></span></td>' : '';
+      const c1rmk = this.CFG.showRmk ? '<td class="rmk-cell"></td>' : '';
+      const c2chk = this.CFG.showChk ? `<td class="chk-cell">${p[1]?'<span class="chk-box"></span>':''}</td>` : '';
+      const c2rmk = this.CFG.showRmk ? '<td class="rmk-cell"></td>' : '';
+
+      return `<tr>
+        ${c1chk}
+        <td>${p[0]?.name||''}</td>
+        <td>${p[0] ? (p[0].qty+' '+p[0].unit).trim() : ''}</td>
+        ${c1rmk}
+        ${c2chk}
+        <td>${p[1]?.name||''}</td>
+        <td>${p[1] ? (p[1].qty+' '+p[1].unit).trim() : ''}</td>
+        ${c2rmk}
+      </tr>`;
+    }).join('');
+
+    return `<table class="pdf-tbl">
+      <thead><tr>${chkTH}<th>सामान</th><th>मात्रा</th>${rmkTH}${chkTH2}<th>सामान</th><th>मात्रा</th>${rmkTH2}</tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  },
+
+  /**
+   * Generates header HTML for page 1
+   */
+  _headerHTML(editable=false) {
+    if(!this.CFG.showHdr) return '';
+    const p = this.pandits[this.S.pandit];
+    const ed = this.S.editData;
+
+    const yField = editable
+      ? `<input type="text" class="editable-inline" data-field="yajman" value="${ed.yajman||''}">`
+      : (ed.yajman || this.S.yajman || '');
+    const dField = editable
+      ? `<input type="text" class="editable-inline" data-field="date" value="${ed.date||''}">`
+      : (ed.date || this.S.date || '');
+    const phField = editable
+      ? `<input type="text" class="editable-inline" data-field="phone" value="${ed.phone||''}">`
+      : (ed.phone || this.S.phone || '');
+    const pjField = editable
+      ? `<input type="text" class="editable-inline" data-field="poojas" value="${ed.poojas||''}" style="width:95%;">`
+      : (ed.poojas || this.S.selPoojas.map(x=>x.name).join(', '));
+
+    return `
+      <div class="pdf-hdr">
+        <div class="pdf-swastik">卐</div>
+        <div class="pdf-hdr-center">
+          <h1>॥ श्री गणेशाय नमः ॥</h1>
+          <h2>पूजा सामग्री सूची</h2>
+        </div>
+        <div class="pdf-swastik">卐</div>
+      </div>
+      <div class="pdf-divider"></div>
+      <div class="pdf-info">
+        <div><b>यजमान:</b> ${yField}</div>
+        <div><b>तारीख:</b> ${dField}</div>
+        <div><b>पंडित:</b> ${p.name}</div>
+        <div><b>फोन:</b> ${phField}</div>
+        <div class="full"><b>पूजा:</b>&nbsp;${pjField}</div>
+        <div class="full"><b>पता:</b>&nbsp;${p.address}</div>
+      </div>
+      <div class="pdf-swastika-line">卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐 卐</div>
+    `;
+  },
+
+  /**
+   * Generates footer HTML
+   */
+  _footerHTML() {
+    if(!this.CFG.showFtr) return '';
+    const p = this.pandits[this.S.pandit];
+    return `<div class="pdf-ftr">
+      <div><strong>पंडित:</strong> ${p.name} | <strong>फोन:</strong> ${p.phone}</div>
+      <div><strong>पता:</strong> ${p.address}</div>
+      ${p.website ? `<div><strong>वेबसाइट:</strong> ${p.website}</div>` : ''}
+    </div>`;
+  },
+
+  /**
+   * Generates remark section HTML (for last page)
+   */
+  _remarkHTML() {
+    return `<div class="pdf-remark-section">
+      <div class="pdf-remark-title">📝 विशेष टिप्पणी / Special Remarks:</div>
+      <div class="pdf-remark-lines">
+        ${'<div class="remark-line"></div>'.repeat(5)}
+      </div>
+    </div>`;
+  },
+
+  // ============================================================
+  //  PAGINATION ENGINE
+  //  Groups all included items by pooja, pairs them,
+  //  then distributes across pages respecting row limits.
+  //  Returns array of page objects: [{isFirst, groups:[{title,pairs}]}]
+  // ============================================================
+  _paginate() {
+    const included = this.S.mats.filter(m => m.on);
+    
+    // Group by pooja in selected order
+    const groups = [];
+    this.S.selPoojas.forEach(sp => {
+      const items = included.filter(m => m.pooja === sp.name);
+      if(items.length > 0) {
+        groups.push({ title: sp.name, pairs: this._pairItems(items) });
+      }
+    });
+
+    const pages = [];
+    let currentGroups = [];
+    let rowCount = 0;
+    let isFirst = true;
+
+    const maxRows = () => isFirst ? this.CFG.firstRows : this.CFG.nextRows;
+
+    const flushPage = () => {
+      if(currentGroups.length > 0) {
+        pages.push({ isFirst, groups: currentGroups });
+        currentGroups = [];
+        rowCount = 0;
+        isFirst = false;
+      }
+    };
+
+    groups.forEach(g => {
+      // Each group heading takes ~1 row equivalent
+      const headingCost = 1;
+
+      // Try to fit entire group on current page
+      const totalNeeded = headingCost + g.pairs.length;
+
+      if(rowCount + totalNeeded <= maxRows()) {
+        // Fits entirely
+        currentGroups.push({ title: g.title, pairs: g.pairs, continued: false });
+        rowCount += totalNeeded;
+      } else {
+        // Need to split this group across pages
+        let remaining = [...g.pairs];
+        let firstChunk = true;
+
+        while(remaining.length > 0) {
+          const available = maxRows() - rowCount - headingCost;
+
+          if(available <= 0) {
+            // Current page full, start new
+            flushPage();
+            continue;
+          }
+
+          const chunk = remaining.splice(0, Math.max(1, available));
+          currentGroups.push({
+            title: g.title,
+            pairs: chunk,
+            continued: !firstChunk
+          });
+          rowCount += headingCost + chunk.length;
+          firstChunk = false;
+
+          if(remaining.length > 0) {
+            flushPage();
+          }
+        }
+      }
+    });
+
+    // Flush last page
+    if(currentGroups.length > 0) {
+      pages.push({ isFirst, groups: currentGroups });
+    }
+
+    return pages;
+  },
+
+  // ============================================================
+  //  PREVIEW BUILDER (visible in UI, editable)
+  // ============================================================
+  buildPreview() {
+    this.load('Building preview...');
+
+    const pages = this._paginate();
+    const wrap = document.getElementById('previewWrap');
+
+    if(pages.length === 0) {
+      wrap.innerHTML = '<p style="color:#666;text-align:center;padding:2rem;">No materials selected</p>';
+      this.unload();
+      return;
+    }
+
+    const totalPages = pages.length;
+
+    wrap.innerHTML = pages.map((pg, pi) => {
+      let content = '';
+
+      if(pg.isFirst) {
+        content += this._headerHTML(true); // editable inputs
+      }
+
+      pg.groups.forEach(g => {
+        const suffix = g.continued ? ' (जारी...)' : '';
+        content += `<div class="pdf-pooja-title">🕉️ ${g.title}${suffix}</div>`;
+        content += this._tableHTML(g.pairs);
+      });
+
+      // Add remark section to last page
+      if(pi === totalPages - 1) {
+        content += this._remarkHTML();
+      }
+
+      content += this._footerHTML();
+
+      return `
+        <div class="preview-page">
+          <div class="preview-page-num">Page ${pi+1} / ${totalPages}</div>
+          <div class="pdfpage" style="font-size:${this.CFG.fontSize}px;">
+            ${content}
+          </div>
+        </div>`;
+    }).join('');
+
+    // Bind editable inputs
+    wrap.querySelectorAll('.editable-inline').forEach(inp => {
+      inp.addEventListener('input', e => {
+        this.S.editData[e.target.dataset.field] = e.target.value;
+      });
+    });
+
+    this.unload();
+    this.toast('✅ Preview Ready', `${totalPages} page(s)`, 'ok');
+  },
+
+  // ============================================================
+  //  RENDER PAGES FOR PDF/IMAGE (off-screen, static, fixed size)
+  // ============================================================
+  _renderPages() {
+    // Read latest editable values from preview inputs
+    document.querySelectorAll('.editable-inline').forEach(inp => {
+      if(inp.dataset.field) this.S.editData[inp.dataset.field] = inp.value;
+    });
+
+    const pages = this._paginate();
+    const zone = document.getElementById('renderZone');
+    zone.innerHTML = '';
+    const totalPages = pages.length;
+    const elements = [];
+
+    pages.forEach((pg, pi) => {
+      const div = document.createElement('div');
+      div.className = 'pdfpage render-mode';
+      div.style.fontSize = this.CFG.fontSize + 'px';
+
+      let content = '';
+
+      if(pg.isFirst) {
+        content += this._headerHTML(false); // static text
+      }
+
+      pg.groups.forEach(g => {
+        const suffix = g.continued ? ' (जारी...)' : '';
+        content += `<div class="pdf-pooja-title">🕉️ ${g.title}${suffix}</div>`;
+        content += this._tableHTML(g.pairs);
+      });
+
+      // Remark on last page
+      if(pi === totalPages - 1) {
+        content += this._remarkHTML();
+      }
+
+      // Footer positioned at bottom
+      if(this.CFG.showFtr) {
+        content += `<div style="position:absolute;bottom:25px;left:30px;right:30px;">${this._footerHTML()}</div>`;
+      }
+
+      div.innerHTML = content;
+      zone.appendChild(div);
+      elements.push(div);
+    });
+
+    return elements;
+  },
+
+  // ============================================================
+  //  PDF DOWNLOAD
+  // ============================================================
+  async dlPDF() {
+    this.load('Generating PDF...');
+    try {
+      const pages = this._renderPages();
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p','mm','a4');
+
+      for(let i=0; i<pages.length; i++) {
+        if(i>0) pdf.addPage();
+        const canvas = await html2canvas(pages[i], { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
+        const img = canvas.toDataURL('image/jpeg', 0.92);
+        pdf.addImage(img, 'JPEG', 0, 0, 210, 297);
+      }
+
+      const name = `${this.S.editData.yajman||this.S.yajman||'Pooja'}_Samagri.pdf`;
+      pdf.save(name);
+      document.getElementById('renderZone').innerHTML = '';
+      this.unload();
+      this.toast('✅ PDF Downloaded', `${pages.length} pages`, 'ok');
+    } catch(e) {
+      this.unload();
+      this.toast('❌ Error', e.message, 'err');
+      console.error(e);
+    }
+  },
+
+  // ============================================================
+  //  IMAGE ZIP DOWNLOAD
+  // ============================================================
+  async dlImages() {
+    this.load('Generating images...');
+    try {
+      const pages = this._renderPages();
+      const zip = new JSZip();
+      const folder = zip.folder(`${this.S.editData.yajman||this.S.yajman}_Samagri`);
+
+      for(let i=0; i<pages.length; i++) {
+        const canvas = await html2canvas(pages[i], { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
+        const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+        folder.file(`Page_${i+1}.png`, blob);
+      }
+
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(zipBlob);
+      a.download = `${this.S.editData.yajman||this.S.yajman}_Samagri.zip`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+
+      document.getElementById('renderZone').innerHTML = '';
+      this.unload();
+      this.toast('✅ ZIP Downloaded', `${pages.length} images`, 'ok');
+    } catch(e) {
+      this.unload();
+      this.toast('❌ Error', e.message, 'err');
+      console.error(e);
+    }
+  },
+
+  // ============================================================
+  //  SHARE (WhatsApp / native share)
+  // ============================================================
+  async share() {
+    this.load('Preparing...');
+    try {
+      const pages = this._renderPages();
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p','mm','a4');
+
+      for(let i=0; i<pages.length; i++) {
+        if(i>0) pdf.addPage();
+        const canvas = await html2canvas(pages[i], { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
+        pdf.addImage(canvas.toDataURL('image/jpeg',0.9), 'JPEG', 0, 0, 210, 297);
+      }
+
+      const blob = pdf.output('blob');
+      const file = new File([blob], `${this.S.editData.yajman||'Pooja'}_Samagri.pdf`, {type:'application/pdf'});
+
+      document.getElementById('renderZone').innerHTML = '';
+      this.unload();
+
+      if(navigator.share) {
+        await navigator.share({
+          files: [file],
+          title: 'पूजा सामग्री सूची',
+          text: `${this.S.editData.yajman||this.S.yajman} की सामग्री सूची`
+        });
+        this.toast('✅ Shared','','ok');
+      } else {
+        this.toast('⚠️','Direct share not supported. PDF downloaded instead.','warn');
+        pdf.save(`${this.S.editData.yajman||'Pooja'}_Samagri.pdf`);
+      }
+    } catch(e) {
+      this.unload();
+      this.toast('❌ Error', e.message, 'err');
+    }
+  },
+
+  // ============================================================
+  //  CLOUD SAVE
+  // ============================================================
+  async saveCloud() {
+    const name = this.S.yajman || 'Unnamed';
+    const payload = {
+      action: 'saveTemplate',
+      id: Date.now().toString(),
+      name: name,
+      date: this.S.date || new Date().toLocaleDateString('hi-IN'),
+      poojas: this.S.selPoojas.map(p=>p.name).join(', '),
+      samagri: this.S.mats.filter(m=>m.on),
+      meta: { yajman: name, date: this.S.date }
+    };
+    this.load('Saving...');
+    try {
+      const r = await fetch(this.API, { method:'POST', body: JSON.stringify(payload) });
+      const txt = await r.text();
+      this.unload();
+      this.toast('✅ Saved','Template saved to cloud','ok');
+      await this.fetchTemplates();
+    } catch(e) {
+      this.unload();
+      this.toast('❌ Failed', e.message, 'err');
+    }
+  },
+
+  // ============================================================
+  //  LIBRARY
+  // ============================================================
+  drawLib() {
+    const g = document.getElementById('tplGrid');
+    if(!this.S.templates.length) {
+      g.innerHTML = '<p style="color:var(--gray-500);text-align:center;padding:2rem;grid-column:1/-1;">No templates yet</p>';
+      return;
+    }
+    g.innerHTML = [...this.S.templates].reverse().map(t => `
+      <div class="tpl-card">
+        <div class="tpl-name">${t.name}</div>
+        <div class="tpl-meta">
+          <span>📅 ${this._fmtDate(t.date)}</span>
+          <span>🕉️ ${t.poojasArr?t.poojasArr.length:0} poojas</span>
+        </div>
+        <div class="tpl-actions">
+          <button class="btn btn-sm btn-p" onclick="V.loadTpl('${t.id}')">Open</button>
+          <button class="btn btn-sm btn-s" onclick="V.cloneTpl('${t.id}')">Clone</button>
+          <button class="btn btn-sm btn-d" onclick="V.delTpl('${t.id}')">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  filterLib() {
+    const q = document.getElementById('libSearch').value.toLowerCase();
+    const filtered = this.S.templates.filter(t =>
+      t.name.toLowerCase().includes(q) || (t.poojas||'').toLowerCase().includes(q)
+    );
+    const g = document.getElementById('tplGrid');
+    if(!filtered.length) {
+      g.innerHTML = '<p style="color:var(--gray-500);text-align:center;padding:2rem;grid-column:1/-1;">No match</p>';
+      return;
+    }
+    g.innerHTML = [...filtered].reverse().map(t => `
+      <div class="tpl-card">
+        <div class="tpl-name">${t.name}</div>
+        <div class="tpl-meta">
+          <span>📅 ${this._fmtDate(t.date)}</span>
+          <span>🕉️ ${t.poojasArr?t.poojasArr.length:0} poojas</span>
+        </div>
+        <div class="tpl-actions">
+          <button class="btn btn-sm btn-p" onclick="V.loadTpl('${t.id}')">Open</button>
+          <button class="btn btn-sm btn-s" onclick="V.cloneTpl('${t.id}')">Clone</button>
+          <button class="btn btn-sm btn-d" onclick="V.delTpl('${t.id}')">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  loadTpl(id) {
+    const t = this.S.templates.find(x => x.id.toString() === id.toString());
+    if(!t) { this.toast('❌','Not found','err'); return; }
+    this.S.yajman = t.name;
+    this.S.date = t.date;
+    this.S.selPoojas = (t.poojasArr||[]).map((n,i)=>({name:n,order:i}));
+    this.S.mats = t.samagri || [];
+    document.getElementById('inpYajman').value = t.name;
+    document.getElementById('inpDate').value = t.date;
+    this.drawPoojaList();
+    if(this.S.mats.length) {
+      this.drawMats();
+      this.go('pgMats');
+    } else {
+      this.buildMats();
+      this.drawMats();
+      this.go('pgMats');
+    }
+    this.toast('✅ Loaded', t.name, 'ok');
+  },
+
+  async cloneTpl(id) {
+    const t = this.S.templates.find(x => x.id.toString() === id.toString());
+    if(!t) return;
+    const nn = prompt('New name:', t.name+' (Copy)');
+    if(!nn) return;
+    this.load('Cloning...');
+    try {
+      await fetch(this.API, { method:'POST', body: JSON.stringify({
+        action:'saveTemplate', id:Date.now().toString(),
+        name:nn, date:new Date().toLocaleDateString('hi-IN'),
+        poojas:t.poojas, samagri:t.samagri,
+        meta:{yajman:nn}
+      })});
+      this.unload();
+      this.toast('✅ Cloned', nn, 'ok');
+      await this.fetchTemplates();
+    } catch(e) { this.unload(); this.toast('❌',e.message,'err'); }
+  },
+
+  async delTpl(id) {
+    if(!confirm('Delete this template?')) return;
+    this.load('Deleting...');
+    try {
+      await fetch(this.API, { method:'POST', body: JSON.stringify({action:'deleteTemplate',id}) });
+      this.unload();
+      this.toast('✅ Deleted','','ok');
+      await this.fetchTemplates();
+    } catch(e) { this.unload(); this.toast('❌',e.message,'err'); }
+  },
+
+  // ============================================================
+  //  DATABASE MANAGEMENT
+  // ============================================================
+  drawDB() {
+    const b = document.getElementById('dbBody');
+    if(!this.S.master.length) {
+      b.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;">No data</td></tr>';
+      return;
+    }
+    b.innerHTML = this.S.master.map((r,i) => `
+      <tr>
+        <td>${i+1}</td>
+        <td><strong>${r.pooja||''}</strong></td>
+        <td>${r.samagri||''}</td>
+        <td><div class="db-acts">
+          <button class="db-btn db-btn-e" onclick="V.dbEdit(${i})">Edit</button>
+          <button class="db-btn db-btn-d" onclick="V.dbDel(${i})">Del</button>
+        </div></td>
+      </tr>
+    `).join('');
+  },
+
+  syncDBStats() {
+    const up = [...new Set(this.S.master.map(x=>x.pooja?.trim()))].filter(Boolean);
+    document.getElementById('dbStP').textContent = up.length;
+    document.getElementById('dbStS').textContent = this.S.master.length;
+  },
+
+  fillExistingSel() {
+    const up = [...new Set(this.S.master.map(x=>x.pooja?.trim()))].filter(Boolean);
+    document.getElementById('mAddSel').innerHTML =
+      '<option value="">— or select existing —</option>' +
+      up.map(p=>`<option value="${p}">${p}</option>`).join('');
+  },
+
+  pickExisting() {
+    const v = document.getElementById('mAddSel').value;
+    if(v) document.getElementById('mAddPooja').value = v;
+  },
+
+  async dbAdd() {
+    const pooja = document.getElementById('mAddPooja').value.trim();
+    const txt = document.getElementById('mAddItems').value.trim();
+    if(!pooja||!txt) { this.toast('⚠️','Fill all fields','warn'); return; }
+    const items = txt.split('\n').filter(x=>x.trim());
+    this.load('Adding...');
+    try {
+      for(const item of items) {
+        await fetch(this.API, { method:'POST', body: JSON.stringify({action:'add',pooja,samagri:item.trim()}) });
+      }
+      this.modal('mAdd',0);
+      this.unload();
+      this.toast('✅',`Added ${items.length} items`,'ok');
+      document.getElementById('mAddPooja').value='';
+      document.getElementById('mAddItems').value='';
+      document.getElementById('mAddSel').value='';
+      await this.fetchMaster();
+    } catch(e) { this.unload(); this.toast('❌',e.message,'err'); }
+  },
+
+  dbEdit(i) {
+    const r = this.S.master[i];
+    document.getElementById('mEditPooja').value = r.pooja||'';
+    document.getElementById('mEditSamagri').value = r.samagri||'';
+    document.getElementById('mEditIdx').value = i;
+    this.modal('mEdit',1);
+  },
+
+  async dbUpdate() {
+    const i = parseInt(document.getElementById('mEditIdx').value);
+    const ns = document.getElementById('mEditSamagri').value.trim();
+    if(!ns) { this.toast('⚠️','Cannot be empty','warn'); return; }
+    this.load('Updating...');
+    try {
+      const old = this.S.master[i];
+      await fetch(this.API, { method:'POST', body: JSON.stringify({action:'delete',pooja:old.pooja,samagri:old.samagri}) });
+      await fetch(this.API, { method:'POST', body: JSON.stringify({action:'add',pooja:old.pooja,samagri:ns}) });
+      this.modal('mEdit',0);
+      this.unload();
+      this.toast('✅','Updated','ok');
+      await this.fetchMaster();
+    } catch(e) { this.unload(); this.toast('❌',e.message,'err'); }
+  },
+
+  async dbDel(i) {
+    if(!confirm('Delete?')) return;
+    this.load('Deleting...');
+    try {
+      const r = this.S.master[i];
+      await fetch(this.API, { method:'POST', body: JSON.stringify({action:'delete',pooja:r.pooja,samagri:r.samagri}) });
+      this.unload();
+      this.toast('✅','Deleted','ok');
+      await this.fetchMaster();
+    } catch(e) { this.unload(); this.toast('❌',e.message,'err'); }
+  },
+
+  // ============================================================
+  //  STATS
+  // ============================================================
+  syncStats() {
+    const up = this._uniquePoojas();
+    document.getElementById('stYaj').textContent = this.S.templates.length;
+    document.getElementById('stPooja').textContent = up.length;
+    document.getElementById('stItems').textContent = this.S.master.length;
+    document.getElementById('stCloud').textContent = this.S.templates.length;
+  },
+
+  // ============================================================
+  //  UTILITIES
+  // ============================================================
+  _fmtDate(d) {
+    if(!d) return '';
+    const dt = new Date(d);
+    if(isNaN(dt)) return d;
+    return `${String(dt.getDate()).padStart(2,'0')}/${String(dt.getMonth()+1).padStart(2,'0')}/${dt.getFullYear()}`;
+  }
+};
+
+// ============================================================
+//  BOOT
+// ============================================================
+if(document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => V.init());
+} else {
+  V.init();
+}
+
+// Auto-save state every 30s
+setInterval(() => V.saveState(), 30000);
+</script>
+
+</body>
+</html>
