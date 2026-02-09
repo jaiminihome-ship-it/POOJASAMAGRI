@@ -444,6 +444,10 @@
       background: var(--bhagwa-pale); color: var(--bhagwa);
       font-family: 'Noto Serif Devanagari', serif; font-weight: 700;
     }
+    /* hide header row for all tables except the first one */
+.pdf-tbl:not(:first-of-type) tr:first-child {
+  display: none !important;
+}
     .pdf-tbl .chk-cell { width: 24px; text-align: center; }
     .pdf-tbl .chk-box {
       width: 14px; height: 14px; border: 1.5px solid #555;
