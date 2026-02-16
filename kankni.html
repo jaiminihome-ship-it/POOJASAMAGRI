@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kakini Vichar Pro - Vastu System</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background: linear-gradient(135deg,#000000,#111111);
+    color:#fff;
+}
+
+/* GOLD GRADIENT */
+.gold{
+    background:linear-gradient(90deg,#d4af37,#f9e076,#d4af37);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+/* GLASS CARD */
+.glass{
+    background:rgba(255,215,0,0.05);
+    border:1px solid rgba(255,215,0,0.3);
+    backdrop-filter:blur(12px);
+    border-radius:20px;
+    padding:20px;
+    margin:15px;
+    box-shadow:0 0 25px rgba(212,175,55,0.2);
+}
+
+.container{
+    max-width:600px;
+    margin:auto;
+    padding-bottom:40px;
+}
+
+h1{
+    text-align:center;
+    margin-top:20px;
+    font-weight:700;
+    font-size:28px;
+}
+
+input,select{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border-radius:12px;
+    border:1px solid rgba(255,215,0,0.3);
+    font-size:16px;
+    background:#111;
+    color:#fff;
+    box-sizing:border-box;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    margin-top:15px;
+    border-radius:30px;
+    border:none;
+    font-weight:600;
+    font-size:16px;
+    cursor:pointer;
+    background:linear-gradient(90deg,#d4af37,#f9e076);
+    color:#000;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+.result-item{
+    padding:15px;
+    border-bottom:1px solid rgba(255,215,0,0.2);
+    margin:10px 0;
+}
+
+.calculation-box{
+    background:rgba(0,0,0,0.3);
+    padding:15px;
+    border-radius:10px;
+    margin:10px 0;
+    border-left:4px solid #d4af37;
+}
+
+.beneficial{
+    color:#4ade80;
+    font-weight:600;
+}
+
+.not-beneficial{
+    color:#f87171;
+    font-weight:600;
+}
+
+.equal{
+    color:#fbbf24;
+    font-weight:600;
+}
+
+.history{
+    max-height:200px;
+    overflow:auto;
+    font-size:14px;
+}
+
+.small{
+    font-size:12px;
+    opacity:0.7;
+}
+
+.char-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+    gap:10px;
+    margin-top:15px;
+}
+
+.char-card{
+    background:rgba(0,0,0,0.4);
+    padding:15px;
+    border-radius:10px;
+    text-align:center;
+    border:2px solid transparent;
+    transition:all 0.3s;
+}
+
+.char-card.best{
+    border-color:#4ade80;
+    background:rgba(74,222,128,0.1);
+}
+
+.char-card.equal{
+    border-color:#fbbf24;
+    background:rgba(251,191,36,0.1);
+}
+
+.char-card.worst{
+    border-color:#f87171;
+    background:rgba(248,113,113,0.1);
+}
+
+.char-letter{
+    font-size:24px;
+    font-weight:700;
+    margin-bottom:5px;
+}
+
+.lang-toggle{
+    display:flex;
+    gap:10px;
+    margin-bottom:10px;
+}
+
+.lang-btn{
+    flex:1;
+    padding:8px;
+    border-radius:8px;
+    border:1px solid rgba(255,215,0,0.3);
+    background:#111;
+    color:#fff;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.lang-btn.active{
+    background:linear-gradient(90deg,#d4af37,#f9e076);
+    color:#000;
+    font-weight:600;
+}
+
+.group-info{
+    background:rgba(212,175,55,0.1);
+    padding:10px;
+    border-radius:8px;
+    margin:10px 0;
+    font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1 class="gold">🔮 Kakini Vichar Pro</h1>
+<p style="text-align:center;opacity:0.8;font-size:14px;">Vastu Shastra Based Name Compatibility System</p>
+
+<div class="glass">
+<label><strong>Select Language / भाषा चुनें</strong></label>
+<div class="lang-toggle">
+    <button class="lang-btn active" onclick="setLanguage('en')">English (A-Z)</button>
+    <button class="lang-btn" onclick="setLanguage('hi')">हिंदी (अ-ज्ञ)</button>
+</div>
+</div>
+
+<div class="glass">
+<label id="labelYourName"><strong>Your Name First Letter (अपना नाम का पहला अक्षर)</strong></label>
+<input type="text" id="nameLetter" maxlength="1" placeholder="Enter Letter / अक्षर डालें" style="text-transform:uppercase;">
+<div class="group-info" id="yourGroupInfo"></div>
+</div>
+
+<div class="glass">
+<label id="labelCheckLetter"><strong>Check Specific Letter (किसी खास अक्षर को चेक करें)</strong></label>
+<input type="text" id="checkLetter" maxlength="1" placeholder="Enter Letter to Check / चेक करने के लिए अक्षर डालें" style="text-transform:uppercase;">
+<button onclick="checkSingle()">🔍 Check Compatibility / जांचें</button>
+</div>
+
+<div class="glass">
+<button onclick="findBestLetters()">✅ Most Beneficial Letters / सबसे लाभकारी अक्षर</button>
+<button onclick="findEqualLetters()">⚖️ Equal Match Letters / समान अक्षर</button>
+<button onclick="findWorstLetters()">⚠️ Least Beneficial Letters / कम लाभकारी अक्षर</button>
+<button onclick="showAllLetters()">📊 Show All Letters / सभी अक्षर देखें</button>
+</div>
+
+<div class="glass">
+<h3 class="gold">📈 Results / परिणाम</h3>
+<div id="results"></div>
+</div>
+
+<div class="glass">
+<h3 class="gold">📜 History / इतिहास</h3>
+<div id="history" class="history"></div>
+<button onclick="clearHistory()">Clear History / साफ़ करें</button>
+</div>
+
+<div class="glass">
+<h3 class="gold">ℹ️ Group Information / समूह जानकारी</h3>
+<div style="font-size:13px;line-height:1.8;">
+    <div><strong>Group 1:</strong> A, E, I, O, U / अ, आ, इ, ई, उ, ऊ, ए, ऐ, ओ, औ</div>
+    <div><strong>Group 2:</strong> K, G, Q / क, ख, ग, घ</div>
+    <div><strong>Group 3:</strong> C, J, Z / च, छ, ज, झ</div>
+    <div><strong>Group 4:</strong> T, D / ट, ठ, ड, ढ</div>
+    <div><strong>Group 5:</strong> N / ण, त, थ, द, ध, न</div>
+    <div><strong>Group 6:</strong> P, B, M / प, फ, ब, भ, म</div>
+    <div><strong>Group 7:</strong> Y, R, L, V, W / य, र, ल, व</div>
+    <div><strong>Group 8:</strong> S, H, X, F / श, ष, स, ह, क्ष, त्र, ज्ञ</div>
+</div>
+</div>
+
+</div>
+
+<script>
+
+let currentLang = 'en';
+
+// English Mapping
+const groupMapEN = {
+  1:['A','E','I','O','U'],
+  2:['K','G','Q'],
+  3:['C','J','Z'],
+  4:['T','D'],
+  5:['N'],
+  6:['P','B','M'],
+  7:['Y','R','L','V','W'],
+  8:['S','H','X','F']
+};
+
+// Hindi Mapping (using English equivalents for input)
+const groupMapHI = {
+  1:['अ','आ','इ','ई','उ','ऊ','ए','ऐ','ओ','औ','A','E','I','O','U'],
+  2:['क','ख','ग','घ','K','G','Q'],
+  3:['च','छ','ज','झ','C','J','Z'],
+  4:['ट','ठ','ड','ढ','T','D'],
+  5:['ण','त','थ','द','ध','न','N'],
+  6:['प','फ','ब','भ','म','P','B','M'],
+  7:['य','र','ल','व','Y','R','L','V','W'],
+  8:['श','ष','स','ह','क्ष','त्र','ज्ञ','S','H','X','F']
+};
+
+// All letters for display
+const allLettersEN = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+const allLettersHI = ['अ','आ','इ','ई','उ','ऊ','ए','ऐ','ओ','औ','क','ख','ग','घ','च','छ','ज','झ','ट','ठ','ड','ढ','ण','त','थ','द','ध','न','प','फ','ब','भ','म','य','र','ल','व','श','ष','स','ह','क्ष','त्र','ज्ञ'];
+
+function setLanguage(lang){
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(btn=>btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Update input method hint
+    if(lang === 'hi'){
+        document.getElementById('nameLetter').placeholder = 'हिंदी अक्षर डालें';
+        document.getElementById('checkLetter').placeholder = 'चेक करने के लिए अक्षर डालें';
+    }else{
+        document.getElementById('nameLetter').placeholder = 'Enter Letter (A-Z)';
+        document.getElementById('checkLetter').placeholder = 'Enter Letter to Check';
+    }
+}
+
+function getGroup(letter){
+    letter = letter.toUpperCase();
+    const groupMap = currentLang === 'hi' ? groupMapHI : groupMapEN;
+    
+    for(let g in groupMap){
+        if(groupMap[g].includes(letter)){
+            return parseInt(g);
+        }
+    }
+    return null;
+}
+
+function getKakini(g1,g2){
+    let val = (g1*2 + g2) % 8;
+    return val === 0 ? 8 : val;
+}
+
+function updateYourGroupInfo(){
+    let name = document.getElementById("nameLetter").value.toUpperCase();
+    let g1 = getGroup(name);
+    if(g1){
+        document.getElementById("yourGroupInfo").innerHTML = 
+        `✨ Your letter "<strong>${name}</strong>" belongs to <strong class="gold">Group ${g1}</strong>`;
+    }else{
+        document.getElementById("yourGroupInfo").innerHTML = "";
+    }
+}
+
+document.getElementById("nameLetter").addEventListener('input', updateYourGroupInfo);
+
+function checkSingle(){
+    let name = document.getElementById("nameLetter").value.toUpperCase();
+    let check = document.getElementById("checkLetter").value.toUpperCase();
+    
+    let g1 = getGroup(name);
+    let g2 = getGroup(check);
+    
+    if(!g1){ alert("कृपया अपना नाम का पहला अक्षर डालें / Please enter your name first letter"); return; }
+    if(!g2){ alert("कृपया चेक करने के लिए अक्षर डालें / Please enter letter to check"); return; }
+    
+    let yourKakini = getKakini(g1,g2);
+    let otherKakini = getKakini(g2,g1);
+    
+    let status = "";
+    let statusClass = "";
+    if(otherKakini > yourKakini){
+        status = "✅ Beneficial / लाभकारी";
+        statusClass = "beneficial";
+    }else if(otherKakini === yourKakini){
+        status = "⚖️ Equal / समान";
+        statusClass = "equal";
+    }else{
+        status = "❌ Not Beneficial / लाभकारी नहीं";
+        statusClass = "not-beneficial";
+    }
+    
+    let html = `
+    <div class="calculation-box">
+        <h4 style="margin-top:0;">🔢 Full Calculation / पूरी गणना:</h4>
+        
+        <div style="margin:10px 0;">
+        <strong>Your Letter / आपका अक्षर:</strong> ${name} → Group ${g1}
+        </div>
+        
+        <div style="margin:10px 0;">
+        <strong>Checking Letter / जांच अक्षर:</strong> ${check} → Group ${g2}
+        </div>
+        
+        <div style="margin:15px 0;padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;">
+        <div><strong>Step 1:</strong> Your Kakini = (Group ${g1} × 2 + Group ${g2}) % 8</div>
+        <div style="margin-left:20px;">= (${g1} × 2 + ${g2}) % 8</div>
+        <div style="margin-left:20px;">= (${g1*2} + ${g2}) % 8</div>
+        <div style="margin-left:20px;">= ${(g1*2 + g2)} % 8</div>
+        <div style="margin-left:20px;">= <strong class="gold">${yourKakini}</strong></div>
+        </div>
+        
+        <div style="margin:15px 0;padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;">
+        <div><strong>Step 2:</strong> Other's Kakini = (Group ${g2} × 2 + Group ${g1}) % 8</div>
+        <div style="margin-left:20px;">= (${g2} × 2 + ${g1}) % 8</div>
+        <div style="margin-left:20px;">= (${g2*2} + ${g1}) % 8</div>
+        <div style="margin-left:20px;">= ${(g2*2 + g1)} % 8</div>
+        <div style="margin-left:20px;">= <strong class="gold">${otherKakini}</strong></div>
+        </div>
+        
+        <div style="margin:15px 0;padding:15px;background:rgba(212,175,55,0.2);border-radius:8px;">
+        <div><strong>Result / परिणाम:</strong></div>
+        <div style="margin:5px 0;">Your Kakini: <strong>${yourKakini}</strong></div>
+        <div style="margin:5px 0;">Other's Kakini: <strong>${otherKakini}</strong></div>
+        <div style="margin:10px 0;font-size:18px;" class="${statusClass}">${status}</div>
+        <div style="font-size:13px;opacity:0.8;margin-top:10px;">
+        ${otherKakini > yourKakini ? "✅ Other's Kakini is higher - This is beneficial for you!" : 
+          otherKakini === yourKakini ? "⚖️ Both Kakini are equal - Neutral match" : 
+          "❌ Your Kakini is higher - Not beneficial"}
+        </div>
+        </div>
+    </div>
+    `;
+    
+    document.getElementById("results").innerHTML = html;
+    saveHistory(`${name} → ${check}: ${status}`);
+}
+
+function findBestLetters(){
+    calculateByType("best");
+}
+
+function findEqualLetters(){
+    calculateByType("equal");
+}
+
+function findWorstLetters(){
+    calculateByType("worst");
+}
+
+function showAllLetters(){
+    calculateByType("all");
+}
+
+function calculateByType(type){
+    let name = document.getElementById("nameLetter").value.toUpperCase();
+    let g1 = getGroup(name);
+    
+    if(!g1){ alert("कृपया अपना नाम का पहला अक्षर डालें / Please enter your name first letter"); return; }
+    
+    const letters = currentLang === 'hi' ? allLettersHI : allLettersEN;
+    
+    let bestLetters = [];
+    let equalLetters = [];
+    let worstLetters = [];
+    
+    letters.forEach(letter=>{
+        let g2 = getGroup(letter);
+        if(!g2) return;
+        
+        let yourKakini = getKakini(g1,g2);
+        let otherKakini = getKakini(g2,g1);
+        
+        let data = {
+            letter: letter,
+            group: g2,
+            yourKakini: yourKakini,
+            otherKakini: otherKakini
+        };
+        
+        if(otherKakini > yourKakini){
+            bestLetters.push(data);
+        }else if(otherKakini === yourKakini){
+            equalLetters.push(data);
+        }else{
+            worstLetters.push(data);
+        }
+    });
+    
+    let html = "";
+    
+    if(type === "best"){
+        html = generateLetterCards(bestLetters, "best", "✅ Most Beneficial Letters / सबसे लाभकारी अक्षर");
+    }else if(type === "equal"){
+        html = generateLetterCards(equalLetters, "equal", "⚖️ Equal Match Letters / समान अक्षर");
+    }else if(type === "worst"){
+        html = generateLetterCards(worstLetters, "worst", "⚠️ Least Beneficial Letters / कम लाभकारी अक्षर");
+    }else if(type === "all"){
+        html = `
+        ${generateLetterCards(bestLetters, "best", "✅ Most Beneficial / सबसे लाभकारी")}
+        ${generateLetterCards(equalLetters, "equal", "⚖️ Equal Match / समान")}
+        ${generateLetterCards(worstLetters, "worst", "⚠️ Least Beneficial / कम लाभकारी")}
+        `;
+    }
+    
+    document.getElementById("results").innerHTML = html || "No letters found / कोई अक्षर नहीं मिला";
+    saveHistory(`${type.toUpperCase()} letters for ${name}`);
+}
+
+function generateLetterCards(letters, cardClass, title){
+    if(letters.length === 0) return "";
+    
+    let html = `<h4 style="margin-top:20px;">${title}</h4><div class="char-grid">`;
+    
+    letters.forEach(data=>{
+        html += `
+        <div class="char-card ${cardClass}">
+            <div class="char-letter">${data.letter}</div>
+            <div style="font-size:12px;opacity:0.8;">Group ${data.group}</div>
+            <div style="font-size:11px;margin-top:5px;">
+                You: ${data.yourKakini} | Other: ${data.otherKakini}
+            </div>
+        </div>
+        `;
+    });
+    
+    html += `</div>`;
+    return html;
+}
+
+function saveHistory(text){
+    let data = JSON.parse(localStorage.getItem("kakiniHistory")) || [];
+    const timestamp = new Date().toLocaleString();
+    data.unshift(`${text} <span class="small">(${timestamp})</span>`);
+    if(data.length > 20) data = data.slice(0,20);
+    localStorage.setItem("kakiniHistory",JSON.stringify(data));
+    loadHistory();
+}
+
+function loadHistory(){
+    let data = JSON.parse(localStorage.getItem("kakiniHistory")) || [];
+    let html="";
+    data.forEach(item=>{
+        html+=`<div class="result-item">${item}</div>`;
+    });
+    document.getElementById("history").innerHTML = html || "<div style='text-align:center;opacity:0.5;'>No history yet</div>";
+}
+
+function clearHistory(){
+    localStorage.removeItem("kakiniHistory");
+    loadHistory();
+}
+
+loadHistory();
+
+</script>
+
+</body>
+</html>
