@@ -3,26 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kakini Vichar Pro - Vastu System</title>
+<title>Kakini Vichar Pro - Complete Vastu System</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
 <style>
+*{box-sizing:border-box;}
 body{
     margin:0;
     font-family:'Poppins',sans-serif;
-    background: linear-gradient(135deg,#000000,#111111);
+    background: linear-gradient(135deg,#000000,#0a0a0a,#111111);
     color:#fff;
+    min-height:100vh;
 }
 
-/* GOLD GRADIENT */
 .gold{
     background:linear-gradient(90deg,#d4af37,#f9e076,#d4af37);
     -webkit-background-clip:text;
     -webkit-text-fill-color:transparent;
 }
 
-/* GLASS CARD */
 .glass{
     background:rgba(255,215,0,0.05);
     border:1px solid rgba(255,215,0,0.3);
@@ -34,101 +34,210 @@ body{
 }
 
 .container{
-    max-width:600px;
+    max-width:650px;
     margin:auto;
-    padding-bottom:40px;
+    padding:10px 5px 40px;
 }
 
 h1{
     text-align:center;
     margin-top:20px;
     font-weight:700;
-    font-size:28px;
+    font-size:26px;
 }
 
-input,select{
+input{
     width:100%;
-    padding:12px;
+    padding:14px;
     margin-top:10px;
     border-radius:12px;
     border:1px solid rgba(255,215,0,0.3);
     font-size:16px;
-    background:#111;
+    background:#0a0a0a;
     color:#fff;
-    box-sizing:border-box;
+}
+
+input:focus{
+    outline:none;
+    border-color:#d4af37;
+    box-shadow:0 0 10px rgba(212,175,55,0.3);
 }
 
 button{
     width:100%;
-    padding:12px;
-    margin-top:15px;
+    padding:14px;
+    margin-top:12px;
     border-radius:30px;
     border:none;
     font-weight:600;
-    font-size:16px;
+    font-size:15px;
     cursor:pointer;
     background:linear-gradient(90deg,#d4af37,#f9e076);
     color:#000;
+    transition:all 0.3s;
 }
 
 button:hover{
-    opacity:0.9;
+    transform:translateY(-2px);
+    box-shadow:0 5px 20px rgba(212,175,55,0.4);
 }
 
-.result-item{
-    padding:15px;
-    border-bottom:1px solid rgba(255,215,0,0.2);
-    margin:10px 0;
+button:active{
+    transform:translateY(0);
+}
+
+.btn-secondary{
+    background:#222;
+    color:#d4af37;
+    border:1px solid #d4af37;
+}
+
+.btn-secondary:hover{
+    background:#d4af37;
+    color:#000;
+}
+
+.conversion-box{
+    background:linear-gradient(135deg,rgba(212,175,55,0.15),rgba(212,175,55,0.05));
+    border:2px solid rgba(212,175,55,0.4);
+    border-radius:15px;
+    padding:20px;
+    margin:15px 0;
+    text-align:center;
+}
+
+.letter-display{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+    margin:15px 0;
+}
+
+.letter-box{
+    width:80px;
+    height:80px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,0.5);
+    border-radius:15px;
+    border:2px solid #d4af37;
+}
+
+.letter-big{
+    font-size:36px;
+    font-weight:700;
+    color:#d4af37;
+}
+
+.letter-label{
+    font-size:10px;
+    opacity:0.7;
+    margin-top:2px;
+}
+
+.arrow-convert{
+    font-size:28px;
+    color:#d4af37;
+    animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+    0%,100%{opacity:1;transform:scale(1);}
+    50%{opacity:0.5;transform:scale(1.1);}
+}
+
+.group-badge{
+    display:inline-block;
+    background:linear-gradient(90deg,#d4af37,#f9e076);
+    color:#000;
+    padding:5px 15px;
+    border-radius:20px;
+    font-weight:600;
+    font-size:14px;
+    margin-top:10px;
 }
 
 .calculation-box{
-    background:rgba(0,0,0,0.3);
-    padding:15px;
-    border-radius:10px;
-    margin:10px 0;
+    background:rgba(0,0,0,0.4);
+    padding:20px;
+    border-radius:15px;
+    margin:15px 0;
     border-left:4px solid #d4af37;
 }
 
-.beneficial{
-    color:#4ade80;
-    font-weight:600;
-}
-
-.not-beneficial{
-    color:#f87171;
-    font-weight:600;
-}
-
-.equal{
-    color:#fbbf24;
-    font-weight:600;
-}
-
-.history{
-    max-height:200px;
-    overflow:auto;
+.calc-step{
+    background:rgba(0,0,0,0.3);
+    padding:12px;
+    border-radius:8px;
+    margin:10px 0;
+    font-family:monospace;
     font-size:14px;
 }
 
-.small{
-    font-size:12px;
-    opacity:0.7;
+.calc-result{
+    font-size:28px;
+    font-weight:700;
+    color:#d4af37;
 }
+
+.status-box{
+    padding:20px;
+    border-radius:12px;
+    text-align:center;
+    margin:15px 0;
+}
+
+.status-beneficial{
+    background:linear-gradient(135deg,rgba(74,222,128,0.2),rgba(74,222,128,0.05));
+    border:2px solid #4ade80;
+}
+
+.status-equal{
+    background:linear-gradient(135deg,rgba(251,191,36,0.2),rgba(251,191,36,0.05));
+    border:2px solid #fbbf24;
+}
+
+.status-notbeneficial{
+    background:linear-gradient(135deg,rgba(248,113,113,0.2),rgba(248,113,113,0.05));
+    border:2px solid #f87171;
+}
+
+.status-icon{
+    font-size:48px;
+    margin-bottom:10px;
+}
+
+.status-text{
+    font-size:20px;
+    font-weight:700;
+}
+
+.beneficial{color:#4ade80;}
+.equal{color:#fbbf24;}
+.not-beneficial{color:#f87171;}
 
 .char-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+    grid-template-columns:repeat(auto-fill,minmax(100px,1fr));
     gap:10px;
     margin-top:15px;
 }
 
 .char-card{
     background:rgba(0,0,0,0.4);
-    padding:15px;
+    padding:12px 8px;
     border-radius:10px;
     text-align:center;
     border:2px solid transparent;
     transition:all 0.3s;
+    cursor:pointer;
+}
+
+.char-card:hover{
+    transform:translateY(-3px);
 }
 
 .char-card.best{
@@ -147,40 +256,121 @@ button:hover{
 }
 
 .char-letter{
-    font-size:24px;
+    font-size:22px;
     font-weight:700;
-    margin-bottom:5px;
 }
 
-.lang-toggle{
-    display:flex;
-    gap:10px;
-    margin-bottom:10px;
+.char-hindi{
+    font-size:16px;
+    color:#d4af37;
+    margin-top:2px;
 }
 
-.lang-btn{
-    flex:1;
-    padding:8px;
-    border-radius:8px;
-    border:1px solid rgba(255,215,0,0.3);
-    background:#111;
-    color:#fff;
-    cursor:pointer;
+.history{
+    max-height:200px;
+    overflow-y:auto;
     font-size:14px;
 }
 
-.lang-btn.active{
+.history-item{
+    padding:12px;
+    border-bottom:1px solid rgba(255,215,0,0.15);
+    transition:background 0.3s;
+}
+
+.history-item:hover{
+    background:rgba(255,215,0,0.05);
+}
+
+.tab-buttons{
+    display:flex;
+    gap:5px;
+    margin-bottom:15px;
+}
+
+.tab-btn{
+    flex:1;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid rgba(255,215,0,0.3);
+    background:transparent;
+    color:#fff;
+    cursor:pointer;
+    font-size:13px;
+    transition:all 0.3s;
+}
+
+.tab-btn.active{
     background:linear-gradient(90deg,#d4af37,#f9e076);
     color:#000;
     font-weight:600;
 }
 
-.group-info{
-    background:rgba(212,175,55,0.1);
-    padding:10px;
+.mapping-table{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(60px,1fr));
+    gap:8px;
+    margin-top:10px;
+}
+
+.mapping-item{
+    background:rgba(0,0,0,0.3);
+    padding:8px;
     border-radius:8px;
-    margin:10px 0;
+    text-align:center;
+    font-size:12px;
+}
+
+.mapping-eng{
+    font-weight:700;
+    color:#fff;
+}
+
+.mapping-hin{
+    color:#d4af37;
     font-size:14px;
+}
+
+.vs-box{
+    display:flex;
+    align-items:stretch;
+    gap:15px;
+    margin:20px 0;
+}
+
+.vs-card{
+    flex:1;
+    padding:15px;
+    background:rgba(0,0,0,0.3);
+    border-radius:12px;
+    text-align:center;
+}
+
+.vs-divider{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+    color:#d4af37;
+    font-weight:700;
+}
+
+.kakini-value{
+    font-size:40px;
+    font-weight:700;
+    color:#d4af37;
+    line-height:1;
+}
+
+.small{font-size:11px;opacity:0.6;}
+
+@keyframes fadeIn{
+    from{opacity:0;transform:translateY(15px);}
+    to{opacity:1;transform:translateY(0);}
+}
+
+.animate-in{
+    animation:fadeIn 0.4s ease-out;
 }
 </style>
 </head>
@@ -190,296 +380,491 @@ button:hover{
 <div class="container">
 
 <h1 class="gold">🔮 Kakini Vichar Pro</h1>
-<p style="text-align:center;opacity:0.8;font-size:14px;">Vastu Shastra Based Name Compatibility System</p>
+<p style="text-align:center;opacity:0.7;font-size:13px;margin-top:-10px;">
+    वास्तु शास्त्र आधारित नाम अनुकूलता प्रणाली<br>
+    Vastu Shastra Based Name Compatibility System
+</p>
 
+<!-- Name Input Section -->
 <div class="glass">
-<label><strong>Select Language / भाषा चुनें</strong></label>
-<div class="lang-toggle">
-    <button class="lang-btn active" onclick="setLanguage('en')">English (A-Z)</button>
-    <button class="lang-btn" onclick="setLanguage('hi')">हिंदी (अ-ज्ञ)</button>
-</div>
-</div>
-
-<div class="glass">
-<label id="labelYourName"><strong>Your Name First Letter (अपना नाम का पहला अक्षर)</strong></label>
-<input type="text" id="nameLetter" maxlength="1" placeholder="Enter Letter / अक्षर डालें" style="text-transform:uppercase;">
-<div class="group-info" id="yourGroupInfo"></div>
+    <label><strong>👤 Your Full Name / आपका पूरा नाम</strong></label>
+    <input type="text" id="yourName" placeholder="Type your name... (e.g., Rahul, राहुल)" oninput="processName('your')">
+    
+    <div id="yourNameConversion" style="display:none;"></div>
 </div>
 
+<!-- Check Name Section -->
 <div class="glass">
-<label id="labelCheckLetter"><strong>Check Specific Letter (किसी खास अक्षर को चेक करें)</strong></label>
-<input type="text" id="checkLetter" maxlength="1" placeholder="Enter Letter to Check / चेक करने के लिए अक्षर डालें" style="text-transform:uppercase;">
-<button onclick="checkSingle()">🔍 Check Compatibility / जांचें</button>
+    <label><strong>🔍 Check With / मिलान करें</strong></label>
+    <input type="text" id="checkName" placeholder="Name/Place/Business to check... (e.g., Mumbai, मुंबई)" oninput="processName('check')">
+    
+    <div id="checkNameConversion" style="display:none;"></div>
+    
+    <button onclick="calculateCompatibility()">
+        🔮 Calculate Compatibility / अनुकूलता जांचें
+    </button>
 </div>
 
+<!-- Quick Actions -->
 <div class="glass">
-<button onclick="findBestLetters()">✅ Most Beneficial Letters / सबसे लाभकारी अक्षर</button>
-<button onclick="findEqualLetters()">⚖️ Equal Match Letters / समान अक्षर</button>
-<button onclick="findWorstLetters()">⚠️ Least Beneficial Letters / कम लाभकारी अक्षर</button>
-<button onclick="showAllLetters()">📊 Show All Letters / सभी अक्षर देखें</button>
+    <label><strong>⚡ Quick Analysis / त्वरित विश्लेषण</strong></label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+        <button class="btn-secondary" onclick="findLetters('best')">✅ Best Letters</button>
+        <button class="btn-secondary" onclick="findLetters('worst')">❌ Avoid Letters</button>
+        <button class="btn-secondary" onclick="findLetters('equal')">⚖️ Neutral</button>
+        <button class="btn-secondary" onclick="findLetters('all')">📊 Show All</button>
+    </div>
 </div>
 
+<!-- Results Section -->
 <div class="glass">
-<h3 class="gold">📈 Results / परिणाम</h3>
-<div id="results"></div>
+    <h3 class="gold" style="margin-top:0;">📊 Results / परिणाम</h3>
+    <div id="results">
+        <p style="text-align:center;opacity:0.5;">Enter names above to see results<br>परिणाम देखने के लिए ऊपर नाम डालें</p>
+    </div>
 </div>
 
+<!-- History Section -->
 <div class="glass">
-<h3 class="gold">📜 History / इतिहास</h3>
-<div id="history" class="history"></div>
-<button onclick="clearHistory()">Clear History / साफ़ करें</button>
+    <h3 class="gold" style="margin-top:0;">📜 History / इतिहास</h3>
+    <div id="history" class="history"></div>
+    <button class="btn-secondary" onclick="clearHistory()" style="margin-top:10px;">🗑️ Clear History</button>
 </div>
 
+<!-- Letter Mapping Reference -->
 <div class="glass">
-<h3 class="gold">ℹ️ Group Information / समूह जानकारी</h3>
-<div style="font-size:13px;line-height:1.8;">
-    <div><strong>Group 1:</strong> A, E, I, O, U / अ, आ, इ, ई, उ, ऊ, ए, ऐ, ओ, औ</div>
-    <div><strong>Group 2:</strong> K, G, Q / क, ख, ग, घ</div>
-    <div><strong>Group 3:</strong> C, J, Z / च, छ, ज, झ</div>
-    <div><strong>Group 4:</strong> T, D / ट, ठ, ड, ढ</div>
-    <div><strong>Group 5:</strong> N / ण, त, थ, द, ध, न</div>
-    <div><strong>Group 6:</strong> P, B, M / प, फ, ब, भ, म</div>
-    <div><strong>Group 7:</strong> Y, R, L, V, W / य, र, ल, व</div>
-    <div><strong>Group 8:</strong> S, H, X, F / श, ष, स, ह, क्ष, त्र, ज्ञ</div>
+    <h3 class="gold" style="margin-top:0;">📖 English → Hindi Mapping</h3>
+    
+    <div class="tab-buttons">
+        <button class="tab-btn active" onclick="showGroup('all',this)">All</button>
+        <button class="tab-btn" onclick="showGroup(1,this)">G1</button>
+        <button class="tab-btn" onclick="showGroup(2,this)">G2</button>
+        <button class="tab-btn" onclick="showGroup(3,this)">G3</button>
+        <button class="tab-btn" onclick="showGroup(4,this)">G4</button>
+        <button class="tab-btn" onclick="showGroup(5,this)">G5</button>
+        <button class="tab-btn" onclick="showGroup(6,this)">G6</button>
+        <button class="tab-btn" onclick="showGroup(7,this)">G7</button>
+        <button class="tab-btn" onclick="showGroup(8,this)">G8</button>
+    </div>
+    
+    <div id="mappingDisplay"></div>
 </div>
+
+<!-- Formula Reference -->
+<div class="glass">
+    <h3 class="gold" style="margin-top:0;">📐 Kakini Formula / काकिनी सूत्र</h3>
+    <div class="calc-step">
+        <strong>Formula:</strong> Kakini = (Group₁ × 2 + Group₂) mod 8<br>
+        <strong>सूत्र:</strong> काकिनी = (समूह₁ × 2 + समूह₂) mod 8<br><br>
+        <strong>Rule / नियम:</strong><br>
+        • If Other's Kakini > Your Kakini → ✅ Beneficial / लाभकारी<br>
+        • If Other's Kakini = Your Kakini → ⚖️ Neutral / तटस्थ<br>
+        • If Other's Kakini < Your Kakini → ❌ Not Beneficial / हानिकारक
+    </div>
 </div>
 
 </div>
 
 <script>
 
-let currentLang = 'en';
+// ═══════════════════════════════════════════════════════════
+// COMPLETE ENGLISH TO HINDI MAPPING
+// ═══════════════════════════════════════════════════════════
 
-// English Mapping
-const groupMapEN = {
-  1:['A','E','I','O','U'],
-  2:['K','G','Q'],
-  3:['C','J','Z'],
-  4:['T','D'],
-  5:['N'],
-  6:['P','B','M'],
-  7:['Y','R','L','V','W'],
-  8:['S','H','X','F']
+const englishToHindi = {
+    'A': 'अ', 'B': 'ब', 'C': 'च', 'D': 'द', 'E': 'ए',
+    'F': 'फ', 'G': 'ग', 'H': 'ह', 'I': 'इ', 'J': 'ज',
+    'K': 'क', 'L': 'ल', 'M': 'म', 'N': 'न', 'O': 'ओ',
+    'P': 'प', 'Q': 'क', 'R': 'र', 'S': 'स', 'T': 'त',
+    'U': 'उ', 'V': 'व', 'W': 'व', 'X': 'क्ष', 'Y': 'य',
+    'Z': 'ज़'
 };
 
-// Hindi Mapping (using English equivalents for input)
-const groupMapHI = {
-  1:['अ','आ','इ','ई','उ','ऊ','ए','ऐ','ओ','औ','A','E','I','O','U'],
-  2:['क','ख','ग','घ','K','G','Q'],
-  3:['च','छ','ज','झ','C','J','Z'],
-  4:['ट','ठ','ड','ढ','T','D'],
-  5:['ण','त','थ','द','ध','न','N'],
-  6:['प','फ','ब','भ','म','P','B','M'],
-  7:['य','र','ल','व','Y','R','L','V','W'],
-  8:['श','ष','स','ह','क्ष','त्र','ज्ञ','S','H','X','F']
-};
+// ═══════════════════════════════════════════════════════════
+// GROUP MAPPING - VASTU KAKINI SYSTEM
+// ═══════════════════════════════════════════════════════════
 
-// All letters for display
-const allLettersEN = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
-const allLettersHI = ['अ','आ','इ','ई','उ','ऊ','ए','ऐ','ओ','औ','क','ख','ग','घ','च','छ','ज','झ','ट','ठ','ड','ढ','ण','त','थ','द','ध','न','प','फ','ब','भ','म','य','र','ल','व','श','ष','स','ह','क्ष','त्र','ज्ञ'];
-
-function setLanguage(lang){
-    currentLang = lang;
-    document.querySelectorAll('.lang-btn').forEach(btn=>btn.classList.remove('active'));
-    event.target.classList.add('active');
-    
-    // Update input method hint
-    if(lang === 'hi'){
-        document.getElementById('nameLetter').placeholder = 'हिंदी अक्षर डालें';
-        document.getElementById('checkLetter').placeholder = 'चेक करने के लिए अक्षर डालें';
-    }else{
-        document.getElementById('nameLetter').placeholder = 'Enter Letter (A-Z)';
-        document.getElementById('checkLetter').placeholder = 'Enter Letter to Check';
+const groupData = {
+    1: {
+        name: "स्वर (Vowels)",
+        english: ['A', 'E', 'I', 'O', 'U'],
+        hindi: ['अ', 'आ', 'इ', 'ई', 'उ', 'ऊ', 'ए', 'ऐ', 'ओ', 'औ', 'अं', 'अः']
+    },
+    2: {
+        name: "कवर्ग (Ka Varga)",
+        english: ['K', 'G', 'Q'],
+        hindi: ['क', 'ख', 'ग', 'घ', 'ङ']
+    },
+    3: {
+        name: "चवर्ग (Cha Varga)",
+        english: ['C', 'J', 'Z'],
+        hindi: ['च', 'छ', 'ज', 'झ', 'ञ']
+    },
+    4: {
+        name: "टवर्ग (Ta Varga)",
+        english: ['T', 'D'],
+        hindi: ['ट', 'ठ', 'ड', 'ढ', 'ण']
+    },
+    5: {
+        name: "तवर्ग (Tha Varga)",
+        english: ['N'],
+        hindi: ['त', 'थ', 'द', 'ध', 'न']
+    },
+    6: {
+        name: "पवर्ग (Pa Varga)",
+        english: ['P', 'B', 'M'],
+        hindi: ['प', 'फ', 'ब', 'भ', 'म']
+    },
+    7: {
+        name: "अंतस्थ (Antastha)",
+        english: ['Y', 'R', 'L', 'V', 'W'],
+        hindi: ['य', 'र', 'ल', 'व']
+    },
+    8: {
+        name: "ऊष्म (Ushma)",
+        english: ['S', 'H', 'X', 'F'],
+        hindi: ['श', 'ष', 'स', 'ह', 'क्ष', 'त्र', 'ज्ञ']
     }
+};
+
+// ═══════════════════════════════════════════════════════════
+// CORE FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+
+function getFirstLetter(text) {
+    text = text.trim();
+    if (!text) return null;
+    return text.charAt(0).toUpperCase();
 }
 
-function getGroup(letter){
+function convertToHindi(letter) {
     letter = letter.toUpperCase();
-    const groupMap = currentLang === 'hi' ? groupMapHI : groupMapEN;
+    return englishToHindi[letter] || letter;
+}
+
+function isHindiLetter(char) {
+    const code = char.charCodeAt(0);
+    return code >= 0x0900 && code <= 0x097F;
+}
+
+function getGroup(letter) {
+    letter = letter.toUpperCase();
     
-    for(let g in groupMap){
-        if(groupMap[g].includes(letter)){
+    for (let g in groupData) {
+        // Check English letters
+        if (groupData[g].english.includes(letter)) {
+            return parseInt(g);
+        }
+        // Check Hindi letters
+        if (groupData[g].hindi.includes(letter)) {
             return parseInt(g);
         }
     }
     return null;
 }
 
-function getKakini(g1,g2){
-    let val = (g1*2 + g2) % 8;
+function getKakini(g1, g2) {
+    let val = (g1 * 2 + g2) % 8;
     return val === 0 ? 8 : val;
 }
 
-function updateYourGroupInfo(){
-    let name = document.getElementById("nameLetter").value.toUpperCase();
-    let g1 = getGroup(name);
-    if(g1){
-        document.getElementById("yourGroupInfo").innerHTML = 
-        `✨ Your letter "<strong>${name}</strong>" belongs to <strong class="gold">Group ${g1}</strong>`;
-    }else{
-        document.getElementById("yourGroupInfo").innerHTML = "";
-    }
-}
+// ═══════════════════════════════════════════════════════════
+// PROCESS NAME INPUT
+// ═══════════════════════════════════════════════════════════
 
-document.getElementById("nameLetter").addEventListener('input', updateYourGroupInfo);
-
-function checkSingle(){
-    let name = document.getElementById("nameLetter").value.toUpperCase();
-    let check = document.getElementById("checkLetter").value.toUpperCase();
+function processName(type) {
+    const inputId = type === 'your' ? 'yourName' : 'checkName';
+    const displayId = type === 'your' ? 'yourNameConversion' : 'checkNameConversion';
     
-    let g1 = getGroup(name);
-    let g2 = getGroup(check);
+    const name = document.getElementById(inputId).value.trim();
+    const displayBox = document.getElementById(displayId);
     
-    if(!g1){ alert("कृपया अपना नाम का पहला अक्षर डालें / Please enter your name first letter"); return; }
-    if(!g2){ alert("कृपया चेक करने के लिए अक्षर डालें / Please enter letter to check"); return; }
-    
-    let yourKakini = getKakini(g1,g2);
-    let otherKakini = getKakini(g2,g1);
-    
-    let status = "";
-    let statusClass = "";
-    if(otherKakini > yourKakini){
-        status = "✅ Beneficial / लाभकारी";
-        statusClass = "beneficial";
-    }else if(otherKakini === yourKakini){
-        status = "⚖️ Equal / समान";
-        statusClass = "equal";
-    }else{
-        status = "❌ Not Beneficial / लाभकारी नहीं";
-        statusClass = "not-beneficial";
+    if (!name) {
+        displayBox.style.display = 'none';
+        return;
     }
     
-    let html = `
-    <div class="calculation-box">
-        <h4 style="margin-top:0;">🔢 Full Calculation / पूरी गणना:</h4>
-        
-        <div style="margin:10px 0;">
-        <strong>Your Letter / आपका अक्षर:</strong> ${name} → Group ${g1}
+    const firstLetter = getFirstLetter(name);
+    const isHindi = isHindiLetter(firstLetter);
+    const hindiLetter = isHindi ? firstLetter : convertToHindi(firstLetter);
+    const group = getGroup(firstLetter);
+    
+    if (!group) {
+        displayBox.innerHTML = `<div style="color:#f87171;margin-top:10px;">⚠️ Cannot identify letter "${firstLetter}"</div>`;
+        displayBox.style.display = 'block';
+        return;
+    }
+    
+    displayBox.innerHTML = `
+        <div class="conversion-box animate-in">
+            <div style="font-size:14px;opacity:0.7;margin-bottom:10px;">
+                "${name}" का पहला अक्षर / First letter of "${name}"
+            </div>
+            
+            <div class="letter-display">
+                <div class="letter-box">
+                    <div class="letter-big">${isHindi ? hindiLetter : firstLetter}</div>
+                    <div class="letter-label">${isHindi ? 'Hindi' : 'English'}</div>
+                </div>
+                
+                ${!isHindi ? `
+                <div class="arrow-convert">→</div>
+                
+                <div class="letter-box">
+                    <div class="letter-big">${hindiLetter}</div>
+                    <div class="letter-label">Hindi</div>
+                </div>
+                ` : ''}
+            </div>
+            
+            <div class="group-badge">
+                Group ${group} - ${groupData[group].name}
+            </div>
         </div>
-        
-        <div style="margin:10px 0;">
-        <strong>Checking Letter / जांच अक्षर:</strong> ${check} → Group ${g2}
-        </div>
-        
-        <div style="margin:15px 0;padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;">
-        <div><strong>Step 1:</strong> Your Kakini = (Group ${g1} × 2 + Group ${g2}) % 8</div>
-        <div style="margin-left:20px;">= (${g1} × 2 + ${g2}) % 8</div>
-        <div style="margin-left:20px;">= (${g1*2} + ${g2}) % 8</div>
-        <div style="margin-left:20px;">= ${(g1*2 + g2)} % 8</div>
-        <div style="margin-left:20px;">= <strong class="gold">${yourKakini}</strong></div>
-        </div>
-        
-        <div style="margin:15px 0;padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;">
-        <div><strong>Step 2:</strong> Other's Kakini = (Group ${g2} × 2 + Group ${g1}) % 8</div>
-        <div style="margin-left:20px;">= (${g2} × 2 + ${g1}) % 8</div>
-        <div style="margin-left:20px;">= (${g2*2} + ${g1}) % 8</div>
-        <div style="margin-left:20px;">= ${(g2*2 + g1)} % 8</div>
-        <div style="margin-left:20px;">= <strong class="gold">${otherKakini}</strong></div>
-        </div>
-        
-        <div style="margin:15px 0;padding:15px;background:rgba(212,175,55,0.2);border-radius:8px;">
-        <div><strong>Result / परिणाम:</strong></div>
-        <div style="margin:5px 0;">Your Kakini: <strong>${yourKakini}</strong></div>
-        <div style="margin:5px 0;">Other's Kakini: <strong>${otherKakini}</strong></div>
-        <div style="margin:10px 0;font-size:18px;" class="${statusClass}">${status}</div>
-        <div style="font-size:13px;opacity:0.8;margin-top:10px;">
-        ${otherKakini > yourKakini ? "✅ Other's Kakini is higher - This is beneficial for you!" : 
-          otherKakini === yourKakini ? "⚖️ Both Kakini are equal - Neutral match" : 
-          "❌ Your Kakini is higher - Not beneficial"}
-        </div>
-        </div>
-    </div>
     `;
     
-    document.getElementById("results").innerHTML = html;
-    saveHistory(`${name} → ${check}: ${status}`);
+    displayBox.style.display = 'block';
 }
 
-function findBestLetters(){
-    calculateByType("best");
-}
+// ═══════════════════════════════════════════════════════════
+// MAIN CALCULATION
+// ═══════════════════════════════════════════════════════════
 
-function findEqualLetters(){
-    calculateByType("equal");
-}
-
-function findWorstLetters(){
-    calculateByType("worst");
-}
-
-function showAllLetters(){
-    calculateByType("all");
-}
-
-function calculateByType(type){
-    let name = document.getElementById("nameLetter").value.toUpperCase();
-    let g1 = getGroup(name);
+function calculateCompatibility() {
+    const yourName = document.getElementById('yourName').value.trim();
+    const checkName = document.getElementById('checkName').value.trim();
     
-    if(!g1){ alert("कृपया अपना नाम का पहला अक्षर डालें / Please enter your name first letter"); return; }
+    if (!yourName) {
+        alert('कृपया अपना नाम डालें / Please enter your name');
+        return;
+    }
+    if (!checkName) {
+        alert('कृपया जांच के लिए नाम डालें / Please enter name to check');
+        return;
+    }
     
-    const letters = currentLang === 'hi' ? allLettersHI : allLettersEN;
+    const yourFirst = getFirstLetter(yourName);
+    const checkFirst = getFirstLetter(checkName);
+    
+    const yourHindi = isHindiLetter(yourFirst) ? yourFirst : convertToHindi(yourFirst);
+    const checkHindi = isHindiLetter(checkFirst) ? checkFirst : convertToHindi(checkFirst);
+    
+    const g1 = getGroup(yourFirst);
+    const g2 = getGroup(checkFirst);
+    
+    if (!g1) {
+        alert(`"${yourFirst}" के लिए group नहीं मिला`);
+        return;
+    }
+    if (!g2) {
+        alert(`"${checkFirst}" के लिए group नहीं मिला`);
+        return;
+    }
+    
+    const yourKakini = getKakini(g1, g2);
+    const otherKakini = getKakini(g2, g1);
+    
+    let status, statusClass, statusIcon, advice;
+    
+    if (otherKakini > yourKakini) {
+        status = "Highly Beneficial / अत्यंत लाभकारी";
+        statusClass = "status-beneficial";
+        statusIcon = "✅";
+        advice = "यह संयोजन आपके लिए उत्तम है! This combination is excellent for you!";
+    } else if (otherKakini === yourKakini) {
+        status = "Neutral Match / तटस्थ";
+        statusClass = "status-equal";
+        statusIcon = "⚖️";
+        advice = "संतुलित ऊर्जा - न लाभ न हानि। Balanced energy - neutral effect.";
+    } else {
+        status = "Not Beneficial / लाभकारी नहीं";
+        statusClass = "status-notbeneficial";
+        statusIcon = "❌";
+        advice = "इससे बचना बेहतर है। Consider avoiding this combination.";
+    }
+    
+    const html = `
+        <div class="animate-in">
+            <!-- Names Comparison -->
+            <div class="vs-box">
+                <div class="vs-card">
+                    <div style="font-size:12px;opacity:0.7;">Your Name / आपका नाम</div>
+                    <div style="font-size:18px;font-weight:600;margin:8px 0;">${yourName}</div>
+                    <div style="font-size:36px;color:#d4af37;font-weight:700;">${yourFirst}</div>
+                    <div style="font-size:24px;color:#f9e076;">↓</div>
+                    <div style="font-size:28px;color:#d4af37;">${yourHindi}</div>
+                    <div class="group-badge" style="margin-top:10px;">Group ${g1}</div>
+                </div>
+                
+                <div class="vs-divider">VS</div>
+                
+                <div class="vs-card">
+                    <div style="font-size:12px;opacity:0.7;">Checking / जांच</div>
+                    <div style="font-size:18px;font-weight:600;margin:8px 0;">${checkName}</div>
+                    <div style="font-size:36px;color:#d4af37;font-weight:700;">${checkFirst}</div>
+                    <div style="font-size:24px;color:#f9e076;">↓</div>
+                    <div style="font-size:28px;color:#d4af37;">${checkHindi}</div>
+                    <div class="group-badge" style="margin-top:10px;">Group ${g2}</div>
+                </div>
+            </div>
+            
+            <!-- Calculation Steps -->
+            <div class="calculation-box">
+                <h4 style="margin-top:0;" class="gold">📐 Step-by-Step Calculation / चरणबद्ध गणना</h4>
+                
+                <div class="calc-step">
+                    <strong>Step 1: Your Kakini / आपका काकिनी</strong><br>
+                    Formula: (Group₁ × 2 + Group₂) mod 8<br>
+                    = (${g1} × 2 + ${g2}) mod 8<br>
+                    = (${g1 * 2} + ${g2}) mod 8<br>
+                    = ${g1 * 2 + g2} mod 8<br>
+                    = <span class="calc-result">${yourKakini}</span>
+                </div>
+                
+                <div class="calc-step">
+                    <strong>Step 2: Their Kakini / उनका काकिनी</strong><br>
+                    Formula: (Group₂ × 2 + Group₁) mod 8<br>
+                    = (${g2} × 2 + ${g1}) mod 8<br>
+                    = (${g2 * 2} + ${g1}) mod 8<br>
+                    = ${g2 * 2 + g1} mod 8<br>
+                    = <span class="calc-result">${otherKakini}</span>
+                </div>
+                
+                <div class="calc-step">
+                    <strong>Step 3: Comparison / तुलना</strong><br>
+                    Your Kakini: <strong>${yourKakini}</strong><br>
+                    Their Kakini: <strong>${otherKakini}</strong><br>
+                    Difference: <strong>${otherKakini - yourKakini}</strong><br><br>
+                    ${otherKakini} ${otherKakini > yourKakini ? '>' : otherKakini === yourKakini ? '=' : '<'} ${yourKakini}
+                    → <strong>${otherKakini > yourKakini ? 'BENEFICIAL ✅' : otherKakini === yourKakini ? 'NEUTRAL ⚖️' : 'NOT BENEFICIAL ❌'}</strong>
+                </div>
+            </div>
+            
+            <!-- Kakini Values Display -->
+            <div class="vs-box">
+                <div class="vs-card">
+                    <div style="font-size:12px;opacity:0.7;">Your Kakini / आपका काकिनी</div>
+                    <div class="kakini-value">${yourKakini}</div>
+                </div>
+                <div class="vs-divider">⚔️</div>
+                <div class="vs-card">
+                    <div style="font-size:12px;opacity:0.7;">Their Kakini / उनका काकिनी</div>
+                    <div class="kakini-value">${otherKakini}</div>
+                </div>
+            </div>
+            
+            <!-- Final Result -->
+            <div class="status-box ${statusClass}">
+                <div class="status-icon">${statusIcon}</div>
+                <div class="status-text">${status}</div>
+                <div style="margin-top:15px;font-size:14px;opacity:0.9;">${advice}</div>
+                <div style="margin-top:15px;">
+                    <strong>Score:</strong> 
+                    ${otherKakini > yourKakini ? '⭐⭐⭐⭐⭐' : otherKakini === yourKakini ? '⭐⭐⭐' : '⭐'}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('results').innerHTML = html;
+    saveHistory(`${yourName} (${yourHindi}) ↔️ ${checkName} (${checkHindi}): ${statusIcon} ${status.split('/')[0].trim()}`);
+}
+
+// ═══════════════════════════════════════════════════════════
+// FIND LETTERS
+// ═══════════════════════════════════════════════════════════
+
+function findLetters(type) {
+    const yourName = document.getElementById('yourName').value.trim();
+    
+    if (!yourName) {
+        alert('कृपया पहले अपना नाम डालें / Please enter your name first');
+        return;
+    }
+    
+    const yourFirst = getFirstLetter(yourName);
+    const g1 = getGroup(yourFirst);
+    
+    if (!g1) {
+        alert(`"${yourFirst}" के लिए group नहीं मिला`);
+        return;
+    }
+    
+    const allLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     
     let bestLetters = [];
     let equalLetters = [];
     let worstLetters = [];
     
-    letters.forEach(letter=>{
-        let g2 = getGroup(letter);
-        if(!g2) return;
+    allLetters.forEach(letter => {
+        const g2 = getGroup(letter);
+        if (!g2) return;
         
-        let yourKakini = getKakini(g1,g2);
-        let otherKakini = getKakini(g2,g1);
+        const yourKakini = getKakini(g1, g2);
+        const otherKakini = getKakini(g2, g1);
+        const hindiLetter = convertToHindi(letter);
         
-        let data = {
-            letter: letter,
+        const data = {
+            english: letter,
+            hindi: hindiLetter,
             group: g2,
-            yourKakini: yourKakini,
-            otherKakini: otherKakini
+            yourKakini,
+            otherKakini,
+            diff: otherKakini - yourKakini
         };
         
-        if(otherKakini > yourKakini){
+        if (otherKakini > yourKakini) {
             bestLetters.push(data);
-        }else if(otherKakini === yourKakini){
+        } else if (otherKakini === yourKakini) {
             equalLetters.push(data);
-        }else{
+        } else {
             worstLetters.push(data);
         }
     });
     
-    let html = "";
+    bestLetters.sort((a, b) => b.diff - a.diff);
+    worstLetters.sort((a, b) => a.diff - b.diff);
     
-    if(type === "best"){
-        html = generateLetterCards(bestLetters, "best", "✅ Most Beneficial Letters / सबसे लाभकारी अक्षर");
-    }else if(type === "equal"){
-        html = generateLetterCards(equalLetters, "equal", "⚖️ Equal Match Letters / समान अक्षर");
-    }else if(type === "worst"){
-        html = generateLetterCards(worstLetters, "worst", "⚠️ Least Beneficial Letters / कम लाभकारी अक्षर");
-    }else if(type === "all"){
-        html = `
-        ${generateLetterCards(bestLetters, "best", "✅ Most Beneficial / सबसे लाभकारी")}
-        ${generateLetterCards(equalLetters, "equal", "⚖️ Equal Match / समान")}
-        ${generateLetterCards(worstLetters, "worst", "⚠️ Least Beneficial / कम लाभकारी")}
-        `;
+    let html = `<div class="animate-in">`;
+    html += `<h4 class="gold">Analysis for "${yourName}" (${convertToHindi(yourFirst)}) - Group ${g1}</h4>`;
+    
+    if (type === 'best' || type === 'all') {
+        html += `<h5 style="color:#4ade80;margin-top:20px;">✅ Best Letters / श्रेष्ठ अक्षर (${bestLetters.length})</h5>`;
+        html += generateLetterGrid(bestLetters, 'best');
     }
     
-    document.getElementById("results").innerHTML = html || "No letters found / कोई अक्षर नहीं मिला";
-    saveHistory(`${type.toUpperCase()} letters for ${name}`);
+    if (type === 'equal' || type === 'all') {
+        html += `<h5 style="color:#fbbf24;margin-top:20px;">⚖️ Neutral Letters / तटस्थ अक्षर (${equalLetters.length})</h5>`;
+        html += generateLetterGrid(equalLetters, 'equal');
+    }
+    
+    if (type === 'worst' || type === 'all') {
+        html += `<h5 style="color:#f87171;margin-top:20px;">❌ Avoid Letters / बचने योग्य अक्षर (${worstLetters.length})</h5>`;
+        html += generateLetterGrid(worstLetters, 'worst');
+    }
+    
+    html += `</div>`;
+    
+    document.getElementById('results').innerHTML = html;
+    saveHistory(`${type.toUpperCase()} letters for ${yourName}`);
 }
 
-function generateLetterCards(letters, cardClass, title){
-    if(letters.length === 0) return "";
+function generateLetterGrid(letters, cardClass) {
+    if (letters.length === 0) {
+        return `<p style="opacity:0.5;text-align:center;">No letters in this category</p>`;
+    }
     
-    let html = `<h4 style="margin-top:20px;">${title}</h4><div class="char-grid">`;
+    let html = `<div class="char-grid">`;
     
-    letters.forEach(data=>{
+    letters.forEach(data => {
         html += `
-        <div class="char-card ${cardClass}">
-            <div class="char-letter">${data.letter}</div>
-            <div style="font-size:12px;opacity:0.8;">Group ${data.group}</div>
-            <div style="font-size:11px;margin-top:5px;">
-                You: ${data.yourKakini} | Other: ${data.otherKakini}
+            <div class="char-card ${cardClass}">
+                <div class="char-letter">${data.english}</div>
+                <div class="char-hindi">${data.hindi}</div>
+                <div style="font-size:11px;opacity:0.7;margin-top:5px;">
+                    G${data.group} | ${data.diff > 0 ? '+' : ''}${data.diff}
+                </div>
             </div>
-        </div>
         `;
     });
     
@@ -487,30 +872,112 @@ function generateLetterCards(letters, cardClass, title){
     return html;
 }
 
-function saveHistory(text){
-    let data = JSON.parse(localStorage.getItem("kakiniHistory")) || [];
-    const timestamp = new Date().toLocaleString();
-    data.unshift(`${text} <span class="small">(${timestamp})</span>`);
-    if(data.length > 20) data = data.slice(0,20);
-    localStorage.setItem("kakiniHistory",JSON.stringify(data));
-    loadHistory();
+// ═══════════════════════════════════════════════════════════
+// MAPPING DISPLAY
+// ═══════════════════════════════════════════════════════════
+
+function showGroup(group, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    let html = '';
+    
+    if (group === 'all') {
+        for (let g = 1; g <= 8; g++) {
+            html += `<div style="margin-bottom:15px;">
+                <strong style="color:#d4af37;">Group ${g}: ${groupData[g].name}</strong>
+                <div class="mapping-table">`;
+            
+            groupData[g].english.forEach(eng => {
+                html += `
+                    <div class="mapping-item">
+                        <div class="mapping-eng">${eng}</div>
+                        <div class="mapping-hin">${convertToHindi(eng)}</div>
+                    </div>
+                `;
+            });
+            
+            html += `</div></div>`;
+        }
+    } else {
+        html = `<div style="margin-bottom:15px;">
+            <strong style="color:#d4af37;">Group ${group}: ${groupData[group].name}</strong>
+            <div style="margin-top:10px;">
+                <strong>English:</strong> ${groupData[group].english.join(', ')}<br>
+                <strong>Hindi:</strong> ${groupData[group].hindi.join(', ')}
+            </div>
+            <div class="mapping-table" style="margin-top:15px;">`;
+        
+        groupData[group].english.forEach(eng => {
+            html += `
+                <div class="mapping-item">
+                    <div class="mapping-eng">${eng}</div>
+                    <div class="mapping-hin">${convertToHindi(eng)}</div>
+                </div>
+            `;
+        });
+        
+        html += `</div></div>`;
+    }
+    
+    document.getElementById('mappingDisplay').innerHTML = html;
 }
 
-function loadHistory(){
-    let data = JSON.parse(localStorage.getItem("kakiniHistory")) || [];
-    let html="";
-    data.forEach(item=>{
-        html+=`<div class="result-item">${item}</div>`;
+// ═══════════════════════════════════════════════════════════
+// HISTORY FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+
+function saveHistory(text) {
+    let data = JSON.parse(localStorage.getItem('kakiniHistory')) || [];
+    const time = new Date().toLocaleString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit'
     });
-    document.getElementById("history").innerHTML = html || "<div style='text-align:center;opacity:0.5;'>No history yet</div>";
-}
-
-function clearHistory(){
-    localStorage.removeItem("kakiniHistory");
+    
+    data.unshift({ text, time });
+    if (data.length > 25) data = data.slice(0, 25);
+    
+    localStorage.setItem('kakiniHistory', JSON.stringify(data));
     loadHistory();
 }
 
-loadHistory();
+function loadHistory() {
+    const data = JSON.parse(localStorage.getItem('kakiniHistory')) || [];
+    
+    if (data.length === 0) {
+        document.getElementById('history').innerHTML = 
+            `<p style="text-align:center;opacity:0.5;">No history yet / अभी कोई इतिहास नहीं</p>`;
+        return;
+    }
+    
+    let html = '';
+    data.forEach(item => {
+        html += `<div class="history-item">
+            ${item.text}
+            <div class="small">${item.time}</div>
+        </div>`;
+    });
+    
+    document.getElementById('history').innerHTML = html;
+}
+
+function clearHistory() {
+    if (confirm('Clear all history? / सारा इतिहास साफ़ करें?')) {
+        localStorage.removeItem('kakiniHistory');
+        loadHistory();
+    }
+}
+
+// ═══════════════════════════════════════════════════════════
+// INITIALIZE
+// ═══════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadHistory();
+    showGroup('all', document.querySelector('.tab-btn'));
+});
 
 </script>
 
